@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFile
 import org.jetbrains.kotlin.analysis.api.*
 import org.jetbrains.kotlin.analysis.api.compile.KaCodeFragmentCapturedValue
 import org.jetbrains.kotlin.analysis.api.diagnostics.KaDiagnostic
+import org.jetbrains.kotlin.analysis.api.projectStructure.KaModule
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
@@ -56,6 +57,17 @@ public val CODE_FRAGMENT_CLASS_NAME: CompilerConfigurationKey<String> = Compiler
 /** Entry point method name for the code fragment. */
 @KaExperimentalApi
 public val CODE_FRAGMENT_METHOD_NAME: CompilerConfigurationKey<String> = CompilerConfigurationKey("code fragment method name")
+
+/**
+ * A custom actualizer for the source module.
+ * Use if the compiled file is in the common module.
+ *
+ * @see KaCompilerFacilityModuleActualizer
+ */
+@KaK1Unsupported
+@KaExperimentalApi
+public val MODULE_ACTUALIZER: CompilerConfigurationKey<KaCompilerFacilityModuleActualizer> =
+    CompilerConfigurationKey("custom module actualizer")
 
 /**
  * An in-memory compilation result returned from [KaCompilerFacility].
@@ -191,6 +203,29 @@ public class KaCodeCompilationException(cause: Throwable) : RuntimeException(cau
  */
 @KaExperimentalApi
 public class KaDebuggerExtension(public val stack: Sequence<PsiElement?>)
+
+/**
+ * Actualizer for common source modules.
+ *
+ * The Kotlin compiler cannot directly compile classes from common modules, as it needs dependencies and language settings from the target
+ * platform. Such as, even if the compiled class only uses 'kotlin-stdlib', the JVM compiler still needs the library bytecode to understand
+ * JVM facade names and to be able to inline functions (the JVM inliner uses Java bytecode instead of the serialized IR).
+ *
+ * [KaCompilerFacility] attempts to find the platform module with an appropriate target by itself and substitutes it instead of the original
+ * common module – that way, it can pass all the required information to the compiler. However, there might be multiple platform modules
+ * (e.g., Android and JVM); in that case, the facility chooses the first matching one. [KaCompilerFacilityModuleActualizer] is a way to
+ * override the default behavior by offering a closer match – e.g., a module with an Android target.
+ */
+@KaK1Unsupported
+@KaExperimentalApi
+@KaSpi
+public fun interface KaCompilerFacilityModuleActualizer {
+    /**
+     * Actualizes the common [module].
+     * Returns an actual module, target of which matches the [KaCompilerTarget], or `null` if such a module does not exist.
+     */
+    public fun actualize(module: KaModule): KaModule?
+}
 
 /**
  * Compiles the given [file] in-memory (without dumping the compiled binaries to the disk).

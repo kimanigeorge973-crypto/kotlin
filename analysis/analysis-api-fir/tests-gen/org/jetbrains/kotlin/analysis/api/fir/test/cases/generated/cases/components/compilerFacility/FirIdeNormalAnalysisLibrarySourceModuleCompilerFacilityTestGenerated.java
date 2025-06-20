@@ -328,6 +328,18 @@ public class FirIdeNormalAnalysisLibrarySourceModuleCompilerFacilityTestGenerate
     }
 
     @Test
+    @TestMetadata("customActualization.kt")
+    public void testCustomActualization() {
+      run("customActualization.kt");
+    }
+
+    @Test
+    @TestMetadata("customActualization2.kt")
+    public void testCustomActualization2() {
+      run("customActualization2.kt");
+    }
+
+    @Test
     @TestMetadata("customName.kt")
     public void testCustomName() {
       run("customName.kt");

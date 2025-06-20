@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.analysis.api.components.*
 import org.jetbrains.kotlin.analysis.api.diagnostics.KaDiagnostic
 import org.jetbrains.kotlin.analysis.api.diagnostics.KaDiagnosticWithPsi
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaLibraryModule
+import org.jetbrains.kotlin.analysis.api.projectStructure.KaModule
 import org.jetbrains.kotlin.analysis.test.framework.base.AbstractAnalysisApiBasedTest
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtTestModule
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.ktTestModuleStructure
@@ -110,6 +111,10 @@ abstract class AbstractCompilerFacilityTest : AbstractAnalysisApiBasedTest() {
 
             testFile.directives[Directives.CODE_FRAGMENT_METHOD_NAME].singleOrNull()
                 ?.let { put(CODE_FRAGMENT_METHOD_NAME, it) }
+
+            mainModule.testModule.directives[Directives.ACTUALIZATION]
+                .takeIf { it.isNotEmpty() }
+                ?.let { put(MODULE_ACTUALIZER, createModuleActualizer(it, testServices)) }
         }
 
         val callStack = mutableListOf<PsiElement>()
@@ -163,6 +168,34 @@ abstract class AbstractCompilerFacilityTest : AbstractAnalysisApiBasedTest() {
                 testServices.assertions.assertEqualsToTestOutputFile(
                     irCollector.functionsWithAnnotationToCheckCalls.joinToString("\n"), extension = ".check_calls.txt"
                 )
+            }
+        }
+    }
+
+    private fun createModuleActualizer(
+        rawMapping: List<String>,
+        testServices: TestServices
+    ): KaCompilerFacilityModuleActualizer {
+        val mapping = rawMapping
+            .map { it.split("->", limit = 2) }
+            .associate { it[0].trim() to it[1].trim() }
+
+        val namesByModule = testServices.ktTestModuleStructure.mainModules.associate { it.ktModule to it.name }
+
+        for ((commonModule, implementationModule) in mapping) {
+            fun checkModuleExistence(moduleName: String) {
+                if (moduleName !in namesByModule.values) error("Unknown module $moduleName")
+            }
+
+            checkModuleExistence(commonModule)
+            checkModuleExistence(implementationModule)
+        }
+
+        return object : KaCompilerFacilityModuleActualizer {
+            override fun actualize(module: KaModule): KaModule? {
+                val moduleName = namesByModule[module] ?: error("Unknown module $module")
+                val actualizedModuleName = mapping[moduleName] ?: return null
+                return testServices.ktTestModuleStructure.getKtTestModule(actualizedModuleName).ktModule
             }
         }
     }
@@ -252,6 +285,10 @@ abstract class AbstractCompilerFacilityTest : AbstractAnalysisApiBasedTest() {
 
         val DUMP_CODE by directive(
             "Dump full bytecode instead of declarations listing"
+        )
+
+        val ACTUALIZATION by stringDirective(
+            "Custom actualization mapping for common file compilation"
         )
     }
 }
