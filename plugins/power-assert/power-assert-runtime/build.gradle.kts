@@ -115,7 +115,7 @@ kotlin {
         // this magic is needed because of explicit dependency of common
         // source set on the stdlib
         when {
-            HostManager.hostIsMac -> macosArm64("native")
+            HostManager.hostIsMac -> @Suppress("DEPRECATION") macosX64("native")
             HostManager.hostIsMingw -> mingwX64("native")
             HostManager.hostIsLinux -> linuxX64("native")
             else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
