@@ -647,6 +647,7 @@ class WasmDeserializer(inputStream: InputStream, private val skipLocalNames: Boo
         definedGlobalClassITables = deserializeGlobalClassITables(),
         definedRttiGlobal = deserializeGlobalRtti(),
         definedRttiSuperType = deserializeRttiSupertype(),
+        wasmReferencedFunctions = deserializeWasmReferencedFunctions(),
     )
 
     fun deserializeCompiledLinkerDataFragment() = WasmCompiledLinkerDataFileFragment(
@@ -668,7 +669,7 @@ class WasmDeserializer(inputStream: InputStream, private val skipLocalNames: Boo
     )
 
     private fun deserializeDefinedFunctions() = deserializeMap(::deserializeIdSignature, ::deserializeFunction)
-
+    private fun deserializeWasmReferencedFunctions() = deserializeSet(::deserializeIdSignature)
     private fun deserializeGlobalFields() = deserializeMap(::deserializeIdSignature, ::deserializeGlobal)
     private fun deserializeGlobalVTables() = deserializeMap(::deserializeIdSignature, ::deserializeGlobal)
     private fun deserializeGlobalClassITables() = deserializeMap(::deserializeIdSignature, ::deserializeGlobal)

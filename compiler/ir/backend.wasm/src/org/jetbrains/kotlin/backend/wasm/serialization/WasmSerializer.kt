@@ -93,6 +93,7 @@ class WasmSerializer(outputStream: OutputStream) {
         serializeDefinedGlobals(definedGlobalClassITables)
         serializeDefinedGlobals(definedRttiGlobal)
         serializeMap(definedRttiSuperType, ::serializeIdSignature, ::serializeClassSuperType)
+        serializeSet(wasmReferencedFunctions, ::serializeIdSignature)
     }
 
     fun serializeCompiledLinkerData(linkerData: WasmCompiledLinkerDataFileFragment) = with(linkerData) {

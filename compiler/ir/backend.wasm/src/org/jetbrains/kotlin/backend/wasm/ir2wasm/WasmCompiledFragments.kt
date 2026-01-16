@@ -34,6 +34,7 @@ class WasmCompiledDeclarationsFileFragment(
     val definedGlobalClassITables: MutableMap<IdSignature, WasmGlobal> = mutableMapOf(),
     val definedRttiGlobal: MutableMap<IdSignature, WasmGlobal> = mutableMapOf(),
     val definedRttiSuperType: MutableMap<IdSignature, IdSignature?> = mutableMapOf(),
+    val wasmReferencedFunctions: MutableSet<IdSignature> = mutableSetOf(),
 )
 
 class WasmCompiledLinkerDataFileFragment(
