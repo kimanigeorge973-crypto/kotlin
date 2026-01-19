@@ -72,6 +72,7 @@ import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.session.*
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.symbols.*
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.types.*
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.types.typeCreation.AbstractTypeCreatorDslTest
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 import org.jetbrains.kotlin.generators.dsl.TestGroup
 import org.jetbrains.kotlin.generators.tests.analysis.api.dsl.*
@@ -219,6 +220,24 @@ private fun AnalysisApiTestGroup.generateAnalysisApiNonComponentsTests() {
 
             test<AbstractSingleSymbolByPsiTest> {
                 symbolsModel(it, "singleSymbolByPsi")
+            }
+
+            group(filter = frontendIs(FrontendKind.Fir)) {
+                test<AbstractSingleSymbolByPsiTest>(targetPlatform = TargetPlatformEnum.JS) {
+                    model(it, "singleSymbolByPsi", excludeDirsRecursively = listOf("withTestCompilerPluginEnabled"))
+                }
+
+                test<AbstractSingleSymbolByPsiTest>(targetPlatform = TargetPlatformEnum.Wasm) {
+                    model(it, "singleSymbolByPsi", excludeDirsRecursively = listOf("withTestCompilerPluginEnabled"))
+                }
+
+                test<AbstractSingleSymbolByPsiTest>(targetPlatform = TargetPlatformEnum.WasmWasi) {
+                    model(it, "singleSymbolByPsi", excludeDirsRecursively = listOf("withTestCompilerPluginEnabled"))
+                }
+
+                test<AbstractSingleSymbolByPsiTest>(targetPlatform = TargetPlatformEnum.Common) {
+                    model(it, "singleSymbolByPsi", excludeDirsRecursively = listOf("withTestCompilerPluginEnabled"))
+                }
             }
 
             test<AbstractSymbolRestoreFromDifferentModuleTest> {

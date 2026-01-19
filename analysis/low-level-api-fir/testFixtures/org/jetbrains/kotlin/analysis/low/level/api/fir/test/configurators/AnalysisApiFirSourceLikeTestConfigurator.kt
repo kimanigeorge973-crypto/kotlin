@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.analysis.low.level.api.fir.test.base.AnalysisApiFirT
 import org.jetbrains.kotlin.analysis.low.level.api.fir.test.base.configureOptionalTestCompilerPlugin
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtTestModuleStructure
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.TestModuleStructureFactory
+import org.jetbrains.kotlin.analysis.test.framework.services.MultiplatformTestOutputPrefixProvider
 import org.jetbrains.kotlin.analysis.test.framework.services.configuration.AnalysisApiBinaryLibraryIndexingMode
 import org.jetbrains.kotlin.analysis.test.framework.services.configuration.AnalysisApiIndexingConfiguration
 import org.jetbrains.kotlin.analysis.test.framework.services.libraries.configurePlatformEnvironmentConfigurators
@@ -46,7 +47,10 @@ abstract class AnalysisApiFirSourceLikeTestConfigurator(
     }
 
     override val testPrefixes: List<String>
-        get() = if (analyseInDependentSession) listOf("dependent.fir") else emptyList()
+        get() = MultiplatformTestOutputPrefixProvider.getPrefixes(
+            if (analyseInDependentSession) listOf("dependent.fir") else emptyList(),
+            defaultTargetPlatform
+        )
 
     override val serviceRegistrars: List<AnalysisApiServiceRegistrar<TestServices>> = listOf(
         AnalysisApiBaseTestServiceRegistrar,

@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtLibrarySo
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtTestModuleFactory
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtTestModuleStructure
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.TestModuleStructureFactory
+import org.jetbrains.kotlin.analysis.test.framework.services.MultiplatformTestOutputPrefixProvider
 import org.jetbrains.kotlin.analysis.test.framework.services.configuration.AnalysisApiBinaryLibraryIndexingMode
 import org.jetbrains.kotlin.analysis.test.framework.services.configuration.AnalysisApiIndexingConfiguration
 import org.jetbrains.kotlin.analysis.test.framework.services.configuration.AnalysisApiJvmEnvironmentConfigurator
@@ -35,7 +36,8 @@ class AnalysisApiFirLibrarySourceTestConfigurator(override val defaultTargetPlat
     override val analyseInDependentSession: Boolean get() = false
     override val analysisApiMode: AnalysisApiMode get() = AnalysisApiMode.Ide
     override val frontendKind: FrontendKind get() = FrontendKind.Fir
-    override val testPrefixes: List<String> get() = listOf("librarySource")
+    override val testPrefixes: List<String>
+        get() = MultiplatformTestOutputPrefixProvider.getPrefixes(listOf("librarySource"), defaultTargetPlatform)
 
     override fun configureTest(
         builder: TestConfigurationBuilder,
