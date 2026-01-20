@@ -19,6 +19,8 @@ import kotlin.text.MatchResult;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,6 +84,12 @@ public class ReflectionFactoryImpl extends ReflectionFactory {
                 } else {
                     Constructor<?> constructor = container.findJavaConstructor(signature);
                     return new JavaKConstructor(container, constructor, f.getBoundReceiver());
+                }
+            }
+            else if (container instanceof KClassImpl && container.getJClass().getAnnotation(Metadata.class) == null) {
+                Method method = container.findJavaMethod(name, signature);
+                if (Modifier.isStatic(method.getModifiers())) {
+                    return new JavaKNamedFunction(container, method, f.getBoundReceiver(), KCallableOverriddenStorage.EMPTY);
                 }
             }
             else if (container instanceof KPackageImpl) {
