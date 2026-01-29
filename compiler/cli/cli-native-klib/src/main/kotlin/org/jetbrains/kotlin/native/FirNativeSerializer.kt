@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.pipeline.AllModulesFrontendOutput
 import org.jetbrains.kotlin.fir.pipeline.Fir2KlibMetadataSerializer
 import org.jetbrains.kotlin.ir.KtDiagnosticReporterWithImplicitIrBasedContext
-import org.jetbrains.kotlin.konan.config.konanExportKdoc
 import org.jetbrains.kotlin.konan.config.konanPurgeUserLibs
 import org.jetbrains.kotlin.konan.library.isFromKotlinNativeDistribution
 
@@ -51,7 +50,6 @@ internal fun NativeFirstStagePhaseContext.firSerializerBase(
                 configuration,
                 firResult.outputs,
                 fir2IrOutput?.fir2irActualizedResult,
-                exportKDoc = config.configuration.konanExportKdoc,
                 produceHeaderKlib = produceHeaderKlib,
             ),
             cleanFiles = emptyList(),

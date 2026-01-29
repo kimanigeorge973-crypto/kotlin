@@ -126,8 +126,6 @@ object NativeKlibConfigurationUpdater : ConfigurationUpdater<K2NativeCompilerArg
             configuration.konanManifestNativeTargets = parseManifestNativeTargets(it, configuration)
         }
 
-        configuration.konanExportKdoc = arguments.exportKDoc
-
         configuration.setupPartialLinkageConfig(
             mode = arguments.partialLinkageMode,
             logLevel = arguments.partialLinkageLogLevel,
