@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.backend.common.BodyLoweringPass
 import org.jetbrains.kotlin.backend.common.ir.isUnconditional
 import org.jetbrains.kotlin.backend.common.lower.at
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.backend.common.pop
+import org.jetbrains.kotlin.backend.common.push
 import org.jetbrains.kotlin.backend.konan.Context
 import org.jetbrains.kotlin.backend.konan.logMultiple
 import org.jetbrains.kotlin.ir.IrElement
@@ -16,6 +18,8 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.irImplicitCast
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrBody
@@ -36,7 +40,7 @@ import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.IrWhileLoop
 import org.jetbrains.kotlin.ir.expressions.impl.IrDoWhileLoopImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
-import org.jetbrains.kotlin.ir.symbols.IrReturnableBlockSymbol
+import org.jetbrains.kotlin.ir.symbols.IrReturnTargetSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.isAny
 import org.jetbrains.kotlin.ir.types.isNothing
@@ -156,6 +160,7 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
         val needValues = variable is IrExpression && !variable.type.erasedUpperBound.isFinalClass
         val variablesValues = BitSet()
         val variableWrites = if (needValues) BitSet() else null
+        val incomingPhis = mutableMapOf<ControlFlowMergePointInfo, MutableSet<IrExpression>>()
     }
 
     // Some variables (catch block parameters and suspension point id parameters) are initialized by runtime.
@@ -172,7 +177,7 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
 
         fun BitSet.computeType() = this.mapEachBit { allVariablesWrites[it].value }.computeType()
 
-        irBody.accept(object : IrVisitor<BitSet, BitSet>() {
+        container.accept(object : IrVisitor<BitSet, BitSet>() {
             fun getVariableWriteId(variable: IrElement, value: IrExpression) = VariableWrite(variable, value).let { write ->
                 variableWriteMap.getOrPut(write) {
                     allVariablesWrites.add(write)
@@ -193,7 +198,7 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                     val (variable, value) = allVariablesWrites[it]
                     append((variable as? IrVariable)?.name ?: variable::class.java)
                     append(" = ")
-                    append(value::class.java)
+                    append(value.render())
                 }
                 append(']')
             }
@@ -205,11 +210,15 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
             // A simplification for handling try/catch blocks: this BitSet stores all the variable writes inside a try clause.
             // This allows for the corresponding catch clauses to see those writes (even when they are overwritten by control flow).
             var catchesVariablesValues: BitSet? = null
-            val returnableBlockCFMPInfos = mutableMapOf<IrReturnableBlockSymbol, ControlFlowMergePointInfo>()
+            val returnTargetCFMPInfos = mutableMapOf<IrReturnTargetSymbol, ControlFlowMergePointInfo>()
             val breaksCFMPInfos = mutableMapOf<IrLoop, ControlFlowMergePointInfo>()
             val continuesCFMPInfos = mutableMapOf<IrLoop, ControlFlowMergePointInfo>()
             val getValueVariablesWrites = mutableMapOf<IrGetValue, BitSet>()
             val doWhileLoopForWhileLoops = mutableMapOf<IrWhileLoop, IrDoWhileLoop>()
+
+            // Control flow merge point at the start of a finally clause.
+            val finallyClauseCFMPInfos = mutableListOf<ControlFlowMergePointInfo>()
+            val highLevelJumpTargetDepths = mutableMapOf<IrElement, Int>()
 
             fun controlFlowMergePoint(cfmpInfo: ControlFlowMergePointInfo, value: IrExpression, variablesValues: BitSet): BitSet {
                 val result = if (!cfmpInfo.needValues)
@@ -220,7 +229,34 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                     variablesValues.copy().apply { set(id) }
                 }
 
-                cfmpInfo.variablesValues.or(result)
+                return cfmpInfo.variablesValues.also { it.or(result) }
+            }
+
+            fun threadControlFlowMergePoints(from: ControlFlowMergePointInfo, to: ControlFlowMergePointInfo, value: IrExpression) {
+                to.incomingPhis.getOrPut(from) { mutableSetOf() }.add(value)
+            }
+
+            fun handleThreadedControlFlowMergePoints(cfmpInfo: ControlFlowMergePointInfo) {
+                cfmpInfo.incomingPhis.forEach { (from, values) ->
+                    val variablesValues = from.variablesValues
+                    values.forEach { value -> controlFlowMergePoint(cfmpInfo, value, variablesValues) }
+                }
+            }
+
+            override fun visitDeclaration(declaration: IrDeclarationBase, data: BitSet): BitSet {
+                // TODO: Remove all locally defined variables.
+                return visitElement(declaration, data)
+            }
+
+            override fun visitFunction(declaration: IrFunction, data: BitSet): BitSet {
+                // TODO: Remove all locally defined variables.
+                val cfmpInfo = ControlFlowMergePointInfo(declaration)
+                returnTargetCFMPInfos[declaration.symbol] = cfmpInfo
+                highLevelJumpTargetDepths[declaration] = finallyClauseCFMPInfos.size
+                val result = visitElement(declaration, data)
+                returnTargetCFMPInfos.remove(declaration.symbol)
+                highLevelJumpTargetDepths.remove(declaration)
+
                 return result
             }
 
@@ -231,12 +267,28 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                 return result
             }
 
+            fun handleHighLevelJump(cfmpInfo: ControlFlowMergePointInfo, value: IrExpression, variablesValues: BitSet, depth: Int) {
+                val finallyClausesCount = finallyClauseCFMPInfos.size
+                require(depth <= finallyClausesCount) { "High level jump depth $depth is too big: more than $finallyClausesCount" }
+                if (depth == finallyClausesCount) { // No finally clause needs to be executed.
+                    controlFlowMergePoint(cfmpInfo, value, variablesValues)
+                    return
+                }
+                // Instead of going directly to the target, we must first execute all the finally clauses
+                // which are lower than the target (sequentially, starting with the deepest one).
+                controlFlowMergePoint(finallyClauseCFMPInfos[finallyClausesCount - 1], dummyUnitExpression, variablesValues)
+                for (i in finallyClausesCount - 1 downTo depth + 1)
+                    threadControlFlowMergePoints(finallyClauseCFMPInfos[i], finallyClauseCFMPInfos[i - 1], dummyUnitExpression)
+                // And finally jump to the original target.
+                threadControlFlowMergePoints(finallyClauseCFMPInfos[depth], cfmpInfo, value)
+            }
+
             override fun visitReturn(expression: IrReturn, data: BitSet): BitSet {
                 val result = expression.value.accept(this, data)
-                (expression.returnTargetSymbol as? IrReturnableBlockSymbol)?.let {
-                    val cfmpInfo = returnableBlockCFMPInfos[it] ?: error("Unknown returnable block for ${expression.render()}")
-                    controlFlowMergePoint(cfmpInfo, expression.value, result)
-                }
+                val symbol = expression.returnTargetSymbol
+                val cfmpInfo = returnTargetCFMPInfos[symbol] ?: error("Unknown return target for ${expression.render()}")
+                val depth = highLevelJumpTargetDepths[symbol.owner] ?: error("Unknown return target for ${expression.render()}")
+                handleHighLevelJump(cfmpInfo, expression.value, result, depth)
 
                 return nothingValue
             }
@@ -249,9 +301,12 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                     result
                 } else {
                     val cfmpInfo = ControlFlowMergePointInfo(expression)
-                    returnableBlockCFMPInfos[irReturnableBlock.symbol] = cfmpInfo
+                    returnTargetCFMPInfos[irReturnableBlock.symbol] = cfmpInfo
+                    highLevelJumpTargetDepths[irReturnableBlock] = finallyClauseCFMPInfos.size
                     visitElement(expression, data)
-                    returnableBlockCFMPInfos.remove(irReturnableBlock.symbol)
+                    returnTargetCFMPInfos.remove(irReturnableBlock.symbol)
+                    highLevelJumpTargetDepths.remove(irReturnableBlock)
+                    handleThreadedControlFlowMergePoints(cfmpInfo)
                     cfmpInfo.variableWrites?.computeType()?.let { expression.type = it }
                     cfmpInfo.variablesValues
                 }
@@ -288,6 +343,9 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
             }
 
             override fun visitTry(aTry: IrTry, data: BitSet): BitSet {
+                val finallyClause = aTry.finallyExpression
+                if (finallyClause != null)
+                    finallyClauseCFMPInfos.push(ControlFlowMergePointInfo(finallyClause))
                 val prevCatchesVV = catchesVariablesValues
                 catchesVariablesValues = data.copy()
                 val cfmpInfo = ControlFlowMergePointInfo(aTry)
@@ -302,24 +360,39 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                 }
                 cfmpInfo.variableWrites?.computeType()?.let { aTry.type = it }
 
-                return cfmpInfo.variablesValues
+                val vvAtTryCatchEnd = cfmpInfo.variablesValues
+                return if (finallyClause == null)
+                    vvAtTryCatchEnd
+                else {
+                    val finallyClauseCFMPInfo = finallyClauseCFMPInfos.pop()
+                    handleThreadedControlFlowMergePoints(finallyClauseCFMPInfo)
+                    context.log { "TRY/CATCH: ${vvAtTryCatchEnd.format()}" }
+                    context.log { "FINALLY: ${finallyClauseCFMPInfo.variablesValues.format()}" }
+                    val vvAtFinallyClauseStart =
+                            controlFlowMergePoint(finallyClauseCFMPInfo, dummyUnitExpression, vvAtTryCatchEnd)
+                    finallyClause.accept(this, vvAtFinallyClauseStart)
+                }
             }
 
             override fun visitBreak(jump: IrBreak, data: BitSet): BitSet {
                 val cfmpInfo = breaksCFMPInfos[jump.loop] ?: error("Break from an unknown loop: ${jump.render()}")
-                controlFlowMergePoint(cfmpInfo, dummyUnitExpression, data)
+                val depth = highLevelJumpTargetDepths[jump.loop] ?: error("Break from an unknown loop: ${jump.render()}")
+                handleHighLevelJump(cfmpInfo, dummyUnitExpression, data, depth)
 
                 return nothingValue
             }
 
             override fun visitContinue(jump: IrContinue, data: BitSet): BitSet {
                 val cfmpInfo = continuesCFMPInfos[jump.loop] ?: error("Continue to an unknown loop: ${jump.render()}")
-                controlFlowMergePoint(cfmpInfo, dummyUnitExpression, data)
+                val depth = highLevelJumpTargetDepths[jump.loop] ?: error("Continue to an unknown loop: ${jump.render()}")
+                handleHighLevelJump(cfmpInfo, dummyUnitExpression, data, depth)
 
                 return nothingValue
             }
 
             fun handleDoWhileLoop(loop: IrLoop, variablesValues: BitSet): BitSet {
+                highLevelJumpTargetDepths[loop] = finallyClauseCFMPInfos.size
+
                 var vvAtLoopStart = variablesValues
 
                 context.log { "LOOP START: ${vvAtLoopStart.format()}" }
@@ -333,6 +406,7 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                     breaksCFMPInfos[loop] = breaksCFMPInfo
                     continuesCFMPInfos[loop] = continuesCFMPInfo
                     val vvAtBodyEnd = loop.body?.accept(this, vvAtLoopStart) ?: vvAtLoopStart
+                    handleThreadedControlFlowMergePoints(continuesCFMPInfo)
                     val vvAtConditionStart =
                             controlFlowMergePoint(continuesCFMPInfo, dummyUnitExpression, vvAtBodyEnd)
                     val vvAtConditionEnd = loop.condition.accept(this, vvAtConditionStart)
@@ -345,6 +419,8 @@ internal class ComputeTypesPass(val context: Context) : BodyLoweringPass {
                     if (vvAtLoopStart == prevVVAtLoopStart) {
                         breaksCFMPInfos.remove(loop)
                         continuesCFMPInfos.remove(loop)
+                        highLevelJumpTargetDepths.remove(loop)
+                        handleThreadedControlFlowMergePoints(breaksCFMPInfo)
                         return controlFlowMergePoint(breaksCFMPInfo, dummyUnitExpression, vvAtConditionEnd)
                     }
                 }
