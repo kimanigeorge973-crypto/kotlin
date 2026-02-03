@@ -112,26 +112,6 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : We
     }
 }
 
-private fun IrRichFunctionReference.getFlags(): Int = listOfNotNull(
-    (1 shl 0).takeIf { invokeFunction.isSuspend },
-    (1 shl 1).takeIf { hasVarargConversion },
-    (1 shl 2).takeIf { hasSuspendConversion },
-    (1 shl 3).takeIf { hasUnitConversion },
-    (1 shl 4).takeIf { isFunInterfaceConstructorAdapter() },
-).sum()
-
-private fun IrRichFunctionReference.getArity(): Int =
-    invokeFunction.parameters.size - boundValues.size + if (invokeFunction.isSuspend) 1 else 0
-
-private fun IrRichFunctionReference.getFqName(backendContext: WasmBackendContext): String = when {
-    isFunInterfaceConstructorAdapter() -> invokeFunction.returnType.getClass()!!.fqNameForIrSerialization.toString()
-    else -> (backendContext.irFactory as IrFactoryImplForWasmIC).declarationSignature(reflectionTargetSymbol!!.owner).toString()
-}
-
-
-private fun IrRichFunctionReference.isFunInterfaceConstructorAdapter() =
-    invokeFunction.origin == IrDeclarationOrigin.ADAPTER_FOR_FUN_INTERFACE_CONSTRUCTOR
-
 private fun IrRichFunctionReference.getLinkageErrorIfAny(backendContext: WasmBackendContext): String? =
     reflectionTargetLinkageError?.let { reflectionTargetLinkageError ->
         backendContext.partialLinkageSupport.prepareLinkageError(

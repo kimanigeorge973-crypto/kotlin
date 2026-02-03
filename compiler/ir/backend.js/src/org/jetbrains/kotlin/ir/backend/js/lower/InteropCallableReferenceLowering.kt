@@ -582,6 +582,46 @@ class InteropCallableReferenceLowering(val context: JsIrBackendContext) : BodyLo
                         functionReferenceReflectedName.toIrConst(context.irBuiltIns.stringType, UNDEFINED_OFFSET, UNDEFINED_OFFSET)
                     )
                 )
+                val superCall = constructor.body?.statements
+                    ?.filterIsInstance<IrDelegatingConstructorCallImpl>()
+                    ?.firstOrNull()
+                if (superCall != null) {
+                    statements.add(
+                        setDynamicProperty(
+                            tmpVar.symbol,
+                            Namer.KCALLABLE_FLAGS,
+                            (superCall.arguments[0] as IrConstImpl).value.toIrConst(
+                                context.irBuiltIns.intType,
+                                UNDEFINED_OFFSET,
+                                UNDEFINED_OFFSET
+                            )
+                        )
+                    )
+                    statements.add(
+                        setDynamicProperty(
+                            tmpVar.symbol,
+                            Namer.KCALLABLE_ID,
+                            (superCall.arguments[2] as IrConstImpl).value.toIrConst(
+                                context.irBuiltIns.stringType,
+                                UNDEFINED_OFFSET,
+                                UNDEFINED_OFFSET
+                            )
+                        )
+                    )
+                    if (factoryFunction.parameters.any()) {
+                        statements.add(
+                            setDynamicProperty(
+                                tmpVar.symbol,
+                                Namer.KCALLABLE_BOUND_VALUES,
+                                JsIrBuilder.buildArray(
+                                    factoryFunction.parameters.map { JsIrBuilder.buildGetValue(it.symbol) },
+                                    context.irBuiltIns.arrayClass.typeWith(context.irBuiltIns.anyNType),
+                                    context.irBuiltIns.anyNType
+                                )
+                            )
+                        )
+                    }
+                }
             }
 
             if (lambdaDeclaration.isSuspend) {
