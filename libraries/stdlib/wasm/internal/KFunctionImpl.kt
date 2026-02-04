@@ -9,7 +9,7 @@ import kotlin.internal.throwIrLinkageError
 import kotlin.internal.UsedFromCompilerGeneratedCode
 
 @UsedFromCompilerGeneratedCode
-internal abstract class KFunctionImpl(val flags: Int, val arity: Int, val id: String, val receiver: Any?, public val name: String) {
+internal abstract class KFunctionImpl(val flags: Int, val arity: Int, val id: Int, val receiver: Any?, public val name: String) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return other is KFunctionImpl &&
@@ -22,7 +22,7 @@ internal abstract class KFunctionImpl(val flags: Int, val arity: Int, val id: St
     override fun hashCode(): Int {
         var result = flags
         result = 31 * result + arity
-        result = 31 * result + id.hashCode()
+        result = 31 * result + id
         result = 31 * result + receiver.hashCode()
         return result
     }
