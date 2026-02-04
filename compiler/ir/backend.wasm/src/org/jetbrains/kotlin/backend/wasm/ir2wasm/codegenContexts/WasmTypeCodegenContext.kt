@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.ir.declarations.IdSignatureRetriever
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.wasm.ir.WasmFunctionType
 import org.jetbrains.kotlin.wasm.ir.WasmStructDeclaration
 import org.jetbrains.kotlin.wasm.ir.WasmTypeDeclaration
@@ -21,6 +22,12 @@ open class WasmTypeCodegenContext(
 
     fun getDeclarationTag(declaration: IrDeclaration): String =
         declaration.symbol.getReferenceKey().toString()
+
+    private fun getFunctionTypeSignature(wasmFunctionType: WasmFunctionType): IdSignature {
+        val params = wasmFunctionType.parameterTypes.joinToString("_")
+        val results = wasmFunctionType.resultTypes.joinToString("_")
+        return IdSignature.CommonSignature("__SYNTHETIC__", "wasm_func_type_\$${params}_\$${results}", null, 0, null)
+    }
 
     fun defineGcType(irClass: IrClassSymbol, wasmType: WasmTypeDeclaration) {
         if (wasmFileFragment.definedGcTypes.put(irClass.getReferenceKey(), wasmType) != null) {
@@ -38,6 +45,22 @@ open class WasmTypeCodegenContext(
         if (wasmFileFragment.definedFunctionTypes.put(irFunction.getReferenceKey(), wasmFunctionType) != null) {
             redefinitionError(irFunction.getReferenceKey(), "FunctionTypes")
         }
+    }
+
+    fun referenceWasmFunctionType(wasmFunctionType: WasmFunctionType): FunctionTypeSymbol {
+        val signature = getFunctionTypeSignature(wasmFunctionType)
+        if (!wasmFileFragment.definedFunctionTypes.containsKey(signature)) {
+            wasmFileFragment.definedFunctionTypes[signature] = wasmFunctionType
+        }
+        return FunctionTypeSymbol(signature)
+    }
+
+    fun referenceWasmFunctionHeapType(wasmFunctionType: WasmFunctionType): FunctionHeapTypeSymbol {
+        val signature = getFunctionTypeSignature(wasmFunctionType)
+        if (!wasmFileFragment.definedFunctionTypes.containsKey(signature)) {
+            wasmFileFragment.definedFunctionTypes[signature] = wasmFunctionType
+        }
+        return FunctionHeapTypeSymbol(signature)
     }
 
     open fun referenceGcType(irClass: IrClassSymbol): GcTypeSymbol =
