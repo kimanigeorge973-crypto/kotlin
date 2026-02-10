@@ -2,6 +2,9 @@
 // TARGET_BACKEND: JVM
 // WITH_STDLIB
 
+// Minor difference in raw type representation (`MutableList<(raw) Any?>` vs `MutableList<(raw) Any!>`)
+// KOTLIN_REFLECT_DUMP_MISMATCH
+
 // FILE: Java1.java
 import java.util.*;
 

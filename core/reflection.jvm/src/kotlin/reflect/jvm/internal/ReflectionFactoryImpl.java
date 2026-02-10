@@ -19,6 +19,7 @@ import kotlin.text.MatchResult;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
@@ -119,6 +120,12 @@ public class ReflectionFactoryImpl extends ReflectionFactory {
                     List<String> values = result.getGroupValues();
                     return container.createLocalProperty(Integer.parseInt(values.get(1)), signature);
                 }
+                if (container instanceof KClassImpl && container.getJClass().getAnnotation(Metadata.class) == null) {
+                    Field field = container.findJavaField(p.getName());
+                    if (Modifier.isStatic(field.getModifiers())) {
+                        return new JavaKProperty0(container, field, p.getBoundReceiver(), KCallableOverriddenStorage.EMPTY);
+                    }
+                }
                 if (container instanceof KPackageImpl) {
                     KmProperty kmProperty = container.findPropertyMetadata(p.getName(), signature);
                     return new KotlinKProperty0(container, signature, p.getBoundReceiver(), kmProperty, KCallableOverriddenStorage.EMPTY);
@@ -139,6 +146,12 @@ public class ReflectionFactoryImpl extends ReflectionFactory {
                 if (result != null) {
                     List<String> values = result.getGroupValues();
                     return container.createLocalProperty(Integer.parseInt(values.get(1)), signature);
+                }
+                if (container instanceof KClassImpl && container.getJClass().getAnnotation(Metadata.class) == null) {
+                    Field field = container.findJavaField(p.getName());
+                    if (Modifier.isStatic(field.getModifiers())) {
+                        return new JavaKMutableProperty0(container, field, p.getBoundReceiver(), KCallableOverriddenStorage.EMPTY);
+                    }
                 }
                 if (container instanceof KPackageImpl) {
                     KmProperty kmProperty = container.findPropertyMetadata(p.getName(), signature);

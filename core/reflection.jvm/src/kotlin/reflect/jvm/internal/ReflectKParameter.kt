@@ -11,6 +11,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import kotlin.LazyThreadSafetyMode.PUBLICATION
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createDefaultType
@@ -48,6 +49,21 @@ internal class InstanceParameter(override val callable: ReflectKCallable<*>, kla
     override val isVararg: Boolean get() = false
     override val annotations: List<Annotation> get() = emptyList()
     override val declaresDefaultValue: Boolean get() = false
+}
+
+internal class DefaultSetterValueParameter(private val property: ReflectKProperty<*>) : ReflectKParameter() {
+    override val callable: ReflectKCallable<*> get() = (property as KMutableProperty<*>).setter as ReflectKCallable<*>
+    override val index: Int get() = 0
+    override val name: String? get() = null
+    override val type: KType get() = property.returnType
+    override val kind: KParameter.Kind get() = KParameter.Kind.VALUE
+    override val isOptional: Boolean get() = false
+    override val isVararg: Boolean get() = false
+    override val declaresDefaultValue: Boolean get() = false
+
+    override val annotations: List<Annotation>
+        // As long as there's at least one annotation, the setter would no longer be default.
+        get() = emptyList()
 }
 
 /**
