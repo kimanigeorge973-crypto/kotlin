@@ -155,6 +155,9 @@ import org.jetbrains.kotlin.backend.common.linkage.partial.PartialLinkageSources
 class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : FileLoweringPass {
     private val context = backendContext
 
+    // Per-file cache of created classes to avoid duplicates within a single file
+    private val fileLocalClassCache = mutableMapOf<CallableReferenceKey, IrClass>()
+
     companion object {
         val STATIC_FUNCTION_REFERENCE by IrDeclarationOriginImpl.Regular
     }
@@ -218,7 +221,7 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
     private fun IrBuilderWithScope.getExtraConstructorArgument(
         parameter: IrValueParameter,
         reference: IrRichFunctionReference,
-        receiverTemp: IrVariable?
+        receiverTemp: IrVariable?,
     ): IrExpression {
         val linkerError = reference.getLinkageErrorIfAny(backendContext)
         val reflectionTargetSymbol = reference.reflectionTargetSymbol
@@ -272,6 +275,9 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
     )
 
     override fun lower(irFile: IrFile) {
+        // Clear the per-file cache for each new file
+        fileLocalClassCache.clear()
+
         irFile.transform(object : IrTransformer<IrDeclaration?>() {
             override fun visitClass(declaration: IrClass, data: IrDeclaration?): IrStatement {
                 if (declaration.isFun || declaration.symbol.isSuspendFunction() || declaration.symbol.isKSuspendFunction()) {
@@ -299,10 +305,11 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
                     expression.startOffset, expression.endOffset
                 )
 
-                val clazz = createOrGetFunctionReferenceClass(expression)
+                val clazz = createOrGetFunctionReferenceClass(expression, irFile)
                 val bridgedFunction = buildBridgedFunction(
                     expression,
-                    irBuilder.scope.getLocalDeclarationParent()
+                    irBuilder.scope.getLocalDeclarationParent(),
+                    irFile,
                 )
 
                 val constructorExpression = buildConstructorExpression(expression, clazz.primaryConstructor!!, irBuilder, bridgedFunction)
@@ -312,7 +319,8 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
                 // field, as it makes FieldInitializersLowering and DCE simpler.
                 val isInGlobalFieldInitializer = data is IrField && data.isStatic
                 return if (expression.boundValues.isEmpty() && !isInGlobalFieldInitializer) {
-                    val fieldName = Name.identifier("${clazz.name.asString()}_${expression.reflectionTargetSymbol?.owner?.name?.asString() ?: "lambda"}_singleton")
+                    val fieldName =
+                        Name.identifier("${clazz.name.asString()}_${expression.reflectionTargetSymbol?.owner?.name?.asString() ?: "lambda"}_singleton")
                     val singletonField = context.irFactory.buildField {
                         name = fieldName
                         type = expression.type
@@ -337,24 +345,51 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
         }, null)
     }
 
-    private fun IrDeclarationParent.findNearestContainer(): IrDeclarationContainer {
-        var container = this
-        while (container is IrDeclaration && container !is IrClass && container !is IrScript) {
-            container = container.parent
+    private fun IrType.toTypeSignatureCode(): String = when {
+        this.isInt() -> "I"
+        this.isLong() -> "J"
+        this.isFloat() -> "F"
+        this.isDouble() -> "D"
+        this.isBoolean() -> "Z"
+        this.isChar() -> "C"
+        this.isByte() -> "B"
+        this.isShort() -> "S"
+        this.isUInt() -> "UI"
+        this.isULong() -> "UJ"
+        this.isUByte() -> "UB"
+        this.isUShort() -> "US"
+        this.getClass()?.isSingleFieldValueClass == true -> {
+            "V${this.classOrNull?.owner?.name?.asString()?: "0"}"
         }
-        return container as IrDeclarationContainer
+        this.classifierOrNull is IrTypeParameterSymbol -> {
+            "T${(this.classifierOrNull as IrTypeParameterSymbol).owner.name.asString()}"
+        }
+        else -> "A" // anyNType (reference type)
     }
 
+    // The name generated from the key is not just for debugging purposes: it must faithfully
+    // reflect the key as the linker uses this string name for cross-file deduplication.
     private fun callableReferenceKeyToName(key: CallableReferenceKey): Name {
         val arity = key.arity
         val prefix = if (key.isKReference) "K" else ""
         val suspendPrefix = if (key.isSuspend) "Suspend" else ""
-        val boundInfo = if (key.boundValueTypes.isNotEmpty()) "bound${key.boundValueTypes.size}" else ""
 
-        return Name.identifier("${prefix}${suspendPrefix}Function${arity}_${boundInfo}")
+        val superClassSuffix = when (key.superClassType) {
+            backendContext.wasmSymbols.reflectionSymbols.kFunctionImpl.defaultType -> "R"  // Reflection
+            backendContext.wasmSymbols.reflectionSymbols.kFunctionErrorImpl.defaultType -> "E"  // Error
+            else -> "" // Non-reflection (Any)
+        }
+
+        val boundInfo = if (key.boundValueTypes.isNotEmpty()) {
+            // Encode the types of bound values to avoid collisions.
+            val typeCodes = key.boundValueTypes.joinToString("") { it.toTypeSignatureCode() }
+            "bound${key.boundValueTypes.size}_$typeCodes"
+        } else ""
+
+        return Name.identifier("${prefix}${suspendPrefix}Function${arity}${superClassSuffix}_${boundInfo}")
     }
 
-    private fun createOrGetFunctionReferenceClass(functionReference: IrRichFunctionReference): IrClass {
+    private fun createOrGetFunctionReferenceClass(functionReference: IrRichFunctionReference, irFile: IrFile): IrClass {
         val superClass = getSuperClassType(functionReference)
         val arity = (functionReference.type as IrSimpleType).arguments.size - 1
         val isSuspend = functionReference.invokeFunction.isSuspend
@@ -364,11 +399,11 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
         val superInterfaceType = functionReference.type.removeProjections()
         val additionalInterfaces = getAdditionalInterfaces(functionReference)
         val key = CallableReferenceKey(superClass, arity, isSuspend, isKReference, boundValueTypes)
-        backendContext.callableReferenceClasses[key]?.let {
+
+        // Check per-file cache to avoid duplicates within the same file
+        fileLocalClassCache[key]?.let {
             return it
         }
-
-        val sharedParent = backendContext.getSharedCallableReferencePackageFragment()
 
         val functionReferenceClass = backendContext.irFactory.buildClass {
             startOffset = SYNTHETIC_OFFSET
@@ -377,12 +412,12 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
             name = callableReferenceKeyToName(key)
             visibility = DescriptorVisibilities.PUBLIC
         }.apply {
-            this.parent = sharedParent
-            sharedParent.declarations += this
+            this.parent = irFile
+            irFile.declarations += this
             createThisReceiverParameter()
         }
 
-        backendContext.callableReferenceClasses[key] = functionReferenceClass
+        fileLocalClassCache[key] = functionReferenceClass
 
         functionReferenceClass.superTypes =
             listOf(superClass, superInterfaceType) memoryOptimizedPlus additionalInterfaces
@@ -537,6 +572,7 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
     private fun buildBridgedFunction(
         functionReference: IrRichFunctionReference,
         parent: IrDeclarationParent,
+        irFile: IrFile,
     ): IrSimpleFunction {
         val superFunction = functionReference.overriddenFunctionSymbol.owner
         val invokeFunction = functionReference.invokeFunction
@@ -547,7 +583,7 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
         val anyNType = backendContext.irBuiltIns.anyNType
         val containerPath = if (parent is IrClass || parent is IrFunction) parent.name.asString() else ""
         val reflectionTargetName = functionReference.reflectionTargetSymbol?.owner?.name?.asString() ?: "lambda"
-        return context.irFactory.addFunction(parent.findNearestContainer()) {
+        return context.irFactory.addFunction(irFile) {
             setSourceRange(if (isLambda) invokeFunction else functionReference)
             origin = IrDeclarationOrigin.DEFINED
             name = Name.identifier("${containerPath}_${reflectionTargetName}\$bridged")
@@ -594,22 +630,13 @@ class WasmCallableReferenceLowering(val backendContext: WasmBackendContext) : Fi
                         return super.visitDeclaration(declaration)
                     }
                 }, null)
-                when (transformedBody) {
-                    is IrBlockBody -> {
-                        +transformedBody.statements
-                        if (invokeFunction.returnType.isUnit()) {
-                            +irReturn(irUnit())
-                        }
+                if (transformedBody is IrBlockBody) {
+                    +transformedBody.statements
+                    if (invokeFunction.returnType.isUnit()) {
+                        +irReturn(irUnit())
                     }
-                    is IrExpressionBody -> {
-                        if (invokeFunction.returnType.isUnit()) {
-                            +transformedBody.expression
-                            +irReturn(irUnit())
-                        } else {
-                            +irReturn(transformedBody.expression.implicitCastTo(anyNType))
-                        }
-                    }
-                    else -> error("Unexpected body type: ${transformedBody::class.simpleName}")
+                } else {
+                    error("Unexpected body type: ${transformedBody::class.simpleName}")
                 }
             }
         }

@@ -311,8 +311,10 @@ class WasmCompiledModuleFragment(
         val heapTypeResolver: (WasmHeapType.Type) -> WasmTypeDeclaration = definedDeclarations::resolve
 
         val recursiveGroups = with(RecursiveGroupBuilder(heapTypeResolver)) {
-            addTypes(definedDeclarations.gcTypes.values)
-            addTypes(definedDeclarations.vTableGcTypes.values)
+            // Use distinct() because after rebinding equivalent declarations, multiple keys may point
+            // to the same canonical type object.
+            addTypes(definedDeclarations.gcTypes.values.distinct())
+            addTypes(definedDeclarations.vTableGcTypes.values.distinct())
             addTypes(allFunctionTypes.values.toSet())
             build()
         }
@@ -413,10 +415,13 @@ class WasmCompiledModuleFragment(
 
     private fun getGlobals(definedDeclarations: DefinedDeclarationsResolver) = mutableListOf<WasmGlobal>().apply {
         addAll(definedDeclarations.globalFields.values)
-        addAll(definedDeclarations.globalVTables.values)
-        addAll(definedDeclarations.globalClassITables.values)
+        // Use distinct() because after rebinding equivalent declarations, multiple keys may point
+        // to the same canonical global object.
+        addAll(definedDeclarations.globalVTables.values.distinct())
+        addAll(definedDeclarations.globalClassITables.values.distinct())
 
-        val rttiGlobals = mutableMapOf<IdSignature, WasmGlobal>()
+        // Use the already-deduplicated globalRTTI from definedDeclarations
+        val rttiGlobals = definedDeclarations.globalRTTI
         val rttiSuperTypes = mutableMapOf<IdSignature, IdSignature?>()
 
         wasmCompiledFileFragments.forEach { fragment ->
@@ -427,7 +432,7 @@ class WasmCompiledModuleFragment(
         fun wasmRttiGlobalOrderKey(superType: IdSignature?): Int =
             superType?.let { wasmRttiGlobalOrderKey(rttiSuperTypes[it]) + 1 } ?: 0
 
-        rttiGlobals.keys.sortedBy(::wasmRttiGlobalOrderKey).mapTo(this) { rttiGlobals[it]!! }
+        rttiGlobals.keys.sortedBy(::wasmRttiGlobalOrderKey).map { rttiGlobals[it]!! }.distinct().forEach { add(it) }
 
         addAll(definedDeclarations.globalLiteralGlobals.values)
     }
@@ -841,6 +846,11 @@ class WasmCompiledModuleFragment(
         }
 
         rebindEquivalentFunctions(resolver.functions)
+        rebindEquivalentDeclarations(resolver.gcTypes) { it.equivalentGcTypes }
+        rebindEquivalentDeclarations(resolver.vTableGcTypes) { it.equivalentVTableGcTypes }
+        rebindEquivalentDeclarations(resolver.globalRTTI) { it.equivalentRttiGlobals }
+        rebindEquivalentDeclarations(resolver.globalVTables) { it.equivalentVTableGlobals }
+        rebindEquivalentDeclarations(resolver.globalClassITables) { it.equivalentClassITableGlobals }
         bindUniqueJsFunNames()
         return resolver
     }
@@ -956,6 +966,25 @@ class WasmCompiledModuleFragment(
                     // Rebind adapter function to the single instance
                     // There might not be any unbound references in case it's called only from JS side
                     allDefinedFunctions[idSignature] = func
+                }
+            }
+        }
+    }
+
+    private fun <T> rebindEquivalentDeclarations(
+        allDefinedDeclarations: MutableMap<IdSignature, T>,
+        equivalentDeclarationsSelector: (WasmCompiledLinkerDataFileFragment) -> List<Pair<String, IdSignature>>
+    ) {
+        val canonicalDeclarations = mutableMapOf<String, T>()
+        forEachLinkerData { linkerData ->
+            for ((equivalenceKey, idSignature) in equivalentDeclarationsSelector(linkerData)) {
+                val canonical = canonicalDeclarations[equivalenceKey]
+                if (canonical == null) {
+                    // First occurrence, register it as canonical (if not removed by DCE).
+                    canonicalDeclarations[equivalenceKey] = allDefinedDeclarations[idSignature] ?: continue
+                } else {
+                    // Already exists, rebind to the canonical instance.
+                    allDefinedDeclarations[idSignature] = canonical
                 }
             }
         }

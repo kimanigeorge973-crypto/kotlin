@@ -72,6 +72,26 @@ open class WasmLinkerDataCodegenContext(
         wasmFileFragment.equivalentFunctions.add(key to function.getReferenceKey())
     }
 
+    open fun addEquivalentGcType(key: String, klass: IrClassSymbol) {
+        wasmFileFragment.equivalentGcTypes.add(key to klass.getReferenceKey())
+    }
+
+    open fun addEquivalentVTableGcType(key: String, klass: IrClassSymbol) {
+        wasmFileFragment.equivalentVTableGcTypes.add(key to klass.getReferenceKey())
+    }
+
+    open fun addEquivalentRttiGlobal(key: String, klass: IrClassSymbol) {
+        wasmFileFragment.equivalentRttiGlobals.add(key to klass.getReferenceKey())
+    }
+
+    open fun addEquivalentVTableGlobal(key: String, klass: IrClassSymbol) {
+        wasmFileFragment.equivalentVTableGlobals.add(key to klass.getReferenceKey())
+    }
+
+    open fun addEquivalentClassITableGlobal(key: String, klass: IrClassSymbol) {
+        wasmFileFragment.equivalentClassITableGlobals.add(key to klass.getReferenceKey())
+    }
+
     open fun addClassAssociatedObjects(klass: IrClassSymbol, associatedObjectsGetters: List<AssociatedObjectBySymbols>) {
         val classAssociatedObjects = ClassAssociatedObjects(
             referenceTypeId(klass),
