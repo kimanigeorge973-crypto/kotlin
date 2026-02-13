@@ -18,6 +18,8 @@ import kotlin.collections.MutableMap
 import kotlin.collections.MutableSet
 import kotlin.collections.mutableMapOf
 import kotlin.collections.mutableSetOf
+import kotlin.collections.toList
+import kotlin.collections.toTypedArray
 import kotlin.io.path.Path
 import org.jetbrains.kotlin.buildtools.`internal`.DeepCopyable
 import org.jetbrains.kotlin.buildtools.`internal`.UseFromImplModuleRestricted
@@ -162,7 +164,7 @@ internal class JvmCompilerArgumentsImpl(
       throw IllegalStateException("Unknown arguments: ${unknownArgs.joinToString()}")
     }
     if (X_ABI_STABILITY in this) { arguments.abiStability = get(X_ABI_STABILITY)}
-    if (X_ADD_MODULES in this) { arguments.additionalJavaModules = get(X_ADD_MODULES)}
+    if (X_ADD_MODULES in this) { arguments.additionalJavaModules = get(X_ADD_MODULES)?.toTypedArray()}
     if (X_ALLOW_NO_SOURCE_FILES in this) { arguments.allowNoSourceFiles = get(X_ALLOW_NO_SOURCE_FILES)}
     if (X_ALLOW_UNSTABLE_DEPENDENCIES in this) { arguments.allowUnstableDependencies = get(X_ALLOW_UNSTABLE_DEPENDENCIES)}
     if (X_ANNOTATIONS_IN_METADATA in this) { arguments.annotationsInMetadata = get(X_ANNOTATIONS_IN_METADATA)}
@@ -248,7 +250,7 @@ internal class JvmCompilerArgumentsImpl(
   public fun applyCompilerArguments(arguments: K2JVMCompilerArguments) {
     super.applyCompilerArguments(arguments)
     try { this[X_ABI_STABILITY] = arguments.abiStability } catch (_: NoSuchMethodError) {  }
-    try { this[X_ADD_MODULES] = arguments.additionalJavaModules } catch (_: NoSuchMethodError) {  }
+    try { this[X_ADD_MODULES] = arguments.additionalJavaModules?.toList() } catch (_: NoSuchMethodError) {  }
     try { this[X_ALLOW_NO_SOURCE_FILES] = arguments.allowNoSourceFiles } catch (_: NoSuchMethodError) {  }
     try { this[X_ALLOW_UNSTABLE_DEPENDENCIES] = arguments.allowUnstableDependencies } catch (_: NoSuchMethodError) {  }
     try { this[X_ANNOTATIONS_IN_METADATA] = arguments.annotationsInMetadata } catch (_: NoSuchMethodError) {  }
@@ -353,7 +355,7 @@ internal class JvmCompilerArgumentsImpl(
     public val X_ABI_STABILITY: JvmCompilerArgument<String?> =
         JvmCompilerArgument("X_ABI_STABILITY")
 
-    public val X_ADD_MODULES: JvmCompilerArgument<Array<String>?> =
+    public val X_ADD_MODULES: JvmCompilerArgument<List<String>?> =
         JvmCompilerArgument("X_ADD_MODULES")
 
     public val X_ALLOW_NO_SOURCE_FILES: JvmCompilerArgument<Boolean> =
