@@ -654,6 +654,7 @@ class WasmDeserializer(inputStream: InputStream, private val skipLocalNames: Boo
         globalLiterals = deserializeGlobalLiterals(),
         globalLiteralsId = deserializeStringLiteralId(),
         stringLiteralId = deserializeStringLiteralId(),
+        callableReferenceIds = deserializeStringLiteralId(),
         constantArrayDataSegmentId = deserializeConstantArrayDataSegmentId(),
         jsFuns = deserializeJsFuns(),
         jsModuleImports = deserializeJsModuleImports(),

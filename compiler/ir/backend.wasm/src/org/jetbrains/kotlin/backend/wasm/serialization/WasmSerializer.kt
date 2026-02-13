@@ -100,6 +100,7 @@ class WasmSerializer(outputStream: OutputStream) {
         serializeGlobalLiterals(globalLiterals)
         serializeMap(globalLiteralsId, ::serializeString, ::serializeIntSymbol)
         serializeMap(stringLiteralId, ::serializeString, ::serializeIntSymbol)
+        serializeMap(callableReferenceIds, ::serializeString, ::serializeIntSymbol)
         serializeConstantArrayDataSegmentId(constantArrayDataSegmentId)
         serializeMap(jsFuns, ::serializeIdSignature, ::serializeJsCodeSnippet)
         serializeMap(jsModuleImports, ::serializeIdSignature, ::serializeString)

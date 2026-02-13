@@ -166,6 +166,7 @@ class WasmCompiledModuleFragment(
         val stringPoolSizeWithGlobals = bindGlobalLiterals(definedDeclarations, stringPoolSize)
 
         bindConstantArrayDataSegmentIds(data)
+        bindCallableReferenceIds()
 
         val exports = mutableListOf<WasmExport<*>>()
         forEachLinkerData {
@@ -929,6 +930,16 @@ class WasmCompiledModuleFragment(
                 }
                 val constData = ConstantDataIntegerArray(constantArraySegment.first, integerSize)
                 data.add(WasmData(WasmDataMode.Passive, constData.toBytes()))
+            }
+        }
+    }
+
+    private fun bindCallableReferenceIds() {
+        val visitedFqNames = mutableMapOf<String, Int>()
+        forEachLinkerData { linkerData ->
+            for ((fqName, symbol) in linkerData.callableReferenceIds.entries) {
+                val id = visitedFqNames.getOrPut(fqName) { visitedFqNames.size }
+                symbol.bind(id)
             }
         }
     }

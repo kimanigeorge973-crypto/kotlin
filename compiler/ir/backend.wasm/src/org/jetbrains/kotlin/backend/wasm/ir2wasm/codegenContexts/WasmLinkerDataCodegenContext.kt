@@ -36,6 +36,9 @@ open class WasmLinkerDataCodegenContext(
     fun referenceStringLiteralId(string: String): WasmSymbol<Int> =
         wasmFileFragment.stringLiteralId.getOrPut(string) { WasmSymbol() }
 
+    fun referenceCallableReferenceId(fqName: String): WasmSymbol<Int> =
+        wasmFileFragment.callableReferenceIds.getOrPut(fqName) { WasmSymbol() }
+
     fun referenceTypeId(irClass: IrClassSymbol): Long =
         cityHash64(irClass.getReferenceKey().toString().encodeToByteArray()).toLong()
 

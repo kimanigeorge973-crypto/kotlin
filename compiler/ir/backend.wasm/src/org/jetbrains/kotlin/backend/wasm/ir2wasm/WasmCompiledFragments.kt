@@ -41,6 +41,7 @@ class WasmCompiledLinkerDataFileFragment(
     val globalLiterals: MutableSet<LiteralGlobalSymbol> = mutableSetOf(),
     val globalLiteralsId: MutableMap<String, WasmSymbol<Int>> = mutableMapOf(),
     val stringLiteralId: MutableMap<String, WasmSymbol<Int>> = mutableMapOf(),
+    val callableReferenceIds: MutableMap<String, WasmSymbol<Int>> = mutableMapOf(),
     val constantArrayDataSegmentId: MutableMap<Pair<List<Long>, WasmType>, WasmSymbol<Int>> = mutableMapOf(),
     val jsFuns: MutableMap<IdSignature, JsCodeSnippet> = mutableMapOf(),
     val jsModuleImports: MutableMap<IdSignature, String> = mutableMapOf(),
