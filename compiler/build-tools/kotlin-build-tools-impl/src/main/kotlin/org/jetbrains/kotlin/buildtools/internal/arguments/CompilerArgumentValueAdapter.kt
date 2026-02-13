@@ -70,6 +70,11 @@ private object JvmCompilerArgumentPre2_4_0ValueAdapter : CompilerArgumentValueAd
                 } as T
             }
 
+            JvmCompilerArguments.X_ADD_MODULES -> {
+                val listValue: List<String> = value as List<String>
+                listValue.toTypedArray() as T
+            }
+
             else -> value as T
         }
     }
@@ -93,6 +98,11 @@ private object JvmCompilerArgumentPre2_4_0ValueAdapter : CompilerArgumentValueAd
                 require(parts.size == 3) { "Invalid async profiler settings format: $stringValue" }
 
                 ProfileCompilerCommand(Path(parts[0]), parts[1], Path(parts[2])) as T
+            }
+
+            JvmCompilerArguments.X_ADD_MODULES -> {
+                val arrayValue = value as Array<String>
+                arrayValue.toList() as T
             }
 
             else -> value as T
