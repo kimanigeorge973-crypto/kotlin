@@ -31,12 +31,23 @@ object KtRealSourceElementKind : KtSourceElementKind() {
 }
 
 /**
- * When an element has a kind of KtFakeSourceElementKind it means that relevant FIR element was created synthetically.
- * And while this definition might look a bit vaguely because, e.g. RawFirBuilder might create a lot of "synthetic" things
- * and not all of them we want to treat as "fake" (like when's created from if's), there is a criteria that ultimately means
- * that one need to use KtFakeSourceElementKind, and it's the situation when several FIR elements might share the same source element.
+ * When an element has a kind of [KtFakeSourceElementKind] it means that the relevant FIR element was created synthetically. And while this
+ * definition might look a bit vague because, for example, the raw FIR builder might create a lot of "synthetic" things and we don't want to
+ * treat all of them as "fake" (like `when`s created from `if`s), there is a criteria that ultimately means that one needs to use
+ * [KtFakeSourceElementKind], and it's the situation when several FIR elements might share the same real source element.
  *
- * And vice versa, KtRealSourceElementKind means that there's a single FIR node in the resulting tree that has the same source element.
+ * And vice versa, [KtRealSourceElementKind] means that there's a single FIR node in the resulting tree that has the same source element.
+ *
+ * ### Distinct fake source elements
+ *
+ * **Constraint:** To support the unambiguous source-based equality of FIR symbols, each FIR declaration in a file should have a distinct
+ * `(realSource, fakeElementKind)` pair as a source element.
+ *
+ * This constraint can be checked per file because fake source elements from different files can never be equal, as real source elements
+ * are distinct between files.
+ *
+ * When the constraint is violated, we can have two different FIR declarations with the same source element. Source-based equality would
+ * then break, because these FIR declarations would be unexpectedly equal.
  */
 sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeReporting: Boolean = false) : KtSourceElementKind() {
     /**
@@ -629,6 +640,19 @@ class KtOffsetsOnlySourceElement(
     override val endOffset: Int,
 ) : AbstractKtSourceElement()
 
+/**
+ * [KtSourceElement] represents the AST element associated with a specific location in the source code. It allows the compiler to map back
+ * to the source file.
+ *
+ * A source element can be either real or fake:
+ *
+ * - Real source elements are backed directly by a corresponding AST element. See [KtRealSourceElementKind].
+ * - Fake source elements are a combination of a real AST element and a [fake source element kind][KtFakeSourceElementKind]. Fake source
+ *   elements must adhere to distinctness constraints. See [KtFakeSourceElementKind].
+ *
+ * The two current implementations of [KtSourceElement] cover [light tree][KtLightSourceElement] and [PSI][KtPsiSourceElement] source
+ * elements.
+ */
 // TODO: consider renaming to something like AstBasedSourceElement
 sealed class KtSourceElement : AbstractKtSourceElement() {
     abstract val elementType: IElementType?
