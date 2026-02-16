@@ -1342,7 +1342,8 @@ open class FirDeclarationsResolveTransformer(
                     lambda.receiverParameter?.apply {
                         replaceTypeRef(
                             typeRef.resolvedTypeFromPrototype(
-                                coneKotlinType, fallbackSource = lambda.source?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter)
+                                coneKotlinType,
+                                fallbackSource = lambda.source?.fakeElement(KtFakeSourceElementKind.LambdaReceiver),
                             )
                         )
                     }
@@ -1350,17 +1351,18 @@ open class FirDeclarationsResolveTransformer(
 
         lambda.replaceContextParameters(
             lambda.contextParameters.takeIf { it.isNotEmpty() }
-                ?: resolvedLambdaAtom?.contextParameterTypes?.map { receiverType ->
+                ?: resolvedLambdaAtom?.contextParameterTypes?.mapIndexed { index, receiverType ->
+                    val sourceElement = lambda.source?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter(index))
+
                     buildValueParameter {
                         resolvePhase = FirResolvePhase.BODY_RESOLVE
-                        source = lambda.source?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter)
+                        source = sourceElement
                         containingDeclarationSymbol = lambda.symbol
                         moduleData = session.moduleData
                         origin = FirDeclarationOrigin.Source
                         name = SpecialNames.UNDERSCORE_FOR_UNUSED_VAR
                         symbol = FirValueParameterSymbol()
-                        returnTypeRef = receiverType
-                            .toFirResolvedTypeRef(lambda.source?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter))
+                        returnTypeRef = receiverType.toFirResolvedTypeRef(sourceElement)
                         valueParameterKind = FirValueParameterKind.ContextParameter
                     }
                 }.orEmpty()

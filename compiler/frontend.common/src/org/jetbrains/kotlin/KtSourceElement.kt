@@ -19,6 +19,7 @@ import com.intellij.util.diff.FlyweightCapableTreeStructure
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.getElementTextWithContext
+import java.util.Objects
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
 
 sealed class KtSourceElementKind {
@@ -537,8 +538,14 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
     /**
      * For function type `context(Foo) () -> Unit`,
      * the context parameter with type `Foo` of the anonymous function.
+     *
+     * @param index The index of the context parameter to distinguish source elements of different lambda context parameters.
      */
-    object LambdaContextParameter : KtFakeSourceElementKind()
+    class LambdaContextParameter(private val index: Int) : KtFakeSourceElementKind() {
+        override fun equals(other: Any?): Boolean = this === other || other is LambdaContextParameter && index == other.index
+        override fun hashCode(): Int = Objects.hash(javaClass, index.hashCode())
+        override fun toString(): String = "${LambdaContextParameter::class.simpleName}($index)"
+    }
 
     /**
      * While it doesn't have an explicit source, it still has a type that might be a ConeErrorType

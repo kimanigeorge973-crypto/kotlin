@@ -538,10 +538,12 @@ class FirCallCompleter(
             val originalLambdaSource = source
             if (isLambda) {
                 replaceContextParameters(
-                    givenContextParameterTypes.map { contextParameterType ->
+                    givenContextParameterTypes.mapIndexed { index, contextParameterType ->
+                        val sourceElement = originalLambdaSource?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter(index))
+
                         buildValueParameter {
                             resolvePhase = FirResolvePhase.BODY_RESOLVE
-                            source = originalLambdaSource?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter)
+                            source = sourceElement
                             containingDeclarationSymbol = this@setContextParametersConfiguration.symbol
                             moduleData = session.moduleData
                             origin = FirDeclarationOrigin.Source
@@ -549,7 +551,7 @@ class FirCallCompleter(
                             symbol = FirValueParameterSymbol()
                             returnTypeRef = contextParameterType
                                 .approximateLambdaInputType(symbol, withPCLASession, candidate)
-                                .toFirResolvedTypeRef(originalLambdaSource?.fakeElement(KtFakeSourceElementKind.LambdaContextParameter))
+                                .toFirResolvedTypeRef(sourceElement)
                             valueParameterKind = FirValueParameterKind.ContextParameter
                         }
                     }
