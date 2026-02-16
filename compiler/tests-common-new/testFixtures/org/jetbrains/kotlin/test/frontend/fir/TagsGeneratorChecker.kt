@@ -704,8 +704,8 @@ private class TagsCollectorVisitor(private val session: FirSession) : FirVisitor
 
     fun skipSyntheticDeclaration(source: KtSourceElement?): Boolean {
         return when (source?.kind) {
-            KtFakeSourceElementKind.DataClassGeneratedMembers -> true
             is KtFakeSourceElementKind.EnumGeneratedDeclaration -> true
+            is KtFakeSourceElementKind.DataClassGeneratedMembers -> true
             KtFakeSourceElementKind.DesugaredPrefixInc -> true
             KtFakeSourceElementKind.DesugaredPrefixDec -> true
             KtFakeSourceElementKind.DesugaredPostfixInc -> true

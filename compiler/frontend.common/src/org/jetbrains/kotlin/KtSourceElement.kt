@@ -339,11 +339,49 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
     object DesugaredInvertedContains : KtFakeSourceElementKind()
 
     /**
-     * For data classes, fir generates componentN() & copy() functions.
-     * For componentN() functions, the source will refer to the corresponding param and will be marked as a fake one.
-     * For copy() functions, the source will refer class to the param and will be marked as a fake one.
+     * For data classes, FIR generates `componentN()` and `copy()` functions, which are covered by the various fake source element kinds
+     * defined in this class.
+     *
+     * The fake element kinds must be kept in sync with [ALL_DATA_CLASS_GENERATED_MEMBERS].
      */
-    object DataClassGeneratedMembers : KtFakeSourceElementKind(shouldSkipErrorTypeReporting = true)
+    sealed class DataClassGeneratedMembers : KtFakeSourceElementKind(shouldSkipErrorTypeReporting = true) {
+        /**
+         * The source kind of a data class `componentN()` function. Its real source is the corresponding constructor parameter for which the
+         * component function has been generated.
+         */
+        object DataClassComponentFunction : DataClassGeneratedMembers()
+
+        /**
+         * The source kind of a data class `copy()` function. Its real source is the corresponding data class.
+         */
+        object DataClassCopyFunction : DataClassGeneratedMembers()
+
+        /**
+         * The source kind of a parameter of the [DataClassCopyFunction]. Its real source is the corresponding data class constructor
+         * parameter.
+         */
+        object DataClassCopyFunctionParameter : DataClassGeneratedMembers()
+
+        /**
+         * The source kind of a data class `equals(other: Any?)` function. Its real source is the corresponding data class.
+         */
+        object DataClassEqualsFunction : DataClassGeneratedMembers()
+
+        /**
+         * The source kind of the parameter of the [DataClassEqualsFunction]. Its real source is the corresponding data class.
+         */
+        object DataClassEqualsFunctionParameter : DataClassGeneratedMembers()
+
+        /**
+         * The source kind of a data class `hashCode()` function. Its real source is the corresponding data class.
+         */
+        object DataClassHashCodeFunction : DataClassGeneratedMembers()
+
+        /**
+         * The source kind of a data class `toString()` function. Its real source is the corresponding data class.
+         */
+        object DataClassToStringFunction : DataClassGeneratedMembers()
+    }
 
     /**
      * For synthetic overrides implemented by delegation
@@ -690,6 +728,16 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
             EnumGeneratedDeclaration.EnumEntriesPropertyGetter,
             EnumGeneratedDeclaration.EnumEntriesPropertyGetterReturnType,
             EnumGeneratedDeclaration.EnumCloneFunction,
+        )
+
+        val ALL_DATA_CLASS_GENERATED_MEMBERS: Set<DataClassGeneratedMembers> = setOf(
+            DataClassGeneratedMembers.DataClassComponentFunction,
+            DataClassGeneratedMembers.DataClassCopyFunction,
+            DataClassGeneratedMembers.DataClassCopyFunctionParameter,
+            DataClassGeneratedMembers.DataClassEqualsFunction,
+            DataClassGeneratedMembers.DataClassEqualsFunctionParameter,
+            DataClassGeneratedMembers.DataClassHashCodeFunction,
+            DataClassGeneratedMembers.DataClassToStringFunction,
         )
     }
 }
