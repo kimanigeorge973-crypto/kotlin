@@ -160,10 +160,6 @@ internal class SymbolLightMethodForMappedCollectionClass(
         if (name != other.name) return false
         if (isFinal != other.isFinal) return false
         if (hasImplementation != other.hasImplementation) return false
-        if (providedSignature != other.providedSignature) return false
-        if (returnType != other.returnType) return false
-        if (substitutor != other.substitutor) return false
-        if (substituteObjectWith != other.substituteObjectWith) return false
         if (javaMethod != other.javaMethod) return false
         if (containingClass != other.containingClass) return false
 
@@ -174,10 +170,6 @@ internal class SymbolLightMethodForMappedCollectionClass(
         var result = name.hashCode()
         result = 31 * result + isFinal.hashCode()
         result = 31 * result + hasImplementation.hashCode()
-        result = 31 * result + (providedSignature?.hashCode() ?: 0)
-        result = 31 * result + (returnType?.hashCode() ?: 0)
-        result = 31 * result + substitutor.hashCode()
-        result = 31 * result + (substituteObjectWith?.hashCode() ?: 0)
         result = 31 * result + javaMethod.hashCode()
         result = 31 * result + containingClass.hashCode()
         return result
