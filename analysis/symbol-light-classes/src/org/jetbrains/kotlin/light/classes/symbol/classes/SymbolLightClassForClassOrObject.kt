@@ -145,7 +145,7 @@ internal class SymbolLightClassForClassOrObject : SymbolLightClassForNamedClassL
             val allSupertypes = classSymbol.defaultType.allSupertypes
                 .filterIsInstance<KaClassType>()
                 .filter { it.classId != StandardClassIds.Any }
-                .toList()
+                .toList() // We assume that in practice the list is small enough.
 
             val filteredDeclarations = processOwnDeclarationsMappedCollectionMethodsAware(
                 containingClass = this@SymbolLightClassForClassOrObject,
