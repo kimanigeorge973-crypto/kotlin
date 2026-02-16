@@ -95,6 +95,7 @@ internal fun <T, R> unboxIntrinsic(x: T): R =
 // function type with argument types from the arguments of this
 // instrinsic. The return type must be specified explicitly.
 @ExcludedFromCodegen
+@UsedFromCompilerGeneratedCode
 internal fun <R> wasm_call_ref(f: Function<R>): R =
     implementedAsIntrinsic
 

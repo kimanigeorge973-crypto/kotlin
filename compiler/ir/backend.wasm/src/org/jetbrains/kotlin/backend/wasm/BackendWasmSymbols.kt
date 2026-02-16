@@ -16,8 +16,10 @@ import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.isNullable
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.platform.wasm.WasmTarget
@@ -236,6 +238,10 @@ class BackendWasmSymbols(
 
     val wasmStructRefType by ClassIds.structref.defaultType()
     val wasmFuncRefType by ClassIds.funcref.defaultType()
+    val wasmTypedFuncRefClass = ClassIds.typedfuncref.classSymbol()
+
+    fun wasmTypedFuncRefType(functionType: IrType): IrSimpleType =
+        wasmTypedFuncRefClass.typeWith(functionType)
 
     val wasmAnyRefClass = ClassIds.anyref.classSymbol()
 
@@ -341,7 +347,7 @@ private object ClassIds {
     val TypeInfoData = "TypeInfoData".wasmClassId
     val KClassImpl = "KClassImpl".wasmClassId
     val KClassInterfaceImpl = "KClassInterfaceImpl".wasmClassId
-    val KFunctionImpl = "KFunctionImpl".wasmClassId
+    val KFunctionImpl = "KFunctionImplNew".wasmClassId
     val KFunctionErrorImpl = "KFunctionErrorImpl".wasmClassId
     val WasmLongImmutableArray = "WasmLongImmutableArray".wasmClassId
     val FunctionAdapter = "FunctionAdapter".wasmClassId
@@ -380,6 +386,7 @@ private object ClassIds {
     val Appendable = ClassId(StandardClassIds.BASE_TEXT_PACKAGE, Name.identifier("Appendable"))
     val structref = ClassId(WasmStandardClassIds.BASE_WASM_INTERNAL_PACKAGE.child(Name.identifier("reftypes")), Name.identifier("structref"))
     val funcref = ClassId(WasmStandardClassIds.BASE_WASM_INTERNAL_PACKAGE.child(Name.identifier("reftypes")), Name.identifier("funcref"))
+    val typedfuncref = ClassId(WasmStandardClassIds.BASE_WASM_INTERNAL_PACKAGE.child(Name.identifier("reftypes")), Name.identifier("typedfuncref"))
     val anyref = ClassId(WasmStandardClassIds.BASE_WASM_INTERNAL_PACKAGE.child(Name.identifier("reftypes")), Name.identifier("anyref"))
     val WasmExport = ClassId(WasmStandardClassIds.BASE_WASM_PACKAGE, Name.identifier("WasmExport"))
 }

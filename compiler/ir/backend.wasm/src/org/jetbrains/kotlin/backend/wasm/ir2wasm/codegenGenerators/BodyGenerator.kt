@@ -771,9 +771,6 @@ class BodyGenerator(
             return
         }
 
-        // The call ref intrinsic needs to do manual casting of the
-        // function reference, as its first argument is currentlly an
-        // erased funcref.
         if (call.symbol == wasmSymbols.callRef) {
             val resultType = call.typeArguments[0]!!
             val callRefArguments = call.arguments.drop(1)
@@ -786,7 +783,6 @@ class BodyGenerator(
             callRefArguments.forEach { generateExpression(it!!) }
             val functionTypeReference = typeCodegenContext.referenceWasmFunctionType(wasmFunctionType)
             generateExpression(call.arguments[0]!!)
-            body.buildRefCastStatic(typeCodegenContext.referenceWasmFunctionHeapType(wasmFunctionType), location)
             body.buildInstr(WasmOp.CALL_REF, location, functionTypeReference)
             if (resultType.isUnit())
                 body.buildGetUnit()

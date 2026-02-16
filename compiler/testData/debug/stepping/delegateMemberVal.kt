@@ -102,14 +102,14 @@ fun box() {
 
 // EXPECTATIONS WASM
 // test.kt:19 $box (13)
-// test.kt:5 $A.<init> (4)
+// test.kt:5 $A.<init> (4, 13, 4)
 // test.kt:11 $Delegate.<init> (4)
 // test.kt:12 $Delegate.<init> (1)
 // test.kt:5 $A.<init> (4)
 // test.kt:8 $A.<init> (1)
 // test.kt:19 $box (17)
 // test.kt:14 $Delegate.getValue (15)
-// test.kt:6 $A$z$delegate$lambda.invoke (8, 10)
+// test.kt:6 $A$z$delegate$lambda$bridged (8, 10)
 // test.kt:14 $Delegate.getValue (15, 8)
 // test.kt:19 $box (17)
 // test.kt:20 $box (1)

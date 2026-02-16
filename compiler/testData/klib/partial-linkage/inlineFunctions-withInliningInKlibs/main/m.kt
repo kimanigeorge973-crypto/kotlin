@@ -322,7 +322,12 @@ fun box() = abiTest {
 
     // inline fun
     expectSuccess(true) { createRemovedInlineFunReference() is kotlin.reflect.KFunction<*> }
-    expectSuccess("removedInlineFun") { removedInlineFunReferenceName() }
+    if (testMode.isWasm) {
+        // Names of callable references in wasm are treated like other slots.
+        expectFailure(linkage("Reference to function 'removedInlineFun' can not be evaluated: No function found for symbol '/removedInlineFun'")) { removedInlineFunReferenceName() }
+    } else {
+        expectSuccess("removedInlineFun") { removedInlineFunReferenceName() }
+    }
     expectSuccess(123) { removedInlineFunReferenceInvoke() }
 
     if (!testMode.isJs) {

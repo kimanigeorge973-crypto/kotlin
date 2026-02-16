@@ -96,6 +96,7 @@ internal fun <T> wasmTypeId(): Long =
 
 @Suppress("UNUSED_PARAMETER")
 @ExcludedFromCodegen
+@UsedFromCompilerGeneratedCode
 internal fun wasmCallableReferenceId(fqName: String): Int =
     implementedAsIntrinsic
 

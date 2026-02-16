@@ -3,7 +3,12 @@ import abitestutils.abiTest
 fun box() = abiTest {
     // fun
     expectSuccess(true) { createRemovedFunReference() is kotlin.reflect.KFunction<*> }
-    expectSuccess("removedFun") { removedFunReferenceName() }
+    if (testMode.isWasm) {
+        // Names of callable references in wasm are treated like other slots.
+        expectFailure(linkage("Reference to function 'removedFun' can not be evaluated: No function found for symbol '/removedFun'")) { removedFunReferenceName() }
+    } else {
+        expectSuccess("removedFun") { removedFunReferenceName() }
+    }
     expectFailure(linkage("Reference to function 'removedFun' can not be evaluated: No function found for symbol '/removedFun'")) { removedFunReferenceHashCode() }
     expectFailure(linkage("Reference to function 'removedFun' can not be evaluated: No function found for symbol '/removedFun'")) { removedFunReferenceEquals() }
     expectFailure(linkage("Reference to function 'removedFun' can not be evaluated: No function found for symbol '/removedFun'")) { removedFunReferenceToString() }
@@ -11,7 +16,12 @@ fun box() = abiTest {
 
     // constructor
     expectSuccess(true) { createRemovedCtorReference() is kotlin.reflect.KFunction<*> }
-    expectSuccess("<init>") { removedCtorReferenceName() }
+    if (testMode.isWasm) {
+        // Names of callable references in wasm are treated like other slots.
+        expectFailure(linkage("Reference to constructor 'ClassWithRemovedCtor.<init>' can not be evaluated: No constructor found for symbol '/ClassWithRemovedCtor.<init>'")) { removedCtorReferenceName() }
+    } else {
+        expectSuccess("<init>") { removedCtorReferenceName() }
+    }
     expectFailure(linkage("Reference to constructor 'ClassWithRemovedCtor.<init>' can not be evaluated: No constructor found for symbol '/ClassWithRemovedCtor.<init>'")) { removedCtorReferenceHashCode() }
     expectFailure(linkage("Reference to constructor 'ClassWithRemovedCtor.<init>' can not be evaluated: No constructor found for symbol '/ClassWithRemovedCtor.<init>'")) { removedCtorReferenceEquals() }
     expectFailure(linkage("Reference to constructor 'ClassWithRemovedCtor.<init>' can not be evaluated: No constructor found for symbol '/ClassWithRemovedCtor.<init>'")) { removedCtorReferenceToString() }
