@@ -401,7 +401,7 @@ object FirExpectActualDeclarationChecker : FirBasicDeclarationChecker(MppChecker
         return when (source?.kind) {
             null -> false
             KtFakeSourceElementKind.DataClassGeneratedMembers -> false
-            KtFakeSourceElementKind.EnumGeneratedDeclaration -> false
+            is KtFakeSourceElementKind.EnumGeneratedDeclaration -> false
             KtFakeSourceElementKind.ImplicitConstructor -> false
             else -> hasModifier(KtTokens.ACTUAL_KEYWORD)
         }

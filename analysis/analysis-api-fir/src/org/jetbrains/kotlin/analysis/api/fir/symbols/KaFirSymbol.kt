@@ -56,7 +56,7 @@ internal tailrec fun FirDeclaration.ktSymbolOrigin(): KaSymbolOrigin = when (ori
         when (source?.kind) {
             KtFakeSourceElementKind.ImplicitConstructor,
             KtFakeSourceElementKind.DataClassGeneratedMembers, /* Valid for copy() / componentX(), should we change it? */
-            KtFakeSourceElementKind.EnumGeneratedDeclaration,
+            is KtFakeSourceElementKind.EnumGeneratedDeclaration,
             KtFakeSourceElementKind.ItLambdaParameter,
                 -> KaSymbolOrigin.SOURCE_MEMBER_GENERATED
 
@@ -70,7 +70,7 @@ internal tailrec fun FirDeclaration.ktSymbolOrigin(): KaSymbolOrigin = when (ori
     is FirDeclarationOrigin.Java.Library -> KaSymbolOrigin.JAVA_LIBRARY
     FirDeclarationOrigin.SamConstructor -> KaSymbolOrigin.SAM_CONSTRUCTOR
     FirDeclarationOrigin.Enhancement, FirDeclarationOrigin.RenamedForOverride -> when (source?.kind) {
-        KtFakeSourceElementKind.EnumGeneratedDeclaration -> KaSymbolOrigin.SOURCE_MEMBER_GENERATED
+        is KtFakeSourceElementKind.EnumGeneratedDeclaration -> KaSymbolOrigin.SOURCE_MEMBER_GENERATED
         else -> javaOriginBasedOnSessionKind()
     }
     FirDeclarationOrigin.IntersectionOverride -> KaSymbolOrigin.INTERSECTION_OVERRIDE

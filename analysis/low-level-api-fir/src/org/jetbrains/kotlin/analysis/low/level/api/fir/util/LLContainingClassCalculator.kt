@@ -93,7 +93,7 @@ internal object LLContainingClassCalculator {
                     return computeContainingClass(symbol, containingParameter?.containingClassOrObject)
                 }
 
-                if (kind == EnumGeneratedDeclaration) {
+                if (kind is EnumGeneratedDeclaration) {
                     return computeContainingClass(symbol, source.psi)
                 }
 

@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusWithLazyEffectiveVisibility
-import org.jetbrains.kotlin.fir.declarations.utils.isLocal
 import org.jetbrains.kotlin.fir.expressions.builder.buildEmptyExpressionBlock
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
@@ -36,6 +35,9 @@ import org.jetbrains.kotlin.fir.types.toLookupTag
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.StandardClassIds
+
+// Note: The fake source elements of the generated enum members should be distinct per the contract of `KtFakeSourceElementKind`. Hence, the
+// generator functions must ensure that each pair of `(realSource, fakeElementKind)` is distinct.
 
 fun FirRegularClassBuilder.generateValuesFunction(
     moduleData: FirModuleData,
@@ -68,13 +70,15 @@ fun generateValuesFunction(
     makeExpect: Boolean = false,
     origin: FirDeclarationOrigin = FirDeclarationOrigin.Source,
 ): FirNamedFunction {
-    val sourceElement = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration)
     return buildNamedFunction {
+        val sourceElement = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumValuesFunction)
+
         source = sourceElement
         this.origin = origin
         this.moduleData = moduleData
+
         val returnTypeRef = buildResolvedTypeRef {
-            source = sourceElement
+            source = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumValuesFunctionReturnType)
             coneType = ConeClassLikeTypeImpl(
                 StandardClassIds.Array.toLookupTag(),
                 arrayOf(
@@ -87,8 +91,8 @@ fun generateValuesFunction(
                 isMarkedNullable = false
             )
         }
-
         this.returnTypeRef = returnTypeRef
+
         name = ENUM_VALUES
         this.status = createStatus(classStatus).apply {
             isStatic = true
@@ -136,13 +140,13 @@ fun generateValueOfFunction(
     makeExpect: Boolean = false,
     origin: FirDeclarationOrigin = FirDeclarationOrigin.Source,
 ): FirNamedFunction {
-    val sourceElement = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration)
+    val sourceElement = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumValueOfFunction)
     return buildNamedFunction {
         source = sourceElement
         this.origin = origin
         this.moduleData = moduleData
         val returnTypeRef = buildResolvedTypeRef {
-            source = sourceElement
+            source = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumValueOfFunctionReturnType)
             coneType = ConeClassLikeTypeImpl(
                 classSymbol.toLookupTag(),
                 emptyArray(),
@@ -159,12 +163,15 @@ fun generateValueOfFunction(
         isLocal = classStatus.visibility == Visibilities.Local
         symbol = FirNamedFunctionSymbol(CallableId(packageFqName, classFqName, ENUM_VALUE_OF))
         valueParameters += buildValueParameter vp@{
-            source = sourceElement
+            val valueParameterSource = classSource
+                ?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumValueOfFunctionParameter)
+
+            source = valueParameterSource
             containingDeclarationSymbol = this@buildNamedFunction.symbol
             this.origin = origin
             this.moduleData = moduleData
             this.returnTypeRef = buildResolvedTypeRef {
-                source = sourceElement
+                source = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumValueOfFunctionParameterType)
                 coneType = ConeClassLikeTypeImpl(
                     StandardClassIds.String.toLookupTag(),
                     emptyArray(),
@@ -218,14 +225,15 @@ fun generateEntriesGetter(
     makeExpect: Boolean = false,
     origin: FirDeclarationOrigin = FirDeclarationOrigin.Source,
 ): FirProperty {
-    val sourceElement = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration)
     return buildProperty {
+        val sourceElement = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumEntriesProperty)
+
         source = sourceElement
         isVar = false
         this.origin = origin
         this.moduleData = moduleData
         returnTypeRef = buildResolvedTypeRef {
-            source = sourceElement
+            source = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumEntriesPropertyReturnType)
             coneType = ConeClassLikeTypeImpl(
                 StandardClassIds.EnumEntries.toLookupTag(),
                 arrayOf(
@@ -247,11 +255,15 @@ fun generateEntriesGetter(
 
         symbol = FirRegularPropertySymbol(CallableId(packageFqName, classFqName, ENUM_ENTRIES))
         resolvePhase = classResolvePhase
+
+        val getterTypeRefSource =
+            returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumEntriesPropertyGetterReturnType)
+
         getter = FirDefaultPropertyGetter(
-            source = sourceElement?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration),
+            source = classSource?.fakeElement(KtFakeSourceElementKind.EnumGeneratedDeclaration.EnumEntriesPropertyGetter),
             moduleData = moduleData,
             origin = origin,
-            propertyTypeRef = returnTypeRef.copyWithNewSourceKind(KtFakeSourceElementKind.EnumGeneratedDeclaration),
+            propertyTypeRef = getterTypeRefSource,
             visibility = Visibilities.Public,
             propertySymbol = symbol,
             modality = Modality.FINAL,
