@@ -1216,13 +1216,14 @@ internal class KaFirResolver(
 
         val getValueCall = (firProperty.getter?.body?.statements?.singleOrNull() as? FirReturnExpression)
             ?.result
-            ?.asFunctionOperatorCall(KtFakeSourceElementKind.DelegatedPropertyAccessor)
+            ?.asFunctionOperatorCall(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertyGetter)
 
         val setValueCall = (firProperty.setter?.body?.statements?.singleOrNull() as? FirReturnExpression)
             ?.result
-            ?.asFunctionOperatorCall(KtFakeSourceElementKind.DelegatedPropertyAccessor)
+            ?.asFunctionOperatorCall(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertySetter)
 
-        val provideDelegateCall = firProperty.delegate?.asFunctionOperatorCall(KtFakeSourceElementKind.DelegatedPropertyAccessor)
+        val provideDelegateCall = firProperty.delegate
+            ?.asFunctionOperatorCall(KtFakeSourceElementKind.DelegatedPropertyAccessor.DelegatedPropertyDelegateExpression)
 
         return FirPropertyDelegateCalls(
             getValueCall = getValueCall,

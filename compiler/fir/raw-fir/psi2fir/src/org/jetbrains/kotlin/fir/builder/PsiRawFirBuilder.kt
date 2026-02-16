@@ -2673,10 +2673,10 @@ open class PsiRawFirBuilder(
                                     ownerRegularOrAnonymousObjectSymbol,
                                     context,
                                     isExtension = receiverTypeReference != null,
+                                    explicitDeclarationSource = propertySource,
                                     lazyDelegateExpression = lazyDelegateExpression,
                                     lazyBodyForGeneratedAccessors = lazyBody,
                                     bindFunction = ::bindFunctionTarget,
-                                    explicitDeclarationSource = propertySource,
                                 )
                             }
                         }
