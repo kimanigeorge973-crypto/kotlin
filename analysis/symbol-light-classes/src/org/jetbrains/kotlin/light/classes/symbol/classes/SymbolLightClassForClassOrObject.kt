@@ -245,12 +245,12 @@ internal class SymbolLightClassForClassOrObject : SymbolLightClassForNamedClassL
             )
         }
 
-        val hasCollectionSupertype = hasCollectionSupertype(allSupertypes)
+        val hasCollectionSupertype = lazy(LazyThreadSafetyMode.NONE) { hasCollectionSupertype(allSupertypes) }
 
         classSymbol.delegatedMemberScope.callables.forEach { callableSymbol ->
             when (callableSymbol) {
                 is KaNamedFunctionSymbol -> {
-                    if (!hasCollectionSupertype) {
+                    if (!hasCollectionSupertype.value) {
                         createDelegateMethod(functionSymbol = callableSymbol)
                         return@forEach
                     }
