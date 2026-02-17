@@ -438,15 +438,15 @@ private class DebugDiagnosticConsumer(
             KtFakeSourceElementKind.DesugaredTimesAssign,
             KtFakeSourceElementKind.DesugaredDivAssign,
             KtFakeSourceElementKind.DesugaredRemAssign,
-            KtFakeSourceElementKind.DesugaredPrefixDec,
-            KtFakeSourceElementKind.DesugaredPrefixInc,
-            KtFakeSourceElementKind.DesugaredPostfixDec,
-            KtFakeSourceElementKind.DesugaredPostfixInc
         )
+
+        private val KtSourceElementKind.isAllowedKindForDebugInfo: Boolean
+            get() = this in allowedKindsForDebugInfo ||
+                    this is KtFakeSourceElementKind.DesugaredIncrementOrDecrement && !isSecondGetReference
     }
 
     fun report(factory: KtDiagnosticFactory0, sourceElement: KtSourceElement?) {
-        if (sourceElement == null || sourceElement.kind !in allowedKindsForDebugInfo) return
+        if (sourceElement == null || !sourceElement.kind.isAllowedKindForDebugInfo) return
 
         // Lambda argument is always (?) duplicated by function literal
         // Block expression is always (?) duplicated by single block expression
@@ -478,7 +478,7 @@ private class DebugDiagnosticConsumer(
     }
 
     fun report(factory: KtDiagnosticFactory1<String>, element: FirElement, argumentFactory: () -> String) {
-        val sourceElement = element.source?.takeIf { it.kind in allowedKindsForDebugInfo } ?: return
+        val sourceElement = element.source?.takeIf { it.kind.isAllowedKindForDebugInfo } ?: return
 
         // Lambda argument is always (?) duplicated by function literal
         // Block expression is always (?) duplicated by single block expression

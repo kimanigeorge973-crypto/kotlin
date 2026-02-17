@@ -843,17 +843,12 @@ abstract class AbstractRawFirBuilder<T : Any>(val baseSession: FirSession, val c
                     ),
                     sourceKind
                 )
-                statements += buildGetCall(
-                    if (isInc) {
-                        KtFakeSourceElementKind.DesugaredPrefixIncSecondGetReference
-                    } else {
-                        KtFakeSourceElementKind.DesugaredPrefixDecSecondGetReference
-                    }
-                )
+                statements += buildGetCall(sourceKind.forSecondGetReference)
             } else {
+                val unaryVariableSource = baseSource.fakeElement(sourceKind.forUnaryVariable)
                 val initialValueVar = generateTemporaryVariable(
                     baseModuleData,
-                    desugaredSource,
+                    unaryVariableSource,
                     SpecialNames.UNARY,
                     buildGetCall(sourceKind)
                 )

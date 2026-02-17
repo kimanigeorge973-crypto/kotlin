@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isExternal
-import org.jetbrains.kotlin.fir.declarations.utils.isReplSnippetDeclaration
 import org.jetbrains.kotlin.fir.diagnostics.*
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.FirOperation.*
@@ -970,14 +969,17 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
         if (expression is FirQualifiedAccessExpression) expression.replaceSource(expression.source?.fakeElement(fakeSourceKind))
 
         val desugaredSource = incrementDecrementExpression.source?.fakeElement(fakeSourceKind)
+        val receiverVariableSource = incrementDecrementExpression.source?.fakeElement(fakeSourceKind.forReceiverVariable)
+        val unaryVariableSource = incrementDecrementExpression.source?.fakeElement(fakeSourceKind.forUnaryVariable)
 
-        fun generateTemporaryVariable(name: Name, initializer: FirExpression): FirProperty = generateTemporaryVariable(
-            moduleData = session.moduleData,
-            source = desugaredSource,
-            name = name,
-            initializer = initializer,
-            typeRef = initializer.resolvedType.toFirResolvedTypeRef(desugaredSource),
-        )
+        fun generateTemporaryVariable(name: Name, initializer: FirExpression, source: KtSourceElement?): FirProperty =
+            generateTemporaryVariable(
+                moduleData = session.moduleData,
+                source = source,
+                name = name,
+                initializer = initializer,
+                typeRef = initializer.resolvedType.toFirResolvedTypeRef(source),
+            )
 
         fun buildAndResolveOperatorCall(
             receiver: FirExpression,
@@ -1007,7 +1009,7 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
             source = desugaredSource
             annotations += incrementDecrementExpression.annotations
 
-            generateExplicitReceiverTemporaryVariable(session, expression, desugaredSource)
+            generateExplicitReceiverTemporaryVariable(session, expression, receiverVariableSource)
                 ?.let { statements += it }
 
             if (incrementDecrementExpression.isPrefix) {
@@ -1024,7 +1026,7 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
                     transformExpressionUsingSmartcastInfo(it)
                 }
             } else {
-                val unaryVariable = generateTemporaryVariable(SpecialNames.UNARY, expression)
+                val unaryVariable = generateTemporaryVariable(SpecialNames.UNARY, expression, unaryVariableSource)
                 dataFlowAnalyzer.enterLocalVariableDeclaration(unaryVariable)
                 dataFlowAnalyzer.exitLocalVariableDeclaration(unaryVariable, hadExplicitType = false)
 

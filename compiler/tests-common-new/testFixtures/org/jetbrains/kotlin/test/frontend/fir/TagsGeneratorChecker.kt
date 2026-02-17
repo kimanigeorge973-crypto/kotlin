@@ -706,12 +706,7 @@ private class TagsCollectorVisitor(private val session: FirSession) : FirVisitor
         return when (source?.kind) {
             is KtFakeSourceElementKind.EnumGeneratedDeclaration -> true
             is KtFakeSourceElementKind.DataClassGeneratedMembers -> true
-            KtFakeSourceElementKind.DesugaredPrefixInc -> true
-            KtFakeSourceElementKind.DesugaredPrefixDec -> true
-            KtFakeSourceElementKind.DesugaredPostfixInc -> true
-            KtFakeSourceElementKind.DesugaredPostfixDec -> true
-            KtFakeSourceElementKind.DesugaredPrefixIncSecondGetReference -> true
-            KtFakeSourceElementKind.DesugaredPrefixDecSecondGetReference -> true
+            is KtFakeSourceElementKind.DesugaredIncrementOrDecrement -> true
             KtFakeSourceElementKind.ArrayAccessNameReference -> true
             KtFakeSourceElementKind.ArrayIndexExpressionReference -> true
             KtFakeSourceElementKind.ArrayTypeFromVarargParameter -> true

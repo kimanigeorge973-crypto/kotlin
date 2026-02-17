@@ -658,7 +658,7 @@ class CallAndReferenceGenerator(
                                 contextParameterCount = property.contextParameters.size,
                                 hasDispatchReceiver = property.dispatchReceiverType != null,
                                 hasExtensionReceiver = property.isExtension,
-                                origin = incOrDecSourceKindToIrStatementOrigin[qualifiedAccess.source?.kind]
+                                origin = qualifiedAccess.source?.kind?.incOrDecSourceKindToIrStatementOrigin()
                                     ?: augmentedAssignSourceKindToIrStatementOrigin[qualifiedAccess.source?.kind]
                                     ?: IrStatementOrigin.GET_PROPERTY,
                                 superQualifierSymbol = dispatchReceiver?.superQualifierSymbolForFunctionAndPropertyAccess()
@@ -690,7 +690,7 @@ class CallAndReferenceGenerator(
                         variable.irTypeForPotentiallyComponentCall(predefinedType = irType),
                         irSymbol,
                         origin = if (variableAsFunctionMode) IrStatementOrigin.VARIABLE_AS_FUNCTION
-                        else incOrDecSourceKindToIrStatementOrigin[qualifiedAccess.source?.kind] ?: calleeReference.statementOrigin()
+                        else qualifiedAccess.source?.kind?.incOrDecSourceKindToIrStatementOrigin() ?: calleeReference.statementOrigin()
                     )
                 }
 
