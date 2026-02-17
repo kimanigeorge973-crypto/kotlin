@@ -10,6 +10,7 @@ package org.jetbrains.kotlin
 import com.intellij.lang.LighterASTNode
 import com.intellij.lang.TreeBackedLighterAST
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -1119,6 +1120,22 @@ sealed class KtPsiSourceElement(val psi: PsiElement) : KtSourceElement() {
     override fun hashCode(): Int {
         return psi.hashCode()
     }
+
+    override fun toString(): String = buildString {
+        append(this@KtPsiSourceElement::class.simpleName)
+        append('(')
+        elementType?.let { append(it).append(", ") }
+        if (kind is KtFakeSourceElementKind) {
+            append(kind::class.simpleName).append(", ")
+        }
+        try {
+            val pos = StringUtil.offsetToLineColumn(psi.containingFile.text, startOffset)
+            append(pos.line + 1).append(':').append(pos.column + 1)
+        } catch (_: Exception) {
+            append(startOffset).append("..").append(endOffset)
+        }
+        append(')')
+    }
 }
 
 class KtRealPsiSourceElement(psi: PsiElement) : KtPsiSourceElement(psi) {
@@ -1306,6 +1323,17 @@ class KtLightSourceElement(
         result = 31 * result + treeStructure.hashCode()
         result = 31 * result + kind.hashCode()
         return result
+    }
+
+    override fun toString(): String = buildString {
+        append(this@KtLightSourceElement::class.simpleName)
+        append("(")
+        append(elementType).append(", ")
+        if (kind is KtFakeSourceElementKind) {
+            append(kind::class.simpleName).append(", ")
+        }
+        append(startOffset).append("..").append(endOffset)
+        append(')')
     }
 }
 
