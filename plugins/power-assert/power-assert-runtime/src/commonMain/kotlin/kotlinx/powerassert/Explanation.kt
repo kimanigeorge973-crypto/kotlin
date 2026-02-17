@@ -15,19 +15,22 @@ public abstract class Explanation
 }
 
 public fun Explanation.toDefaultMessage(
-    render: Expression.() -> String? = Expression::render,
+    render: (Expression) -> String? = Expression::valueToString,
 ): String = toDiagram(render)
 
 public fun Explanation.toDiagram(
-    render: Expression.() -> String? = Expression::render,
+    render: (Expression) -> String? = Expression::valueToString,
 ): String {
-    return buildString { appendDiagram(source, expressions, render) }.trimIndent()
+    return buildString {
+        appendDiagram(source, expressions, render)
+        appendLine()
+    }.trimIndent()
 }
 
 private fun StringBuilder.appendDiagram(
     source: String,
     expressions: List<Expression>,
-    render: Expression.() -> String?,
+    render: (Expression) -> String?,
 ) {
     class DiagramValue(
         val row: Int,
@@ -35,7 +38,7 @@ private fun StringBuilder.appendDiagram(
         val display: String,
     ) {
         fun overlaps(other: DiagramValue): Boolean {
-            return row == other.row && indent < other.indent && display.length >= (other.indent - indent)
+            return row == other.row && indent <= other.indent && display.length >= (other.indent - indent)
         }
     }
 
@@ -44,7 +47,7 @@ private fun StringBuilder.appendDiagram(
     }
 
     fun Expression.toDiagramValue(): DiagramValue? {
-        val display = render() ?: return null
+        val display = render(this) ?: return null
         val row = -(newlineOffsets.binarySearch(displayOffset) + 1)
         val rowOffset = if (row == 0) 0 else newlineOffsets[row - 1] + 1
         return DiagramValue(
@@ -122,18 +125,9 @@ private fun StringBuilder.appendDiagram(
     }
 }
 
-// TODO service loader implementation?
-public fun Expression.render(): String {
-    if (this is EqualityExpression && value == false) {
-        return "Expected <${lhs.render()}>, actual <${rhs.render()}>."
-    }
-
-    return value.render()
-}
-
 @OptIn(ExperimentalUnsignedTypes::class)
-private fun Any?.render(): String {
-    return when (val value = this) {
+private fun Expression.valueToString(): String {
+    return when (val value = value) {
         is Array<*> -> value.contentDeepToString()
         is ByteArray -> value.contentToString()
         is ShortArray -> value.contentToString()

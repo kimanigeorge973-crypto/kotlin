@@ -45,27 +45,57 @@ import org.jetbrains.kotlin.powerassert.builder.call.CallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.LambdaCallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.SamConversionLambdaCallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.SimpleCallBuilder
+import org.jetbrains.kotlin.powerassert.builder.parameter.CallExplanationParameterBuilder
+import org.jetbrains.kotlin.powerassert.builder.parameter.DefaultMessageParameterBuilder
+import org.jetbrains.kotlin.powerassert.builder.parameter.ExplanationFactory
+import org.jetbrains.kotlin.powerassert.builder.parameter.ParameterBuilder
+import org.jetbrains.kotlin.powerassert.builder.parameter.StringParameterBuilder
 import org.jetbrains.kotlin.powerassert.diagram.*
-import org.jetbrains.kotlin.powerassert.builder.explanation.ParameterBuilder
-import org.jetbrains.kotlin.powerassert.builder.explanation.StringParameterBuilder
 
 class PowerAssertCallTransformer(
     private val sourceFile: SourceFile,
     private val context: IrPluginContext,
     private val configuration: PowerAssertConfiguration,
+    private val builtIns: PowerAssertBuiltIns,
+    private val factory: PowerAssertFunctionFactory,
 ) : IrElementTransformerVoidWithContext() {
     private val irTypeSystemContext = IrTypeSystemContextImpl(context.irBuiltIns)
+    private val explanationFactory = ExplanationFactory(builtIns)
 
     override fun visitCall(expression: IrCall): IrExpression {
         expression.transformChildrenVoid()
 
         val function = expression.symbol.owner
-        val fqName = function.kotlinFqName
         return when {
+            // Call has no parameters to transform.
             function.parameters.isEmpty() -> expression
-            fqName in configuration.functions -> buildForOverride(expression, function)
+            // Never transform calls to super instance. TODO is there a better check for this?
+            expression.symbol in (currentFunction?.irElement as? IrSimpleFunction)?.overriddenSymbols.orEmpty() -> expression
+            // Called function is annotated with @PowerAssert so should be transformed with CallExplanation.
+            function.hasAnnotationOrOverridden(builtIns.powerAssertClass) -> buildForAnnotated(expression, function)
+            // Called function is part of configuration so should be transformed with raw string diagram.
+            function.kotlinFqName in configuration.functions -> buildForOverride(expression, function)
+            // Not a transformable function call.
             else -> expression
         }
+    }
+
+    private fun buildForAnnotated(
+        originalCall: IrCall,
+        function: IrSimpleFunction,
+    ): IrExpression {
+        val synthetic = factory.find(function)
+        if (synthetic == null) {
+            configuration.messageCollector.warn(
+                expression = originalCall,
+                message = "Called function '${function.kotlinFqName}' was not compiled with the power-assert compiler-plugin.",
+            )
+            return originalCall
+        }
+
+        val diagramBuilder = CallExplanationParameterBuilder(explanationFactory, sourceFile, originalCall)
+        val callBuilder = SimpleCallBuilder(synthetic, originalCall)
+        return buildPowerAssertCall(originalCall, function, callBuilder, diagramBuilder)
     }
 
     private fun buildForOverride(originalCall: IrCall, function: IrSimpleFunction): IrExpression {
@@ -109,16 +139,12 @@ class PowerAssertCallTransformer(
         callBuilder: CallBuilder,
         parameterBuilder: ParameterBuilder,
     ): IrExpression {
-        val roots = when (callBuilder.function.parameters.size) {
-            function.parameters.size -> {
-                (0 until originalCall.arguments.size - 1)
-                    .map { buildTree(function.parameters[it], originalCall.arguments[it]) }
-            }
-            else -> {
-                (0 until originalCall.arguments.size)
-                    .map { buildTree(function.parameters[it], originalCall.arguments[it]) }
-            }
+        val argumentsSize = when (callBuilder.function.parameters.size) {
+            function.parameters.size -> originalCall.arguments.size - 1
+            else -> originalCall.arguments.size
         }
+        val roots = (0..<argumentsSize)
+            .map { buildTree(function.parameters[it], originalCall.arguments[it]) }
 
         // If all roots are null or non-visible, there are no transformable parameters
         if (roots.all { it.child == null }) {
@@ -136,7 +162,17 @@ class PowerAssertCallTransformer(
         )
     }
 
-    private fun <T> buildTree(parameter: T, argument: IrExpression?): RootNode<T> {
+    private fun buildTree(parameter: IrValueParameter, argument: IrExpression?): RootNode<IrValueParameter> {
+        // Check if the parameter or parameter type should be ignored.
+        if (
+            parameter.hasAnnotation(builtIns.powerAssertIgnoreClass) ||
+            parameter.type.getClass()?.hasAnnotation(builtIns.powerAssertIgnoreClass) == true
+        ) {
+            val root = RootNode(parameter)
+            if (argument != null) root.addChild(HiddenNode(argument))
+            return root
+        }
+
         return buildTree(configuration.constTracker, sourceFile, parameter, argument)
     }
 

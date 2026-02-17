@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.test.services.AdditionalSourceProvider
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.TestModuleStructure
 import org.jetbrains.kotlin.test.services.TestServices
-import java.io.File
 
 // ------------------------ codegen ------------------------
 
@@ -59,6 +58,7 @@ fun TestConfigurationBuilder.configurePlugin() {
         ::AdditionalSourceFilesProvider,
     )
 
+    enableRuntime()
     enableJunit()
 
     irHandlersStep {
@@ -75,7 +75,14 @@ class PowerAssertEnvironmentConfigurator(testServices: TestServices) : Environme
             .ifEmpty { listOf("kotlin.assert") }
             .mapTo(mutableSetOf()) { FqName(it) }
 
-        IrGenerationExtension.registerExtension(PowerAssertIrGenerationExtension(PowerAssertConfiguration(configuration, functions)))
+        IrGenerationExtension.registerExtension(
+            PowerAssertIrGenerationExtension(
+                PowerAssertConfiguration(
+                    configuration = configuration,
+                    functions = functions,
+                )
+            )
+        )
     }
 }
 

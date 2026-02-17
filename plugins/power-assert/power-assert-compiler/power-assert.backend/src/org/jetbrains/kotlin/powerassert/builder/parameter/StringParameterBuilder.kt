@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.powerassert.builder.explanation
+package org.jetbrains.kotlin.powerassert.builder.parameter
 
 import org.jetbrains.kotlin.ir.SourceRangeInfo
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
@@ -76,8 +76,7 @@ class StringParameterBuilder(
 
         // Get call source string starting at the very beginning of the first line.
         // This is so multiline calls all start from the same column offset.
-        val rows = sourceFile.getText(callInfo.startOffset - callInfo.startColumnNumber, callInfo.endOffset)
-            .clearSourcePrefix(callInfo.startColumnNumber)
+        val rows = sourceFile.getRedactedTextBlock(callInfo)
             .split("\n")
 
         val minSourceIndent = rows.minOf { line ->
@@ -146,20 +145,6 @@ class StringParameterBuilder(
                     appendLine()
                 }
             )
-        }
-    }
-
-    private fun String.clearSourcePrefix(offset: Int): String = buildString {
-        for ((i, c) in this@clearSourcePrefix.withIndex()) {
-            when {
-                i >= offset -> {
-                    // Append the remaining characters and exit.
-                    append(this@clearSourcePrefix.substring(i))
-                    break
-                }
-                c == '\t' -> append('\t') // Preserve tabs.
-                else -> append(' ') // Replace all other characters with spaces.
-            }
         }
     }
 

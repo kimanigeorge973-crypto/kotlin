@@ -1,0 +1,38 @@
+// MODULE: lib
+// FILE: A.kt
+
+@JvmSynthetic
+fun describe$explained(value: Any, $explanation: CallExplanation): String? {
+  return { // BLOCK
+    val tmp_0: CallExplanation? = $explanation
+    when {
+      EQEQ(arg0 = tmp_0, arg1 = null) -> null
+      else -> tmp_0.toDefaultMessage()
+    }
+  }
+}
+
+@PowerAssert
+fun describe(value: Any): String? {
+  return { // BLOCK
+    val tmp_1: CallExplanation? = null
+    when {
+      EQEQ(arg0 = tmp_1, arg1 = null) -> null
+      else -> tmp_1.toDefaultMessage()
+    }
+  }
+}
+
+// MODULE: main
+// FILE: B.kt
+
+fun box(): String {
+  val reallyLongList: List<String> = listOf<String>(elements = ["a", "b"])
+  return { // BLOCK
+    val tmp_0: String? = describe(value = EQEQ(arg0 = reallyLongList.reversed<String>(), arg1 = emptyList<String>()))
+    when {
+      EQEQ(arg0 = tmp_0, arg1 = null) -> "FAIL"
+      else -> tmp_0
+    }
+  }
+}

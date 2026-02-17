@@ -40,13 +40,12 @@ class PowerAssertCompilerPluginRegistrar(
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val functions = configuration[KEY_FUNCTIONS]?.map { FqName(it) } ?: functions
-        if (functions.isEmpty()) return
 
         IrGenerationExtension.registerExtension(
             PowerAssertIrGenerationExtension(
                 PowerAssertConfiguration(
-                    configuration,
-                    functions.toSet()
+                    configuration = configuration,
+                    functions = functions.toSet()
                 )
             )
         )
