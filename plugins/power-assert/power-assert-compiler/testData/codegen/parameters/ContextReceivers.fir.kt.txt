@@ -55,7 +55,7 @@ fun test1() {
     { // BLOCK
       val tmp0_Explain: Int = "test".<get-length>()
       val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-      context1Assert(/* $context-Asserter = $this$with, */ condition = tmp1_Explain, msg = "\ncontext1Assert(\"test\".length == 5)" + "\n                      |      |" + "\n                      |      " + tmp1_Explain + "\n                      " + tmp0_Explain + "\n")
+      context1Assert(/* $context-Asserter = $this$with, */ condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 566, source = "        context1Assert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 23, endOffset = 41, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 23, endOffset = 36, displayOffset = 30, value = tmp0_Explain), EqualityExpression(startOffset = 23, endOffset = 41, displayOffset = 37, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
     }
   }
 )
@@ -66,7 +66,7 @@ fun test2() {
     { // BLOCK
       val tmp0_Explain: Int = "test".<get-length>()
       val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-      context2Assert(/* $context-Asserter#1 = $this$with, $context-Asserter#2 = $this$with, */ condition = tmp1_Explain, msg = "\ncontext2Assert(\"test\".length == 5)" + "\n                      |      |" + "\n                      |      " + tmp1_Explain + "\n                      " + tmp0_Explain + "\n")
+      context2Assert(/* $context-Asserter#1 = $this$with, $context-Asserter#2 = $this$with, */ condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 653, source = "        context2Assert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 23, endOffset = 41, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 23, endOffset = 36, displayOffset = 30, value = tmp0_Explain), EqualityExpression(startOffset = 23, endOffset = 41, displayOffset = 37, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
     }
   }
 )

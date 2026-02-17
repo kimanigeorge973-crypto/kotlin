@@ -70,7 +70,7 @@ fun test1() {
   { // BLOCK
     val tmp0_Explain: Int = "test".<get-length>()
     val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-    Asserter.dispatchAssert(condition = tmp1_Explain, msg = "\nAsserter.dispatchAssert(\"test\".length == 5)" + "\n                               |      |" + "\n                               |      " + tmp1_Explain + "\n                               " + tmp0_Explain + "\n")
+    Asserter.dispatchAssert(condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 770, source = "    Asserter.dispatchAssert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 28, endOffset = 46, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 28, endOffset = 41, displayOffset = 35, value = tmp0_Explain), EqualityExpression(startOffset = 28, endOffset = 46, displayOffset = 42, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
   }
 }
 
@@ -79,7 +79,7 @@ fun test2() {
     { // BLOCK
       val tmp0_Explain: Int = "test".<get-length>()
       val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-      $this$with.dispatchAssert(condition = tmp1_Explain, msg = "\ndispatchAssert(\"test\".length == 5)" + "\n                      |      |" + "\n                      |      " + tmp1_Explain + "\n                      " + tmp0_Explain + "\n")
+      $this$with.dispatchAssert(condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 856, source = "        dispatchAssert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 23, endOffset = 41, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 23, endOffset = 36, displayOffset = 30, value = tmp0_Explain), EqualityExpression(startOffset = 23, endOffset = 41, displayOffset = 37, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
     }
   }
 )
@@ -89,7 +89,7 @@ fun test3() {
   { // BLOCK
     val tmp0_Explain: Int = "test".<get-length>()
     val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-    extensionAssert(/* <this> = Asserter, */ condition = tmp1_Explain, msg = "\nAsserter.extensionAssert(\"test\".length == 5)" + "\n                                |      |" + "\n                                |      " + tmp1_Explain + "\n                                " + tmp0_Explain + "\n")
+    extensionAssert(/* <this> = Asserter, */ condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 922, source = "    Asserter.extensionAssert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 29, endOffset = 47, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 29, endOffset = 42, displayOffset = 36, value = tmp0_Explain), EqualityExpression(startOffset = 29, endOffset = 47, displayOffset = 43, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
   }
 }
 
@@ -98,7 +98,7 @@ fun test4() {
     { // BLOCK
       val tmp0_Explain: Int = "test".<get-length>()
       val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-      extensionAssert(/* <this> = $this$with, */ condition = tmp1_Explain, msg = "\nextensionAssert(\"test\".length == 5)" + "\n                       |      |" + "\n                       |      " + tmp1_Explain + "\n                       " + tmp0_Explain + "\n")
+      extensionAssert(/* <this> = $this$with, */ condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 1009, source = "        extensionAssert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 24, endOffset = 42, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 24, endOffset = 37, displayOffset = 31, value = tmp0_Explain), EqualityExpression(startOffset = 24, endOffset = 42, displayOffset = 38, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
     }
   }
 )
@@ -109,7 +109,7 @@ fun test5() {
     { // BLOCK
       val tmp0_Explain: Int = "test".<get-length>()
       val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-      $this$with.memberExtensionAssert(/* <this> = Asserter, */ condition = tmp1_Explain, msg = "\nAsserter.memberExtensionAssert(\"test\".length == 5)" + "\n                                      |      |" + "\n                                      |      " + tmp1_Explain + "\n                                      " + tmp0_Explain + "\n")
+      $this$with.memberExtensionAssert(/* <this> = Asserter, */ condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 1097, source = "        Asserter.memberExtensionAssert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 39, endOffset = 57, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 39, endOffset = 52, displayOffset = 46, value = tmp0_Explain), EqualityExpression(startOffset = 39, endOffset = 57, displayOffset = 53, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
     }
   }
 )
@@ -120,7 +120,7 @@ fun test6() {
     { // BLOCK
       val tmp0_Explain: Int = "test".<get-length>()
       val tmp1_Explain: Boolean = EQEQ(arg0 = tmp0_Explain, arg1 = 5)
-      $this$with.memberExtensionAssert(/* <this> = $this$with, */ condition = tmp1_Explain, msg = "\nmemberExtensionAssert(\"test\".length == 5)" + "\n                             |      |" + "\n                             |      " + tmp1_Explain + "\n                             " + tmp0_Explain + "\n")
+      $this$with.memberExtensionAssert(/* <this> = $this$with, */ condition = tmp1_Explain, msg = "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 1200, source = "        memberExtensionAssert(\"test\".length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 30, endOffset = 48, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 30, endOffset = 43, displayOffset = 37, value = tmp0_Explain), EqualityExpression(startOffset = 30, endOffset = 48, displayOffset = 44, value = tmp1_Explain, lhs = tmp0_Explain, rhs = 5)]))])) */))
     }
   }
 )
