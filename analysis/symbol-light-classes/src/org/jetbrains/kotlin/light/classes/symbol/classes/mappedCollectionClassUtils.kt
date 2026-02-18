@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.load.java.BuiltinSpecialProperties
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.load.java.SpecialGenericSignatures
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOriginKind
@@ -111,7 +110,7 @@ internal fun KaSession.processOwnDeclarationsMappedCollectionMethodsAware(
     return filteredDeclarations.asSequence()
 }
 
-internal fun hasCollectionSupertype(allSupertypes: List<KaClassType>): Boolean =
+internal fun hasCollectionSupertype(allSupertypes: Iterable<KaClassType>): Boolean =
     allSupertypes.any { it.classId.packageFqName.startsWith(StandardNames.COLLECTIONS_PACKAGE_FQ_NAME) }
 
 /**
@@ -259,7 +258,7 @@ private fun KaSession.isFirstNonInterfaceSubtypeOfCollection(classSymbol: KaClas
     return classSymbol.superTypes.none { directSupertype ->
         val supertypeSymbol = directSupertype.expandedSymbol ?: return@none false
         if (supertypeSymbol.classKind == KaClassKind.INTERFACE) return@none false
-        val allSupertypes = supertypeSymbol.defaultType.allSupertypes.filterIsInstance<KaClassType>().toList()
+        val allSupertypes = supertypeSymbol.defaultType.allSupertypes.filterIsInstance<KaClassType>().asIterable()
         hasCollectionSupertype(allSupertypes)
     }
 }
