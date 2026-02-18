@@ -463,7 +463,6 @@ private fun PsiMethod.wrap(
     providedSignature = signature
 )
 
-@Suppress("UnstableApiUsage")
 private fun KaSession.tryToMapKotlinCollectionMethodToJavaMethod(
     kotlinCollectionFunction: KaNamedFunctionSymbol,
     allSupertypes: List<KaClassType>,
@@ -474,7 +473,7 @@ private fun KaSession.tryToMapKotlinCollectionMethodToJavaMethod(
         return if (kotlinCollectionFunction.valueParameters.size == 1) {
             getJavaCollectionClass(allSupertypes)?.methods?.find { it.name == name }
         } else {
-            getJavaListClass(allSupertypes)?.methods?.find { it.name == name && it.parameters.size == 2 }
+            getJavaListClass(allSupertypes)?.methods?.find { it.name == name && it.parameterList.parametersCount == 2 }
         }
     }
 
