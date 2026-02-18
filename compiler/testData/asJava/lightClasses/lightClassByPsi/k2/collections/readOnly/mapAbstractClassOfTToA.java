@@ -120,11 +120,10 @@ public class TAMap3 /* test.TAMap3*/<T>  implements java.util.Map<T, @org.jetbra
   public @org.jetbrains.annotations.NotNull() java.util.Set<T> getKeys();//  getKeys()
 
   @java.lang.Override()
-  @org.jetbrains.annotations.NotNull()
-  public @org.jetbrains.annotations.NotNull() test.A getOrDefault(T, @org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.A);//  getOrDefault(T, @org.jetbrains.annotations.NotNull() test.A)
+  public @org.jetbrains.annotations.NotNull() test.A get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
-  public @org.jetbrains.annotations.NotNull() test.A get(java.lang.Object);//  get(java.lang.Object)
+  public @org.jetbrains.annotations.NotNull() test.A getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.A);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.A)
 
   @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() test.A put(T, @org.jetbrains.annotations.NotNull() test.A);//  put(T, @org.jetbrains.annotations.NotNull() test.A)

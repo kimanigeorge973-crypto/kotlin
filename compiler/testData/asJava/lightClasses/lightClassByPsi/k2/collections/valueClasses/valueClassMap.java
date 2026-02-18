@@ -155,6 +155,9 @@ public class CMap3 /* test.CMap3*/ implements java.util.Map<@org.jetbrains.annot
   public final @org.jetbrains.annotations.NotNull() kotlin.UInt get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
+  public final @org.jetbrains.annotations.NotNull() kotlin.UInt getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() kotlin.UInt);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() kotlin.UInt)
+
+  @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
 
   @java.lang.Override()

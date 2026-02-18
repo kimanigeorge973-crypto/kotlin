@@ -168,6 +168,9 @@ public class ABMutableMap3 /* test.ABMutableMap3*/ implements java.util.Map<@org
   public final @org.jetbrains.annotations.NotNull() test.B get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
+  public final @org.jetbrains.annotations.NotNull() test.B getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B)
+
+  @java.lang.Override()
   public final @org.jetbrains.annotations.NotNull() test.B remove(java.lang.Object);//  remove(java.lang.Object)
 
   @java.lang.Override()

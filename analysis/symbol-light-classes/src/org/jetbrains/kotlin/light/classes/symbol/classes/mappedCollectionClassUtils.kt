@@ -480,7 +480,7 @@ private fun KaSession.tryToMapKotlinCollectionMethodToJavaMethod(
     val javaClass = when (name) {
         "contains", "containsAll", "removeAll", "retainAll" -> getJavaCollectionClass(allSupertypes)
         "indexOf", "lastIndexOf" -> getJavaListClass(allSupertypes)
-        "get", "containsKey", "containsValue", "putAll" -> getJavaMapClass(allSupertypes)
+        "get", "containsKey", "containsValue", "getOrDefault", "putAll" -> getJavaMapClass(allSupertypes)
         "remove" -> {
             if (kotlinCollectionFunction.callableId?.classId == StandardClassIds.MutableMap) {
                 getJavaMapClass(allSupertypes)

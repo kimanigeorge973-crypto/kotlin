@@ -161,6 +161,9 @@ public class CMap3 /* test.CMap3*/ implements test.IMap {
   public final @org.jetbrains.annotations.NotNull() java.lang.Integer get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
+  public final @org.jetbrains.annotations.NotNull() java.lang.Integer getOrDefault(java.lang.Object, int);//  getOrDefault(java.lang.Object, int)
+
+  @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
 
   @java.lang.Override()
