@@ -66,9 +66,9 @@ internal class SymbolLightMethodForMappedCollectionClass(
                 val typeFromJava = paramFromJava.type
                 val providedType = providedSignature?.parameterTypes?.get(index)
                 val candidateType = providedType ?: substituteType(typeFromJava)
-                val shouldTryToUnbox = typeFromJava.isTypeParameter() ||
-                        providedType != null ||
-                        (typeFromJava.isJavaLangObject() && substituteObjectWith == candidateType)
+                val shouldTryToUnbox = providedType != null ||
+                        (typeFromJava.isJavaLangObject() && substituteObjectWith == candidateType) ||
+                        typeFromJava.isTypeParameter()
                 val type = if (shouldTryToUnbox) candidateType.unboxedOrSelf() else candidateType
 
                 addParameter(
