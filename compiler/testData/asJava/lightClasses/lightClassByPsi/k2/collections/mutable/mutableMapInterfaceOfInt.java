@@ -125,6 +125,10 @@ public abstract class CMutableMap2 /* test.CMutableMap2*/ implements test.IMutab
 public class CMutableMap3 /* test.CMutableMap3*/ implements test.IMutableMap {
   @java.lang.Override()
   @org.jetbrains.annotations.NotNull()
+  public @org.jetbrains.annotations.NotNull() java.lang.Integer getOrDefault(int, int);//  getOrDefault(int, int)
+
+  @java.lang.Override()
+  @org.jetbrains.annotations.NotNull()
   public @org.jetbrains.annotations.NotNull() java.util.Collection<@org.jetbrains.annotations.NotNull() java.lang.Integer> getValues();//  getValues()
 
   @java.lang.Override()
