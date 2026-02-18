@@ -57,6 +57,11 @@ internal class SymbolLightMethodForMappedCollectionClass(
     override fun hasModifierProperty(name: String): Boolean = when (name) {
         PsiModifier.ABSTRACT -> !hasImplementation
         PsiModifier.FINAL -> isFinal
+        PsiModifier.DEFAULT -> {
+            // In the case of the overridden function 'Map.getOrDefault', the Kotlin override is not default, even though the original
+            // Java method is. And in all other cases the mapped methods are not supposed to be default.
+            false
+        }
         else -> javaMethod.hasModifierProperty(name)
     }
 

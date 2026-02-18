@@ -139,7 +139,7 @@ public class SMutableMap3 /* test.SMutableMap3*/<VElem>  implements java.util.Ma
   public @org.jetbrains.annotations.Nullable() VElem remove(int);//  remove(int)
 
   @java.lang.Override()
-  public VElem getOrDefault(int, VElem);//  getOrDefault(int, VElem)
+  public VElem getOrDefault(java.lang.Object, VElem);//  getOrDefault(java.lang.Object, VElem)
 
   @java.lang.Override()
   public boolean containsKey(int);//  containsKey(int)
