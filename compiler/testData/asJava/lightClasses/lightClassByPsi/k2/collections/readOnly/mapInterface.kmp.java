@@ -59,6 +59,9 @@ public class CMap3 /* test.CMap3*/<KElem, VElem>  implements test.IMap<KElem, VE
   public @org.jetbrains.annotations.Nullable() VElem get(KElem);//  get(KElem)
 
   @java.lang.Override()
+  public VElem getOrDefault(KElem, VElem);//  getOrDefault(KElem, VElem)
+
+  @java.lang.Override()
   public boolean containsKey(KElem);//  containsKey(KElem)
 
   @java.lang.Override()
