@@ -68,6 +68,9 @@ public class CMap3 /* test.CMap3*/ implements test.IMap {
   public boolean isEmpty();//  isEmpty()
 
   @java.lang.Override()
+  public int getOrDefault(int, int);//  getOrDefault(int, int)
+
+  @java.lang.Override()
   public int getSize();//  getSize()
 
   public  CMap3();//  .ctor()

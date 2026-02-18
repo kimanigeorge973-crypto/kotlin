@@ -124,6 +124,10 @@ public abstract class CMap2 /* test.CMap2*/ implements test.IMap {
 public class CMap3 /* test.CMap3*/ implements test.IMap {
   @java.lang.Override()
   @org.jetbrains.annotations.NotNull()
+  public @org.jetbrains.annotations.NotNull() java.lang.Integer getOrDefault(int, int);//  getOrDefault(int, int)
+
+  @java.lang.Override()
+  @org.jetbrains.annotations.NotNull()
   public @org.jetbrains.annotations.NotNull() java.util.Collection<@org.jetbrains.annotations.NotNull() java.lang.Integer> getValues();//  getValues()
 
   @java.lang.Override()

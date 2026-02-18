@@ -104,6 +104,9 @@ public class CMutableMap3 /* test.CMutableMap3*/<KElem, VElem>  implements java.
   public VElem get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
+  public VElem getOrDefault(KElem, VElem);//  getOrDefault(KElem, VElem)
+
+  @java.lang.Override()
   public VElem remove(java.lang.Object);//  remove(java.lang.Object)
 
   @java.lang.Override()

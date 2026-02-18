@@ -99,6 +99,9 @@ public class CMutableMap3 /* test.CMutableMap3*/ implements test.IMutableMap {
   public boolean isEmpty();//  isEmpty()
 
   @java.lang.Override()
+  public int getOrDefault(int, int);//  getOrDefault(int, int)
+
+  @java.lang.Override()
   public int getSize();//  getSize()
 
   @java.lang.Override()

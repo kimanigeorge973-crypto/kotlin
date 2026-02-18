@@ -90,6 +90,9 @@ public class CMutableMap3 /* test.CMutableMap3*/<KElem, VElem>  implements test.
   public @org.jetbrains.annotations.Nullable() VElem remove(KElem);//  remove(KElem)
 
   @java.lang.Override()
+  public VElem getOrDefault(KElem, VElem);//  getOrDefault(KElem, VElem)
+
+  @java.lang.Override()
   public boolean containsKey(KElem);//  containsKey(KElem)
 
   @java.lang.Override()
