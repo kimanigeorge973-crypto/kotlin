@@ -11,15 +11,12 @@ fun String.walkRepositoryKotlinFilesWithoutTestData(f: (File) -> Unit) {
     val root = File(this)
     for (file in root.walkTopDown()) {
         if (file.isDirectory) continue
-        val path = file.path
+        val path = file.path.lowercase()
         if (
-            path.contains("kotlin-native") ||
-            path.contains("testData") ||
             path.contains("testdata") ||
+            path.contains("kotlin-native") ||
             path.contains("resources")
         ) continue
-
-        if (path.replace(File.separator, "/").contains("stdlib/api")) continue
 
         if (file.extension != "kt") continue
 
