@@ -5,8 +5,6 @@
 
 package kotlinx.powerassert
 
-import kotlin.jvm.JvmStatic
-
 public class CallExplanation(
     override val offset: Int,
     override val source: String,
@@ -19,8 +17,7 @@ public class CallExplanation(
         return "CallExplanation(offset=$offset, source='$source', arguments=$arguments)"
     }
 
-    public class Argument
-    @PublishedApi internal constructor(
+    public class Argument(
         public val startOffset: Int,
         public val endOffset: Int,
         public val kind: Kind,
@@ -35,23 +32,6 @@ public class CallExplanation(
             CONTEXT,
             EXTENSION,
             VALUE,
-        }
-    }
-
-    @PowerAssert.Ignore
-    public companion object {
-        @JvmStatic
-        @PowerAssert
-        @Suppress("UNUSED_PARAMETER")
-        public fun <T> of(value: T): Pair<T, CallExplanation> {
-            error("Power-Assert compiler-plugin must be applied to project to use this function.")
-        }
-
-        @JvmStatic
-        @Deprecated(level = DeprecationLevel.HIDDEN, message = "Manual implementation for binary compatibility.")
-        @Suppress("FunctionName")
-        public fun <T> `of$powerassert`(value: T, explanation: CallExplanation): Pair<T, CallExplanation> {
-            return value to explanation
         }
     }
 }
