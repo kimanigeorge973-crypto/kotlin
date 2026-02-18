@@ -15,8 +15,8 @@ import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest.Companion.DIAGNOSTIC_IN
 import org.jetbrains.kotlin.fir.builder.AbstractRawFirBuilderTestCase
 import org.jetbrains.kotlin.fir.builder.StubFirScopeProvider
 import org.jetbrains.kotlin.fir.lightTree.LightTree2Fir
-import org.jetbrains.kotlin.fir.lightTree.walkTopDown
-import org.jetbrains.kotlin.fir.lightTree.walkTopDownWithTestData
+import org.jetbrains.kotlin.test.util.walkRepositoryKotlinFilesWithoutTestData
+import org.jetbrains.kotlin.test.util.walkRepositoryKotlinFilesWithTestData
 import org.jetbrains.kotlin.fir.renderer.FirRenderer
 import org.jetbrains.kotlin.fir.session.FirSessionFactoryHelper
 import org.jetbrains.kotlin.psi.KtFile
@@ -44,9 +44,9 @@ class TreesCompareTest : AbstractRawFirBuilderTestCase() {
         }
         println("BASE PATH: $path")
         if (!withTestData) {
-            path.walkTopDown(onEachFile)
+            path.walkRepositoryKotlinFilesWithoutTestData(onEachFile)
         } else {
-            path.walkTopDownWithTestData(onEachFile)
+            path.walkRepositoryKotlinFilesWithTestData(onEachFile)
         }
         println("All scanned files: $counter")
         println("Files that aren't equal to FIR: $errorCounter")
