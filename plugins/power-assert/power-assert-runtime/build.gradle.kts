@@ -21,6 +21,9 @@ fun KotlinCommonCompilerOptions.addReturnValueCheckerInfo() {
     freeCompilerArgs.add("-Xreturn-value-checker=full")
 }
 
+description = "Kotlin Power-Assert Runtime"
+base.archivesName = MODULE_NAME
+
 kotlin {
     explicitApi()
 
@@ -154,17 +157,21 @@ tasks {
     }
     val jvmJar by existing(Jar::class) {
         archiveAppendix = null
+        manifestAttributes(manifest, "Main")
     }
     val jvmSourcesJar by existing(Jar::class) {
         archiveAppendix = null
     }
     val jsJar by existing(Jar::class) {
+        manifestAttributes(manifest, "Main")
         manifest.attributes("Implementation-Title" to "${archiveBaseName.get()}-${archiveAppendix.get()}")
     }
     val wasmJsJar by existing(Jar::class) {
+        manifestAttributes(manifest, "Main")
         manifest.attributes("Implementation-Title" to "${archiveBaseName.get()}-${archiveAppendix.get()}")
     }
     val wasmWasiJar by existing(Jar::class) {
+        manifestAttributes(manifest, "Main")
         manifest.attributes("Implementation-Title" to "${archiveBaseName.get()}-${archiveAppendix.get()}")
     }
 }
@@ -181,7 +188,7 @@ publishing {
         val rootModule = module("rootModule") {
             mavenPublication {
                 artifactId = artifactBaseName
-                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime")
+                configureKotlinPomAttributes(project, description)
                 artifact(emptyJavadocJar)
             }
 
@@ -204,7 +211,7 @@ publishing {
         val js = module("jsModule") {
             mavenPublication {
                 artifactId = "$artifactBaseName-js"
-                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime for JS", packaging = "klib")
+                configureKotlinPomAttributes(project, "$description for JS", packaging = "klib")
             }
             variant("jsApiElements")
             variant("jsRuntimeElements")
@@ -214,7 +221,7 @@ publishing {
         val wasmJs = module("wasmJsModule") {
             mavenPublication {
                 artifactId = "$artifactBaseName-wasm-js"
-                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime for experimental WebAssembly JS platform", packaging = "klib")
+                configureKotlinPomAttributes(project, "$description for experimental WebAssembly JS platform", packaging = "klib")
             }
             variant("wasmJsApiElements")
             variant("wasmJsRuntimeElements")
@@ -223,7 +230,7 @@ publishing {
         val wasmWasi = module("wasmWasiModule") {
             mavenPublication {
                 artifactId = "$artifactBaseName-wasm-wasi"
-                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime for experimental WebAssembly WASI platform", packaging = "klib")
+                configureKotlinPomAttributes(project, "$description for experimental WebAssembly WASI platform", packaging = "klib")
             }
             variant("wasmWasiApiElements")
             variant("wasmWasiRuntimeElements")
