@@ -12,9 +12,8 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.ASTStructure
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.stubs.StubElement
-import com.intellij.psi.util.endOffset
-import com.intellij.psi.util.startOffset
 import com.intellij.util.ThreeState
+import com.intellij.util.containers.addIfNotNull
 import com.intellij.util.diff.DiffTree
 import com.intellij.util.diff.DiffTreeChangeBuilder
 import com.intellij.util.diff.ShallowNodeComparator
@@ -51,7 +50,7 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
  * Otherwise, returns [KaDanglingFileResolutionMode.IGNORE_SELF].
  */
 internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutionModeProvider {
-    @OptIn(LLFirInternals::class, KtImplementationDetail::class)
+    @OptIn(KtImplementationDetail::class)
     override fun calculateMode(file: KtFile): KaDanglingFileResolutionMode {
         val originalFile = file.copyOrigin as? KtFile ?: return KaDanglingFileResolutionMode.PREFER_SELF
         val originalFileStub = originalFile.calcStubTree().root as? KotlinFileStub ?: return KaDanglingFileResolutionMode.PREFER_SELF
@@ -85,23 +84,11 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
          *
          * That's why we need to run the PSI-based diff in some specific cases.
          */
-        val foundOutOfBlockByPsiCheck = originalToCopyStubs.filter { (originalStub, copyStub) ->
-            when {
-                // Properties with no specified return type, different initializers might affect the return type
-                originalStub is KotlinPropertyStub && copyStub is KotlinPropertyStub
-                        && !originalStub.hasReturnTypeRef && !copyStub.hasReturnTypeRef -> true
-                // Functions with no expression body (i.e. fun foo() = expr), different initializers might affect the return type
-                originalStub is KotlinFunctionStub && copyStub is KotlinFunctionStub
-                        && !originalStub.hasNoExpressionBody && !copyStub.hasNoExpressionBody -> true
-                // Class init blocks, most changes inside them are considered OOBM
-                originalStub.elementType == KtStubElementTypes.CLASS_INITIALIZER
-                        && copyStub.elementType == KtStubElementTypes.CLASS_INITIALIZER -> true
-                // Property accessors, the code insight accessors might affect backing field instantiation
-                originalStub is KotlinPropertyAccessorStub
-                        && copyStub is KotlinPropertyAccessorStub -> true
-                else -> false
+        val foundOutOfBlockByPsiCheck = originalToCopyStubs.any { (originalStub, copyStub) ->
+            if (!originalStub.shouldRunPsiCheck()) {
+                return@any false
             }
-        }.any { (originalStub, copyStub) ->
+
             calculateModePsiBased(originalStub.psi, copyStub.psi) == KaDanglingFileResolutionMode.PREFER_SELF
         }
 
@@ -120,7 +107,7 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
             // File stubs contain module / file names as well (in `facadeFqName`).
             // That's why we only compare package names to ignore non-relevant information.
             is KotlinFileStub -> other is KotlinFileStub && this.getPackageFqName() == other.getPackageFqName()
-            else -> this.toString() == other.toString()
+            else -> this.isEquivalentTo(other)
         }
     }
 
@@ -133,13 +120,13 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
     @OptIn(KtImplementationDetail::class)
     private fun getFlatTopLevelStubList(stub: KotlinFileStub): List<KotlinStubElement<*>> {
         val stubList: MutableList<StubElement<*>?> = mutableListOf(stub)
-        val result: MutableList<StubElement<*>?> = mutableListOf()
+        val result: MutableList<KotlinStubElement<*>> = mutableListOf()
         while (stubList.isNotEmpty()) {
-            val stub = stubList.pop() ?: continue
-            stubList.addAll(stub.childrenStubs.filter { stub.shouldAddChild(it) })
-            result.add(stub)
+            val stub = stubList.pop() as? KotlinStubElement<*> ?: continue
+            stub.childrenStubs.filterTo(stubList) { stub.shouldAddChild(it) }
+            result.addIfNotNull(stub)
         }
-        return result.filterIsInstance<KotlinStubElement<*>>()
+        return result
     }
 
     /**
@@ -159,9 +146,22 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
         }
     }
 
+    @OptIn(KtImplementationDetail::class)
+    private fun KotlinStubElement<*>.shouldRunPsiCheck(): Boolean = when (this) {
+        // Properties with no specified return type, different initializers / delegates might affect the return type
+        is KotlinPropertyStub if !hasReturnTypeRef -> hasDelegate || hasInitializer
+        // Functions with expression body (i.e. fun foo() = expr), different initializers might affect the return type
+        is KotlinFunctionStub if !hasNoExpressionBody -> true
+        // Class init blocks, most changes inside them are considered OOBM
+        is KotlinPlaceHolderStub<*> -> elementType == KtStubElementTypes.CLASS_INITIALIZER
+        // Property accessors, the code insight accessors might affect backing field instantiation
+        is KotlinPropertyAccessorStub -> true
+        else -> false
+    }
+
     /**
      * Performs an AST based diff between [originalPsi] and [copyPsi] and returns the resulting [KaDanglingFileResolutionMode].
-     * Done by reusing [LLFirDeclarationModificationService] which handles PSI events in the IDE.
+     * Done by reusing [LLFirDeclarationModificationService] which handles PSI tree change events in the IDE.
      */
     @OptIn(LLFirInternals::class)
     private fun calculateModePsiBased(originalPsi: KtElement, copyPsi: KtElement): KaDanglingFileResolutionMode {
@@ -191,12 +191,17 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
             if (shouldStop()) {
                 return ThreeState.YES
             }
+
+            val oldNodePsi = oldNode.psi
+            val newNodePsi = newNode.psi
+
             if (oldNode.elementType != newNode.elementType) return ThreeState.NO
-            if (oldNode.psi.isWhitespaceOrComment() && newNode.psi.isWhitespaceOrComment()) return ThreeState.YES
-            if (oldNode.psi.textRangeWithoutComments.isEmpty && newNode.psi.textRangeWithoutComments.isEmpty) return ThreeState.YES
-            if (oldNode.psi is LeafPsiElement && newNode.psi is LeafPsiElement && oldNode.psi.getTextWithoutComments() == newNode.psi.getTextWithoutComments()) {
-                return ThreeState.YES
-            }
+            if (oldNodePsi.isWhitespaceOrComment() && newNodePsi.isWhitespaceOrComment()) return ThreeState.YES
+            if (oldNodePsi is LeafPsiElement != newNodePsi is LeafPsiElement) return ThreeState.NO
+            if (oldNodePsi !is LeafPsiElement) return ThreeState.UNSURE
+            if (oldNodePsi.textRangeWithoutComments.isEmpty && newNodePsi.textRangeWithoutComments.isEmpty) return ThreeState.YES
+            if (oldNodePsi.textMatches(newNodePsi)) return ThreeState.YES
+
             return ThreeState.UNSURE
         }
 
@@ -212,14 +217,6 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
                 return true
             }
             return oldNode.hashCode() == newNode.hashCode()
-        }
-
-        private fun PsiElement.getTextWithoutComments(): String {
-            val startOffset = startOffset
-            val startWithoutComments = textRangeWithoutComments.startOffset - startOffset
-            val endOffset = this@getTextWithoutComments.endOffset - startOffset
-
-            return text.substring(startWithoutComments, endOffset)
         }
     }
 
