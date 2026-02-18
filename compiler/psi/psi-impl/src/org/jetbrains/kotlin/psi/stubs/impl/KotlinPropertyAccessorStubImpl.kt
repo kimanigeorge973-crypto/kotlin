@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.contracts.description.KtContractDescriptionElement
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.stubs.KotlinPropertyAccessorStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -29,4 +30,14 @@ class KotlinPropertyAccessorStubImpl(
         mayHaveContract = mayHaveContract,
         contract = contract,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinPropertyAccessorStubImpl) return false
+        if (this.isGetter != other.isGetter) return false
+        if (this.hasBody != other.hasBody) return false
+        if (this.hasNoExpressionBody != other.hasNoExpressionBody) return false
+        if (this.mayHaveContract != other.mayHaveContract) return false
+        return this.contract == other.contract
+    }
 }

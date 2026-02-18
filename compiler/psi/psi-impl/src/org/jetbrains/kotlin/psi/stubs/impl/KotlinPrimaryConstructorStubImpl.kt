@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -34,4 +35,10 @@ class KotlinPrimaryConstructorStubImpl(
         parent = newParent,
         containingClassName = containingClassName,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinPrimaryConstructorStubImpl) return false
+        return this.containingClassName == other.containingClassName
+    }
 }

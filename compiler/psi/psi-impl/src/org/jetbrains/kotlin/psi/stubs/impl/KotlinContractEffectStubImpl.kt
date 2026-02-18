@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.psi.KtContractEffect
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.stubs.KotlinContractEffectStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.psi.stubs.elements.deserializeTypeBean
 import org.jetbrains.kotlin.psi.stubs.elements.serializeTypeBean
@@ -25,6 +26,12 @@ class KotlinContractEffectStubImpl(parent: StubElement<*>?) : KotlinPlaceHolderS
     override fun copyInto(newParent: StubElement<*>?): KotlinContractEffectStubImpl = KotlinContractEffectStubImpl(
         parent = newParent,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinValueArgumentStubImpl<*>) return false
+        return super.isEquivalentTo(other)
+    }
 }
 
 enum class KotlinContractEffectType {

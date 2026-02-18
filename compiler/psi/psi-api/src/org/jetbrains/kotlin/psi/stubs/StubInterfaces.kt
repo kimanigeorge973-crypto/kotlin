@@ -25,6 +25,16 @@ interface KotlinStubElement<T : KtElement> : StubElement<T> {
      */
     @KtImplementationDetail
     fun copyInto(newParent: StubElement<*>?): KotlinStubElement<T>
+
+    /**
+     * Returns whether two stubs are structurally equivalent.
+     *
+     * **Note**: This method is not supposed to be used outside of compiler internals.
+     * Stubs from different files aren't supposed to be comparable, that's why `equals` / `hashCode` are not implemented,
+     * as they would lead to incorrect behavior.
+     */
+    @KtImplementationDetail
+    fun isEquivalentTo(other: KotlinStubElement<*>): Boolean
 }
 
 @SubclassOptInRequired(KtImplementationDetail::class)

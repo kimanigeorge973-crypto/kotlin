@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtTypeAlias
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.KotlinTypeAliasStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
@@ -36,4 +37,12 @@ class KotlinTypeAliasStubImpl(
         classId = classId,
         isTopLevel = isTopLevel,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinTypeAliasStubImpl) return false
+        if (this.fqName != other.fqName) return false
+        if (this.isTopLevel != other.isTopLevel) return false
+        return this.classId == other.classId
+    }
 }

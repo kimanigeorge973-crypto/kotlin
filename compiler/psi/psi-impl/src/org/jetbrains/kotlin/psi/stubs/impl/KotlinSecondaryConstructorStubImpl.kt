@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.stubs.KotlinConstructorStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -41,4 +42,14 @@ class KotlinSecondaryConstructorStubImpl(
         isExplicitDelegationCall = isExplicitDelegationCall,
         mayHaveContract = mayHaveContract,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinSecondaryConstructorStubImpl) return false
+        if (this.containingClassName != other.containingClassName) return false
+        if (this.hasBody != other.hasBody) return false
+        if (this.isDelegatedCallToThis != other.isDelegatedCallToThis) return false
+        if (this.isExplicitDelegationCall != other.isExplicitDelegationCall) return false
+        return this.mayHaveContract == other.mayHaveContract
+    }
 }

@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.stubs.KotlinObjectStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -40,4 +41,16 @@ class KotlinObjectStubImpl(
         isLocal = isLocal,
         isObjectLiteral = isObjectLiteral,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinObjectStubImpl) return false
+        if (this.name != other.name) return false
+        if (this.fqName != other.fqName) return false
+        if (this.classId != other.classId) return false
+        if (this.isTopLevel != other.isTopLevel) return false
+        if (this.isLocal != other.isLocal) return false
+        if (this.isObjectLiteral != other.isObjectLiteral) return false
+        return this.superNames == other.superNames
+    }
 }

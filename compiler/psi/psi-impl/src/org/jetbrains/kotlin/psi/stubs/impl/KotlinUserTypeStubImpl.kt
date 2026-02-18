@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtProjectionKind
 import org.jetbrains.kotlin.psi.KtUserType
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.KotlinUserTypeStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.types.model.FlexibleTypeMarker
@@ -35,6 +36,13 @@ class KotlinUserTypeStubImpl(
         upperBound = upperBound,
         abbreviatedType = abbreviatedType,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinUserTypeStubImpl) return false
+        if (this.abbreviatedType != other.abbreviatedType) return false
+        return this.upperBound == other.upperBound
+    }
 }
 
 sealed interface KotlinTypeBean : KotlinTypeMarker {

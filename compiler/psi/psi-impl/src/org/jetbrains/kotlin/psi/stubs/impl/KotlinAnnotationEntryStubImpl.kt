@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.stubs.KotlinAnnotationEntryStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -31,4 +32,12 @@ class KotlinAnnotationEntryStubImpl(
         hasValueArguments = hasValueArguments,
         valueArguments = valueArguments,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinAnnotationEntryStubImpl) return false
+        if (this.shortName != other.shortName) return false
+        if (this.hasValueArguments != other.hasValueArguments) return false
+        return this.valueArguments == other.valueArguments
+    }
 }

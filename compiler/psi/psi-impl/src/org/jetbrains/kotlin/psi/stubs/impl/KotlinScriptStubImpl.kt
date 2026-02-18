@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtScript
 import org.jetbrains.kotlin.psi.stubs.KotlinScriptStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -26,4 +27,10 @@ class KotlinScriptStubImpl(
         parent = newParent,
         fqNameRef = fqNameRef,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinScriptStubImpl) return false
+        return this.fqName == other.fqName
+    }
 }

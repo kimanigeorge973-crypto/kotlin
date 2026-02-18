@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.stubs.KotlinPropertyStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -58,4 +59,21 @@ class KotlinPropertyStubImpl(
         origin = origin,
         hasBackingField = hasBackingField,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinPropertyStubImpl) return false
+        if (this.name != other.name) return false
+        if (this.fqName != other.fqName) return false
+        if (this.isTopLevel != other.isTopLevel) return false
+        if (this.hasDelegate != other.hasDelegate) return false
+        if (this.hasDelegateExpression != other.hasDelegateExpression) return false
+        if (this.hasInitializer != other.hasInitializer) return false
+        if (this.isExtension != other.isExtension) return false
+        if (this.hasReturnTypeRef != other.hasReturnTypeRef) return false
+        if (this.hasBackingField != other.hasBackingField) return false
+        if (this.origin != other.origin) return false
+        if (this.isVar != other.isVar) return false
+        return this.constantInitializer == other.constantInitializer
+    }
 }

@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.stubs.KotlinParameterStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 @OptIn(KtImplementationDetail::class)
@@ -40,4 +41,14 @@ class KotlinParameterStubImpl(
         hasDefaultValue = hasDefaultValue,
         functionTypeParameterName = functionTypeParameterName,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinParameterStubImpl) return false
+        if (this.name != other.name) return false
+        if (this.isMutable != other.isMutable) return false
+        if (this.hasValOrVar != other.hasValOrVar) return false
+        if (this.hasDefaultValue != other.hasDefaultValue) return false
+        return this.functionTypeParameterName == other.functionTypeParameterName
+    }
 }

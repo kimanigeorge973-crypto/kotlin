@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtImplementationDetail
 import org.jetbrains.kotlin.psi.stubs.KotlinClassStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubElement
 import org.jetbrains.kotlin.psi.stubs.elements.KotlinValueClassRepresentation
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
@@ -52,4 +53,18 @@ class KotlinClassStubImpl(
         isTopLevel = isTopLevel,
         valueClassRepresentation = valueClassRepresentation,
     )
+
+    @KtImplementationDetail
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
+        if (other !is KotlinClassStubImpl) return false
+        if (this.name != other.name) return false
+        if (this.classId != other.classId) return false
+        if (this.isClsStubCompiledToJvmDefaultImplementation != other.isClsStubCompiledToJvmDefaultImplementation) return false
+        if (this.isLocal != other.isLocal) return false
+        if (this.isTopLevel != other.isTopLevel) return false
+        if (this.qualifiedName != other.qualifiedName) return false
+        if (this.superNames != other.superNames) return false
+        if (this.isInterface != other.isInterface) return false
+        return this.valueClassRepresentation == other.valueClassRepresentation
+    }
 }
