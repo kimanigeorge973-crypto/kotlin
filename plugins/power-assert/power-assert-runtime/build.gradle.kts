@@ -1,10 +1,19 @@
+import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.konan.target.HostManager
+import plugins.configureDefaultPublishing
+import plugins.configureKotlinPomAttributes
+import plugins.publishing.configureMultiModuleMavenPublishing
+import org.gradle.jvm.tasks.Jar
 
 plugins {
     kotlin("multiplatform")
+    `maven-publish`
+    signing
 }
 
 val MODULE_NAME = "kotlin-power-assert-runtime"
@@ -136,5 +145,104 @@ sourceSets {
     "test" { none() }
 }
 
-//publish()
-//standardPublicJars()
+tasks {
+    val allMetadataJar by existing(Jar::class) {
+        archiveClassifier = "all"
+    }
+    val sourcesJar by existing(Jar::class) {
+        archiveAppendix = "metadata"
+    }
+    val jvmJar by existing(Jar::class) {
+        archiveAppendix = null
+    }
+    val jvmSourcesJar by existing(Jar::class) {
+        archiveAppendix = null
+    }
+    val jsJar by existing(Jar::class) {
+        manifest.attributes("Implementation-Title" to "${archiveBaseName.get()}-${archiveAppendix.get()}")
+    }
+    val wasmJsJar by existing(Jar::class) {
+        manifest.attributes("Implementation-Title" to "${archiveBaseName.get()}-${archiveAppendix.get()}")
+    }
+    val wasmWasiJar by existing(Jar::class) {
+        manifest.attributes("Implementation-Title" to "${archiveBaseName.get()}-${archiveAppendix.get()}")
+    }
+}
+
+configureDefaultPublishing()
+
+val emptyJavadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+}
+
+publishing {
+    val artifactBaseName = base.archivesName.get()
+    configureMultiModuleMavenPublishing {
+        val rootModule = module("rootModule") {
+            mavenPublication {
+                artifactId = artifactBaseName
+                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime")
+                artifact(emptyJavadocJar)
+            }
+
+            variant("metadataApiElements") { suppressPomMetadataWarnings() }
+            variant("jvmApiElements")
+            variant("jvmRuntimeElements") {
+                configureVariantDetails { mapToMavenScope("runtime") }
+            }
+            variant("jvmSourcesElements")
+            variant("nativeApiElements") {
+                attributes {
+                    attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                    attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named("non-jvm"))
+                    attribute(Usage.USAGE_ATTRIBUTE, objects.named(KotlinUsages.KOTLIN_API))
+                    attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+                }
+            }
+        }
+
+        val js = module("jsModule") {
+            mavenPublication {
+                artifactId = "$artifactBaseName-js"
+                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime for JS", packaging = "klib")
+            }
+            variant("jsApiElements")
+            variant("jsRuntimeElements")
+            variant("jsSourcesElements")
+        }
+
+        val wasmJs = module("wasmJsModule") {
+            mavenPublication {
+                artifactId = "$artifactBaseName-wasm-js"
+                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime for experimental WebAssembly JS platform", packaging = "klib")
+            }
+            variant("wasmJsApiElements")
+            variant("wasmJsRuntimeElements")
+            variant("wasmJsSourcesElements")
+        }
+        val wasmWasi = module("wasmWasiModule") {
+            mavenPublication {
+                artifactId = "$artifactBaseName-wasm-wasi"
+                configureKotlinPomAttributes(project, "Kotlin Power-Assert Runtime for experimental WebAssembly WASI platform", packaging = "klib")
+            }
+            variant("wasmWasiApiElements")
+            variant("wasmWasiRuntimeElements")
+            variant("wasmWasiSourcesElements")
+        }
+
+        // Makes all variants from accompanying artifacts visible through `available-at`
+        rootModule.include(js, wasmJs, wasmWasi)
+    }
+
+    publications {
+        val rootModule by existing(MavenPublication::class)
+        val jsModule by existing(MavenPublication::class)
+        configureSbom("Main", MODULE_NAME, setOf("jvmRuntimeClasspath"), rootModule)
+        configureSbom("Js", "$MODULE_NAME-js", setOf("jsRuntimeClasspath"), jsModule)
+
+        val wasmJsModule by existing(MavenPublication::class)
+        val wasmWasiModule by existing(MavenPublication::class)
+        configureSbom("Wasm-Js", "$MODULE_NAME-wasm-js", setOf("wasmJsRuntimeClasspath"), wasmJsModule)
+        configureSbom("Wasm-Wasi", "$MODULE_NAME-wasm-wasi", setOf("wasmWasiRuntimeClasspath"), wasmWasiModule)
+    }
+}
