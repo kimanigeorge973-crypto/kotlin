@@ -118,7 +118,7 @@ internal class SymbolLightMethodForMappedCollectionClass(
 
     override fun isConstructor(): Boolean = false
 
-    private val identifier: LightIdentifier by lazyPub { LightIdentifier(manager, name) }
+    private val identifier: LightIdentifier = LightIdentifier(manager, name)
 
     override fun getNameIdentifier(): LightIdentifier = identifier
 
