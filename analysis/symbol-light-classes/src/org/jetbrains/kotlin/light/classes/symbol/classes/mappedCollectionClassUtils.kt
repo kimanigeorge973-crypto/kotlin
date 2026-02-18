@@ -251,8 +251,9 @@ internal fun KaSession.generateJavaCollectionMethodStubsIfNeeded(
 }
 
 private fun KaSession.isFirstNonInterfaceSubtypeOfCollection(classSymbol: KaClassSymbol): Boolean {
-    if (classSymbol.classKind.let { it != KaClassKind.CLASS && it != KaClassKind.OBJECT }) {
-        return false
+    when (classSymbol.classKind) {
+        KaClassKind.INTERFACE, KaClassKind.ANNOTATION_CLASS -> return false
+        else -> {}
     }
 
     return classSymbol.superTypes.none { directSupertype ->
