@@ -110,7 +110,7 @@ public class CMap3 /* test.CMap3*/<KElem, VElem>  implements test.IMap<KElem, VE
   public VElem get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
-  public VElem getOrDefault(KElem, VElem);//  getOrDefault(KElem, VElem)
+  public VElem getOrDefault(java.lang.Object, VElem);//  getOrDefault(java.lang.Object, VElem)
 
   @java.lang.Override()
   public VElem put(KElem, VElem);//  put(KElem, VElem)

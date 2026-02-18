@@ -164,6 +164,9 @@ public class CMutableMap3 /* test.CMutableMap3*/ implements test.IMutableMap {
   public final @org.jetbrains.annotations.NotNull() java.lang.String get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
+  public final @org.jetbrains.annotations.NotNull() java.lang.String getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() java.lang.String);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() java.lang.String)
+
+  @java.lang.Override()
   public final @org.jetbrains.annotations.NotNull() java.lang.String remove(java.lang.Object);//  remove(java.lang.Object)
 
   @java.lang.Override()

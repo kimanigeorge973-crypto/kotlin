@@ -165,6 +165,9 @@ public class ABMap3 /* test.ABMap3*/ implements java.util.Map<@org.jetbrains.ann
   public final @org.jetbrains.annotations.NotNull() test.B get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
+  public final @org.jetbrains.annotations.NotNull() test.B getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B)
+
+  @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
 
   @java.lang.Override()
