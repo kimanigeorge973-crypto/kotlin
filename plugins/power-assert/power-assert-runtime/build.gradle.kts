@@ -40,7 +40,7 @@ kotlin {
     }
 
     js {
-        if (!kotlinBuildProperties.isTeamcityBuild) {
+        if (!kotlinBuildProperties.isTeamcityBuild.get()) {
             browser {}
         }
         nodejs {}
@@ -85,7 +85,7 @@ kotlin {
         }
     }
 
-    if (!kotlinBuildProperties.isInIdeaSync) {
+    if (!kotlinBuildProperties.isInIdeaSync.get()) {
         // Tier 1
         macosArm64()
         iosSimulatorArm64()
