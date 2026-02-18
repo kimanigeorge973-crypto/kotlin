@@ -175,6 +175,5 @@ internal class SymbolLightMethodForMappedCollectionClass(
         return result
     }
 
-    override fun toString(): String =
-        "${this::class.simpleName.orEmpty()}:$name"
+    override fun toString(): String = "${this::class.simpleName.orEmpty()}:$name"
 }
