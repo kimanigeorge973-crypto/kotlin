@@ -11,7 +11,8 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrMetadataSourceOwner
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.IrAnnotation
+import org.jetbrains.kotlin.ir.expressions.impl.IrAnnotationImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.irAttribute
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
@@ -76,9 +77,9 @@ class PowerAssertFunctionFactory(
         return powerAssertFunction
     }
 
-    private fun createJvmSyntheticAnnotation(): IrConstructorCallImpl {
+    private fun createJvmSyntheticAnnotation(): IrAnnotation {
         val symbol = builtIns.jvmSyntheticAnnotation
-        return IrConstructorCallImpl.fromSymbolOwner(
+        return IrAnnotationImpl.fromSymbolOwner(
             startOffset = SYNTHETIC_OFFSET,
             endOffset = SYNTHETIC_OFFSET,
             type = symbol.owner.parentAsClass.defaultType,
