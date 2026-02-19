@@ -272,7 +272,7 @@ private fun KaSession.generateJavaCollectionMethodStubs(
 
     val javaMethods = javaCollectionPsiClass.methods
         .filterNot { it.name in ignoredMethodNames }
-        .filterNot { it.hasModifierProperty(PsiModifier.DEFAULT) }
+        .filterNot { it.hasModifierProperty(PsiModifier.DEFAULT) || it.hasModifierProperty(PsiModifier.STATIC) }
 
     val candidateMethods = javaMethods.flatMap { method ->
         createWrappersForJavaCollectionMethod(containingClass, method, javaCollectionPsiClass, kotlinNames, substitutor)
