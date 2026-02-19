@@ -1,4 +1,5 @@
 // WITH_STDLIB
+// FULL_JDK
 // LANGUAGE: +ImplicitJvmExposeBoxed
 package test
 
