@@ -45,22 +45,17 @@ import org.jetbrains.kotlin.powerassert.builder.call.CallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.LambdaCallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.SamConversionLambdaCallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.SimpleCallBuilder
-import org.jetbrains.kotlin.powerassert.builder.parameter.CallExplanationParameterBuilder
-import org.jetbrains.kotlin.powerassert.builder.parameter.DefaultMessageParameterBuilder
-import org.jetbrains.kotlin.powerassert.builder.parameter.ExplanationFactory
-import org.jetbrains.kotlin.powerassert.builder.parameter.ParameterBuilder
-import org.jetbrains.kotlin.powerassert.builder.parameter.StringParameterBuilder
+import org.jetbrains.kotlin.powerassert.builder.parameter.*
 import org.jetbrains.kotlin.powerassert.diagram.*
 
 class PowerAssertCallTransformer(
     private val sourceFile: SourceFile,
     private val context: IrPluginContext,
     private val configuration: PowerAssertConfiguration,
-    private val builtIns: PowerAssertBuiltIns,
-    private val factory: PowerAssertFunctionFactory,
+    private val factory: PowerAssertFunctionFactory?,
+    private val explanationFactory: ExplanationFactory?
 ) : IrElementTransformerVoidWithContext() {
     private val irTypeSystemContext = IrTypeSystemContextImpl(context.irBuiltIns)
-    private val explanationFactory = ExplanationFactory(builtIns)
 
     override fun visitCall(expression: IrCall): IrExpression {
         expression.transformChildrenVoid()
@@ -72,7 +67,7 @@ class PowerAssertCallTransformer(
             // Never transform calls to super instance. TODO is there a better check for this?
             expression.symbol in (currentFunction?.irElement as? IrSimpleFunction)?.overriddenSymbols.orEmpty() -> expression
             // Called function is annotated with @PowerAssert so should be transformed with CallExplanation.
-            function.hasAnnotationOrOverridden(builtIns.powerAssertClass) -> buildForAnnotated(expression, function)
+            function.hasAnnotationOrOverridden(PowerAssertBuiltIns.powerAssertClassId) -> buildForAnnotated(expression, function)
             // Called function is part of configuration so should be transformed with raw string diagram.
             function.kotlinFqName in configuration.functions -> buildForOverride(expression, function)
             // Not a transformable function call.
@@ -84,6 +79,14 @@ class PowerAssertCallTransformer(
         originalCall: IrCall,
         function: IrSimpleFunction,
     ): IrExpression {
+        if (explanationFactory == null || factory == null) {
+            configuration.messageCollector.warn(
+                expression = originalCall,
+                message = "Power-Assert runtime library not available.",
+            )
+            return originalCall
+        }
+
         val synthetic = factory.find(function)
         if (synthetic == null) {
             configuration.messageCollector.warn(
@@ -128,9 +131,12 @@ class PowerAssertCallTransformer(
             function.parameters.size -> originalCall.arguments.last()
             else -> null
         }
-
-        val diagramBuilder = CallExplanationParameterBuilder(explanationFactory, sourceFile, originalCall)
-        val parameterBuilder = DefaultMessageParameterBuilder(explanationFactory, function, messageArgument, diagramBuilder)
+        val parameterBuilder = if (explanationFactory != null) {
+            val diagramBuilder = CallExplanationParameterBuilder(explanationFactory, sourceFile, originalCall)
+            DefaultMessageParameterBuilder(explanationFactory, function, messageArgument, diagramBuilder)
+        } else {
+            StringParameterBuilder(sourceFile, originalCall, function, messageArgument)
+        }
         return buildPowerAssertCall(originalCall, function, callBuilder, parameterBuilder)
     }
 
@@ -166,8 +172,8 @@ class PowerAssertCallTransformer(
     private fun buildTree(parameter: IrValueParameter, argument: IrExpression?): RootNode<IrValueParameter> {
         // Check if the parameter or parameter type should be ignored.
         if (
-            parameter.hasAnnotation(builtIns.powerAssertIgnoreClass) ||
-            parameter.type.getClass()?.hasAnnotation(builtIns.powerAssertIgnoreClass) == true
+            parameter.hasAnnotation(PowerAssertBuiltIns.powerAssertIgnoreClassId) ||
+            parameter.type.getClass()?.hasAnnotation(PowerAssertBuiltIns.powerAssertIgnoreClassId) == true
         ) {
             val root = RootNode(parameter)
             if (argument != null) root.addChild(HiddenNode(argument))

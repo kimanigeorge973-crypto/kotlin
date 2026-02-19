@@ -33,15 +33,15 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.isComparisonOperator
 import org.jetbrains.kotlin.ir.irAttribute
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
-fun IrSimpleFunction.hasAnnotationOrOverridden(annotation: IrClassSymbol): Boolean =
-    hasAnnotation(annotation) || overriddenSymbols.any { it.owner.hasAnnotationOrOverridden(annotation) }
+fun IrSimpleFunction.hasAnnotationOrOverridden(classId: ClassId): Boolean =
+    hasAnnotation(classId) || overriddenSymbols.any { it.owner.hasAnnotationOrOverridden(classId) }
 
 fun IrBuilderWithScope.irString(builderAction: StringBuilder.() -> Unit) =
     irString(buildString { builderAction() })

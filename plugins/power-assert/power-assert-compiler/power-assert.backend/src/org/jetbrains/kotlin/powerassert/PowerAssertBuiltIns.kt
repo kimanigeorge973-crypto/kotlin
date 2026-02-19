@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.powerassert
 
+import org.jetbrains.kotlin.backend.common.extensions.DeclarationFinder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.fir.backend.utils.defaultTypeWithoutArguments
@@ -13,16 +14,20 @@ import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.isVararg
-import org.jetbrains.kotlin.name.CallableId
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.JvmStandardClassIds
-import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.*
 
-class PowerAssertBuiltIns(
-    context: IrPluginContext,
+class PowerAssertBuiltIns private constructor(
+    finder: DeclarationFinder,
+    val metadata: PowerAssertMetadata,
+    val powerAssertClass: IrClassSymbol,
 ) {
     companion object {
+        fun from(context: IrPluginContext): PowerAssertBuiltIns? {
+            val finder = context.finderForBuiltins()
+            val powerAssertClass = finder.findClass(powerAssertClassId) ?: return null
+            return PowerAssertBuiltIns(finder, PowerAssertMetadata(context.languageVersionSettings.languageVersion), powerAssertClass)
+        }
+
         const val PLUGIN_ID = "org.jetbrains.kotlin.powerassert"
 
         private fun dependencyError(message: String? = null): Nothing {
@@ -42,6 +47,13 @@ class PowerAssertBuiltIns(
         private fun callableId(identifier: String): CallableId =
             CallableId(packageFqName, Name.identifier(identifier))
 
+
+        private fun DeclarationFinder.findClassOrError(classId: ClassId): IrClassSymbol =
+            findClass(classId) ?: dependencyError(classId.toString())
+
+        private fun DeclarationFinder.findFunctionOrError(callableId: CallableId): IrSimpleFunctionSymbol =
+            findFunctions(callableId).singleOrNull() ?: dependencyError()
+
         private fun IrClassSymbol.primaryConstructor(): IrConstructorSymbol =
             constructors.singleOrNull { it.owner.isPrimary } ?: dependencyError()
 
@@ -49,6 +61,7 @@ class PowerAssertBuiltIns(
 
         val powerAssertFqName = packageFqName.child(Name.identifier("PowerAssert"))
         val powerAssertClassId = ClassId.topLevel(powerAssertFqName)
+        val powerAssertIgnoreClassId = classId(powerAssertClassId, "Ignore")
 
         private val callExplanationFqName = packageFqName.child(Name.identifier("CallExplanation"))
         private val callExplanationClassId = ClassId.topLevel(callExplanationFqName)
@@ -56,43 +69,32 @@ class PowerAssertBuiltIns(
         private val kindClassId = classId(argumentClassId, "Kind")
     }
 
-    private val finder = context.finderForBuiltins()
-
-    val metadata = PowerAssertMetadata(context.languageVersionSettings.languageVersion)
-
-    private fun findClass(classId: ClassId): IrClassSymbol =
-        finder.findClass(classId) ?: dependencyError(classId.toString())
-
-    private fun findFunction(callableId: CallableId): IrSimpleFunctionSymbol =
-        finder.findFunctions(callableId).singleOrNull() ?: dependencyError()
-
-    val powerAssertClass = findClass(powerAssertClassId)
     val powerAssertType = powerAssertClass.defaultTypeWithoutArguments
 
-    val powerAssertIgnoreClass = findClass(classId(powerAssertClassId, "Ignore"))
+    val powerAssertIgnoreClass = finder.findClassOrError(powerAssertIgnoreClassId)
     val powerAssertIgnoreType = powerAssertIgnoreClass.defaultTypeWithoutArguments
 
-    val expressionClass = findClass(classId("Expression"))
+    val expressionClass = finder.findClassOrError(classId("Expression"))
     val expressionType = expressionClass.defaultTypeWithoutArguments
 
-    val valueExpressionClass = findClass(classId("ValueExpression"))
+    val valueExpressionClass = finder.findClassOrError(classId("ValueExpression"))
     val valueExpressionType = valueExpressionClass.defaultTypeWithoutArguments
     val valueExpressionConstructor = valueExpressionClass.primaryConstructor()
 
-    val equalityExpressionClass = findClass(classId("EqualityExpression"))
+    val equalityExpressionClass = finder.findClassOrError(classId("EqualityExpression"))
     val equalityExpressionType = equalityExpressionClass.defaultTypeWithoutArguments
     val equalityExpressionConstructor = equalityExpressionClass.primaryConstructor()
 
-    val callExplanationClass = findClass(callExplanationClassId)
+    val callExplanationClass = finder.findClassOrError(callExplanationClassId)
     val callExplanationType = callExplanationClass.defaultTypeWithoutArguments
     val callExplanationConstructor = callExplanationClass.primaryConstructor()
-    val toDefaultMessageFunction = findFunction(callableId("toDefaultMessage"))
+    val toDefaultMessageFunction = finder.findFunctionOrError(callableId("toDefaultMessage"))
 
-    val argumentClass = findClass(argumentClassId)
+    val argumentClass = finder.findClassOrError(argumentClassId)
     val argumentType = argumentClass.defaultTypeWithoutArguments
     val argumentConstructor = argumentClass.primaryConstructor()
 
-    val argumentKindClass = findClass(kindClassId)
+    val argumentKindClass = finder.findClassOrError(kindClassId)
     val argumentKindType = argumentKindClass.defaultTypeWithoutArguments
 
     // -----

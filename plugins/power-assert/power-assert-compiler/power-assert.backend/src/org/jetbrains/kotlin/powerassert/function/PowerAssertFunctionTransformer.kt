@@ -8,18 +8,17 @@ package org.jetbrains.kotlin.powerassert
 import org.jetbrains.kotlin.backend.common.DeclarationTransformer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 class PowerAssertFunctionTransformer(
-    private val builtIns: PowerAssertBuiltIns,
+    builtIns: PowerAssertBuiltIns,
     private val factory: PowerAssertFunctionFactory,
 ) : DeclarationTransformer {
     private val transformer = PowerAssertGetExplanationTransformer(builtIns, parameter = null)
 
     override fun transformFlat(declaration: IrDeclaration): List<IrDeclaration>? {
         if (declaration is IrSimpleFunction) {
-            if (declaration.hasAnnotationOrOverridden(builtIns.powerAssertClass)) {
+            if (declaration.hasAnnotationOrOverridden(PowerAssertBuiltIns.powerAssertClassId)) {
                 return lower(declaration)
             }
         }
