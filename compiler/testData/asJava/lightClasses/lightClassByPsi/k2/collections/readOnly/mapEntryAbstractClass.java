@@ -2,6 +2,18 @@ public abstract class CMapEntry /* test.CMapEntry*/<KElem, VElem>  implements ja
   @java.lang.Override()
   public VElem setValue(VElem);//  setValue(VElem)
 
+  @java.lang.Override()
+  public static <K extends java.lang.Comparable<? super K>, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByKey();// <K extends java.lang.Comparable<? super K>, V>  comparingByKey()
+
+  @java.lang.Override()
+  public static <K, V extends java.lang.Comparable<? super V>> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByValue();// <K, V extends java.lang.Comparable<? super V>>  comparingByValue()
+
+  @java.lang.Override()
+  public static <K, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByKey(java.util.Comparator<? super K>);// <K, V>  comparingByKey(java.util.Comparator<? super K>)
+
+  @java.lang.Override()
+  public static <K, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByValue(java.util.Comparator<? super V>);// <K, V>  comparingByValue(java.util.Comparator<? super V>)
+
   public  CMapEntry();//  .ctor()
 }
 
@@ -15,6 +27,18 @@ public abstract class CMapEntry2 /* test.CMapEntry2*/<KElem, VElem>  implements 
   @java.lang.Override()
   public VElem setValue(VElem);//  setValue(VElem)
 
+  @java.lang.Override()
+  public static <K extends java.lang.Comparable<? super K>, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByKey();// <K extends java.lang.Comparable<? super K>, V>  comparingByKey()
+
+  @java.lang.Override()
+  public static <K, V extends java.lang.Comparable<? super V>> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByValue();// <K, V extends java.lang.Comparable<? super V>>  comparingByValue()
+
+  @java.lang.Override()
+  public static <K, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByKey(java.util.Comparator<? super K>);// <K, V>  comparingByKey(java.util.Comparator<? super K>)
+
+  @java.lang.Override()
+  public static <K, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByValue(java.util.Comparator<? super V>);// <K, V>  comparingByValue(java.util.Comparator<? super V>)
+
   public  CMapEntry2();//  .ctor()
 }
 
@@ -27,6 +51,18 @@ public class CMapEntry3 /* test.CMapEntry3*/<KElem, VElem>  implements java.util
 
   @java.lang.Override()
   public VElem setValue(VElem);//  setValue(VElem)
+
+  @java.lang.Override()
+  public static <K extends java.lang.Comparable<? super K>, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByKey();// <K extends java.lang.Comparable<? super K>, V>  comparingByKey()
+
+  @java.lang.Override()
+  public static <K, V extends java.lang.Comparable<? super V>> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByValue();// <K, V extends java.lang.Comparable<? super V>>  comparingByValue()
+
+  @java.lang.Override()
+  public static <K, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByKey(java.util.Comparator<? super K>);// <K, V>  comparingByKey(java.util.Comparator<? super K>)
+
+  @java.lang.Override()
+  public static <K, V> java.util.Comparator<java.util.Map.Entry<K, V>> comparingByValue(java.util.Comparator<? super V>);// <K, V>  comparingByValue(java.util.Comparator<? super V>)
 
   public  CMapEntry3();//  .ctor()
 }
