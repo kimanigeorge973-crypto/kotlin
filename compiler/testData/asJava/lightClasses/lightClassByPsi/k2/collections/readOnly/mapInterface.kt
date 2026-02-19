@@ -1,4 +1,5 @@
 // WITH_STDLIB
+// FULL_JDK
 package test
 
 interface IMap<KElem, VElem> : Map<KElem, VElem>
