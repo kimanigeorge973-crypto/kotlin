@@ -13,8 +13,10 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.common.prepareJsSessions
 import org.jetbrains.kotlin.cli.common.prepareJvmSessions
 import org.jetbrains.kotlin.cli.common.prepareWasmSessions
+import org.jetbrains.kotlin.cli.extensionsStorage
 import org.jetbrains.kotlin.cli.jvm.compiler.VfsBasedProjectEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.legacy.pipeline.MinimizedFrontendContext
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.fir.DependencyListForCliModule
 import org.jetbrains.kotlin.fir.FirSession
@@ -196,6 +198,7 @@ abstract class AbstractLoadedMetadataDumpHandler<A : ResultingArtifact.Binary<A>
     override val directiveContainers: List<DirectivesContainer>
         get() = listOf(FirDiagnosticsDirectives)
 
+    @OptIn(ExperimentalCompilerApi::class)
     override fun processModule(module: TestModule, info: A) {
         val languageSettingsBuilder = testServices.defaultsProvider.newLanguageSettingsBuilder()
         languageSettingsBuilder.configureUsingDirectives(
@@ -212,6 +215,7 @@ abstract class AbstractLoadedMetadataDumpHandler<A : ResultingArtifact.Binary<A>
         val configuration = testServices.compilerConfigurationProvider.getCompilerConfiguration(emptyModule)
         val environment = VfsBasedProjectEnvironment(
             testServices.compilerConfigurationProvider.getProject(emptyModule),
+            configuration.extensionsStorage,
             VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL),
             testServices.compilerConfigurationProvider.getPackagePartProviderFactory(emptyModule)
         )
