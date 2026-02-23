@@ -17,7 +17,7 @@ class IsSortedSequencesTest {
 
     @Test
     fun isSorted() {
-        assertTrue(sequenceOf<Int>().isSorted())
+        assertTrue(sequenceOf<String>().isSorted())
         assertTrue(sequenceOf("a").isSorted())
         assertTrue(sequenceOf("a", "b", "c").isSorted())
         assertFalse(sequenceOf("c", "b", "a").isSorted())
@@ -27,7 +27,7 @@ class IsSortedSequencesTest {
 
     @Test
     fun isSortedDescending() {
-        assertTrue(sequenceOf<Int>().isSortedDescending())
+        assertTrue(sequenceOf<String>().isSortedDescending())
         assertTrue(sequenceOf("a").isSortedDescending())
         assertTrue(sequenceOf("c", "b", "a").isSortedDescending())
         assertFalse(sequenceOf("a", "b", "c").isSortedDescending())
@@ -37,7 +37,7 @@ class IsSortedSequencesTest {
 
     @Test
     fun isSortedWith() {
-        assertTrue(sequenceOf<Int>().isSortedWith(naturalOrder()))
+        assertTrue(sequenceOf<String>().isSortedWith(naturalOrder()))
         assertTrue(sequenceOf("a", "b", "c").isSortedWith(naturalOrder()))
         assertTrue(sequenceOf("c", "b", "a").isSortedWith(reverseOrder()))
         assertFalse(sequenceOf("b", "a", "c").isSortedWith(naturalOrder()))
@@ -47,14 +47,14 @@ class IsSortedSequencesTest {
 
     @Test
     fun isSortedBy() {
-        assertTrue(sequenceOf<Int>().isSortedBy { it })
+        assertTrue(sequenceOf<String>().isSortedBy { it })
         assertTrue(sequenceOf("a", "bb", "ccc").isSortedBy { it.length })
         assertFalse(sequenceOf("ccc", "bb", "a").isSortedBy { it.length })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(sequenceOf<Int>().isSortedByDescending { it })
+        assertTrue(sequenceOf<String>().isSortedByDescending { it })
         assertTrue(sequenceOf("ccc", "bb", "a").isSortedByDescending { it.length })
         assertFalse(sequenceOf("a", "bb", "ccc").isSortedByDescending { it.length })
     }

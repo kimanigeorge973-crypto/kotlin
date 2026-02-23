@@ -17,7 +17,7 @@ class IsSortedIterablesTest {
 
     @Test
     fun isSorted() {
-        assertTrue(listOf<Int>().isSorted())
+        assertTrue(listOf<String>().isSorted())
         assertTrue(listOf("a").isSorted())
         assertTrue(listOf("a", "b", "c").isSorted())
         assertFalse(listOf("c", "b", "a").isSorted())
@@ -27,7 +27,7 @@ class IsSortedIterablesTest {
 
     @Test
     fun isSortedDescending() {
-        assertTrue(listOf<Int>().isSortedDescending())
+        assertTrue(listOf<String>().isSortedDescending())
         assertTrue(listOf("a").isSortedDescending())
         assertTrue(listOf("c", "b", "a").isSortedDescending())
         assertFalse(listOf("a", "b", "c").isSortedDescending())
@@ -37,7 +37,7 @@ class IsSortedIterablesTest {
 
     @Test
     fun isSortedWith() {
-        assertTrue(listOf<Int>().isSortedWith(naturalOrder()))
+        assertTrue(listOf<String>().isSortedWith(naturalOrder()))
         assertTrue(listOf("a", "b", "c").isSortedWith(naturalOrder()))
         assertTrue(listOf("c", "b", "a").isSortedWith(reverseOrder()))
         assertFalse(listOf("b", "a", "c").isSortedWith(naturalOrder()))
@@ -47,14 +47,14 @@ class IsSortedIterablesTest {
 
     @Test
     fun isSortedBy() {
-        assertTrue(listOf<Int>().isSortedBy { it })
+        assertTrue(listOf<String>().isSortedBy { it })
         assertTrue(listOf("a", "bb", "ccc").isSortedBy { it.length })
         assertFalse(listOf("ccc", "bb", "a").isSortedBy { it.length })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(listOf<Int>().isSortedByDescending { it })
+        assertTrue(listOf<String>().isSortedByDescending { it })
         assertTrue(listOf("ccc", "bb", "a").isSortedByDescending { it.length })
         assertFalse(listOf("a", "bb", "ccc").isSortedByDescending { it.length })
     }

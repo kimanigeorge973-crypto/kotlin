@@ -19,42 +19,42 @@ class IsSortedFloatArrayTest {
     fun isSorted() {
         assertTrue(floatArrayOf().isSorted())
         assertTrue(floatArrayOf(1.0f).isSorted())
-        assertTrue(floatArrayOf(1.0f, 2.0f, 3.0f).isSorted())
-        assertFalse(floatArrayOf(3.0f, 2.0f, 1.0f).isSorted())
-        assertFalse(floatArrayOf(2.0f, 1.0f, 3.0f).isSorted())
-        assertTrue(floatArrayOf(2.0f, 2.0f, 2.0f).isSorted())
+        assertTrue(floatArrayOf(1.0f, 2.5f, 3.14f).isSorted())
+        assertFalse(floatArrayOf(3.14f, 2.5f, 1.0f).isSorted())
+        assertFalse(floatArrayOf(2.5f, 1.0f, 3.14f).isSorted())
+        assertTrue(floatArrayOf(2.5f, 2.5f, 2.5f).isSorted())
     }
 
     @Test
     fun isSortedDescending() {
         assertTrue(floatArrayOf().isSortedDescending())
         assertTrue(floatArrayOf(1.0f).isSortedDescending())
-        assertTrue(floatArrayOf(3.0f, 2.0f, 1.0f).isSortedDescending())
-        assertFalse(floatArrayOf(1.0f, 2.0f, 3.0f).isSortedDescending())
-        assertFalse(floatArrayOf(2.0f, 1.0f, 3.0f).isSortedDescending())
-        assertTrue(floatArrayOf(2.0f, 2.0f, 2.0f).isSortedDescending())
+        assertTrue(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedDescending())
+        assertFalse(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedDescending())
+        assertFalse(floatArrayOf(2.5f, 1.0f, 3.14f).isSortedDescending())
+        assertTrue(floatArrayOf(2.5f, 2.5f, 2.5f).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(floatArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(floatArrayOf(1.0f, 2.0f, 3.0f).isSortedWith(naturalOrder()))
-        assertTrue(floatArrayOf(3.0f, 2.0f, 1.0f).isSortedWith(reverseOrder()))
-        assertFalse(floatArrayOf(2.0f, 1.0f, 3.0f).isSortedWith(naturalOrder()))
+        assertTrue(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedWith(naturalOrder()))
+        assertTrue(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedWith(reverseOrder()))
+        assertFalse(floatArrayOf(2.5f, 1.0f, 3.14f).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(floatArrayOf().isSortedBy { it })
-        assertTrue(floatArrayOf(1.0f, 2.0f, 3.0f).isSortedBy { it })
-        assertFalse(floatArrayOf(3.0f, 2.0f, 1.0f).isSortedBy { it })
+        assertTrue(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedBy { it })
+        assertFalse(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(floatArrayOf().isSortedByDescending { it })
-        assertTrue(floatArrayOf(3.0f, 2.0f, 1.0f).isSortedByDescending { it })
-        assertFalse(floatArrayOf(1.0f, 2.0f, 3.0f).isSortedByDescending { it })
+        assertTrue(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedByDescending { it })
+        assertFalse(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedByDescending { it })
     }
 
     @Test

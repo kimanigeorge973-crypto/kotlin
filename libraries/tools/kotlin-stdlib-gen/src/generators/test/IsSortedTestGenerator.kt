@@ -6,79 +6,22 @@
 package generators.test
 
 import templates.*
-import templates.Family.*
-import templates.PrimitiveType
 import java.io.BufferedWriter
 import java.io.File
 
 object IsSortedTestGenerator {
     fun generate() {
-        generate(Iterables)
-        generate(Sequences)
-        generate(ArraysOfObjects)
-        for (primitive in PrimitiveType.defaultPrimitives) {
-            generate(ArraysOfPrimitives, primitive)
-        }
-        for (primitive in PrimitiveType.unsignedPrimitives) {
-            generate(ArraysOfUnsigned, primitive)
-        }
-    }
-
-    private class TestTypeConfig(
-        val sortedValues: List<String>,
-        val unsortedValues: List<String> = listOf(sortedValues[1], sortedValues[0], sortedValues[2]),
-        val selectorExpr: String = "it",
-        val selectorSortedValues: List<String> = sortedValues,
-        val caseInsensitiveValues: Pair<List<String>, List<String>>? = null,
-    )
-
-    private fun configFor(primitive: PrimitiveType?): TestTypeConfig = when (primitive) {
-        PrimitiveType.Char -> TestTypeConfig(
-            sortedValues = listOf("'a'", "'b'", "'c'")
-        )
-        PrimitiveType.Boolean -> TestTypeConfig(
-            sortedValues = listOf("false", "true", "true"),
-            selectorExpr = "it.compareTo(false)"
-        )
-        null -> TestTypeConfig(
-            sortedValues = listOf("\"a\"", "\"b\"", "\"c\""),
-            selectorExpr = "it.length",
-            selectorSortedValues = listOf("\"a\"", "\"bb\"", "\"ccc\""),
-            caseInsensitiveValues = listOf("\"Apple\"", "\"banana\"", "\"Cherry\"") to listOf("\"banana\"", "\"Apple\"", "\"Cherry\""),
-        )
-        else -> {
-            val suffix = when (primitive) {
-                PrimitiveType.Long -> "L"
-                PrimitiveType.ULong -> "uL"
-                in PrimitiveType.unsignedPrimitives -> "u"
-                PrimitiveType.Float -> ".0f"
-                PrimitiveType.Double -> ".0"
-                else -> ""
-            }
-            TestTypeConfig(sortedValues = listOf("1$suffix", "2$suffix", "3$suffix"))
-        }
+        forEachIsSortedFamily { family, primitive -> generate(family, primitive) }
     }
 
     private fun generate(family: Family, primitive: PrimitiveType? = null) {
-        val collectionClass = when (family) {
-            Iterables, Sequences -> family.toString()
-            ArraysOfObjects -> "Array"
-            ArraysOfPrimitives, ArraysOfUnsigned -> "${primitive!!}Array"
-            else -> error(family)
-        }
-
-        val isGeneric = primitive == null
-        val ctor = when (family) {
-            Iterables -> "listOf"
-            Sequences -> "sequenceOf"
-            ArraysOfObjects -> "arrayOf"
-            ArraysOfPrimitives, ArraysOfUnsigned -> "${primitive!!.name.lowercase()}ArrayOf"
-        }
-        val config = configFor(primitive)
-        val emptyCollection = if (isGeneric) "$ctor<Int>()" else "$ctor()"
-        val fpTypes = when {
-            isGeneric -> listOf(PrimitiveType.Double, PrimitiveType.Float)
-            primitive.isFloatingPoint() -> listOf(primitive)
+        val collectionClass = collectionClassName(family, primitive)
+        val ctor = constructorName(family, primitive)
+        val config = isSortedConfigFor(primitive)
+        val emptyCollection = if (primitive == null) "$ctor<String>()" else "$ctor()"
+        val fpTypes = when (primitive) {
+            null -> listOf(PrimitiveType.Double, PrimitiveType.Float)
+            PrimitiveType.Float, PrimitiveType.Double -> listOf(primitive)
             else -> emptyList()
         }
 
@@ -113,29 +56,29 @@ object IsSortedTestGenerator {
         appendLine("class $className {")
     }
 
-    private fun BufferedWriter.writeIsSortedTest(ctor: String, config: TestTypeConfig, emptyCollection: String, descending: Boolean) {
+    private fun BufferedWriter.writeIsSortedTest(ctor: String, config: IsSortedTypeConfig, emptyCollection: String, descending: Boolean) {
         val funcName = if (descending) "isSortedDescending" else "isSorted"
         val sorted = config.sortedValues
         val equalElement = sorted[1]
         val ascValues = sorted.joinToString()
         val descValues = sorted.reversed().joinToString()
-        val trueSorted = if (descending) descValues else ascValues
-        val falseSorted = if (descending) ascValues else descValues
+        val expectedSorted = if (descending) descValues else ascValues
+        val expectedUnsorted = if (descending) ascValues else descValues
         appendLine(
             """
     @Test
     fun $funcName() {
         assertTrue($emptyCollection.$funcName())
         assertTrue($ctor(${sorted.take(1).joinToString()}).$funcName())
-        assertTrue($ctor($trueSorted).$funcName())
-        assertFalse($ctor($falseSorted).$funcName())
+        assertTrue($ctor($expectedSorted).$funcName())
+        assertFalse($ctor($expectedUnsorted).$funcName())
         assertFalse($ctor(${config.unsortedValues.joinToString()}).$funcName())
         assertTrue($ctor($equalElement, $equalElement, $equalElement).$funcName())
     }"""
         )
     }
 
-    private fun BufferedWriter.writeIsSortedWithTest(ctor: String, config: TestTypeConfig, emptyCollection: String) {
+    private fun BufferedWriter.writeIsSortedWithTest(ctor: String, config: IsSortedTypeConfig, emptyCollection: String) {
         val sorted = config.sortedValues
         val unsorted = config.unsortedValues
         val caseInsensitiveLines = config.caseInsensitiveValues?.let { (sorted, unsorted) ->
@@ -155,7 +98,7 @@ object IsSortedTestGenerator {
         )
     }
 
-    private fun BufferedWriter.writeIsSortedByTest(ctor: String, config: TestTypeConfig, emptyCollection: String, descending: Boolean) {
+    private fun BufferedWriter.writeIsSortedByTest(ctor: String, config: IsSortedTypeConfig, emptyCollection: String, descending: Boolean) {
         val funcName = if (descending) "isSortedByDescending" else "isSortedBy"
         val selectorExpr = config.selectorExpr
         val sortedValues = if (descending) config.selectorSortedValues.reversed() else config.selectorSortedValues

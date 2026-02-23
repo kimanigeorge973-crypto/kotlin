@@ -19,9 +19,9 @@ class IsSortedUShortArrayTest {
     fun isSorted() {
         assertTrue(ushortArrayOf().isSorted())
         assertTrue(ushortArrayOf(1u).isSorted())
-        assertTrue(ushortArrayOf(1u, 2u, 3u).isSorted())
-        assertFalse(ushortArrayOf(3u, 2u, 1u).isSorted())
-        assertFalse(ushortArrayOf(2u, 1u, 3u).isSorted())
+        assertTrue(ushortArrayOf(1u, 2u, 3u, 4u, 5u).isSorted())
+        assertFalse(ushortArrayOf(5u, 4u, 3u, 2u, 1u).isSorted())
+        assertFalse(ushortArrayOf(2u, 1u, 3u, 4u, 5u).isSorted())
         assertTrue(ushortArrayOf(2u, 2u, 2u).isSorted())
     }
 
@@ -29,31 +29,31 @@ class IsSortedUShortArrayTest {
     fun isSortedDescending() {
         assertTrue(ushortArrayOf().isSortedDescending())
         assertTrue(ushortArrayOf(1u).isSortedDescending())
-        assertTrue(ushortArrayOf(3u, 2u, 1u).isSortedDescending())
-        assertFalse(ushortArrayOf(1u, 2u, 3u).isSortedDescending())
-        assertFalse(ushortArrayOf(2u, 1u, 3u).isSortedDescending())
+        assertTrue(ushortArrayOf(5u, 4u, 3u, 2u, 1u).isSortedDescending())
+        assertFalse(ushortArrayOf(1u, 2u, 3u, 4u, 5u).isSortedDescending())
+        assertFalse(ushortArrayOf(2u, 1u, 3u, 4u, 5u).isSortedDescending())
         assertTrue(ushortArrayOf(2u, 2u, 2u).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(ushortArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(ushortArrayOf(1u, 2u, 3u).isSortedWith(naturalOrder()))
-        assertTrue(ushortArrayOf(3u, 2u, 1u).isSortedWith(reverseOrder()))
-        assertFalse(ushortArrayOf(2u, 1u, 3u).isSortedWith(naturalOrder()))
+        assertTrue(ushortArrayOf(1u, 2u, 3u, 4u, 5u).isSortedWith(naturalOrder()))
+        assertTrue(ushortArrayOf(5u, 4u, 3u, 2u, 1u).isSortedWith(reverseOrder()))
+        assertFalse(ushortArrayOf(2u, 1u, 3u, 4u, 5u).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(ushortArrayOf().isSortedBy { it })
-        assertTrue(ushortArrayOf(1u, 2u, 3u).isSortedBy { it })
-        assertFalse(ushortArrayOf(3u, 2u, 1u).isSortedBy { it })
+        assertTrue(ushortArrayOf(1u, 2u, 3u, 4u, 5u).isSortedBy { it })
+        assertFalse(ushortArrayOf(5u, 4u, 3u, 2u, 1u).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(ushortArrayOf().isSortedByDescending { it })
-        assertTrue(ushortArrayOf(3u, 2u, 1u).isSortedByDescending { it })
-        assertFalse(ushortArrayOf(1u, 2u, 3u).isSortedByDescending { it })
+        assertTrue(ushortArrayOf(5u, 4u, 3u, 2u, 1u).isSortedByDescending { it })
+        assertFalse(ushortArrayOf(1u, 2u, 3u, 4u, 5u).isSortedByDescending { it })
     }
 }

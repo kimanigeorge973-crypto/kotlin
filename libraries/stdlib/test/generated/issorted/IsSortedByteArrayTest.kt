@@ -19,9 +19,9 @@ class IsSortedByteArrayTest {
     fun isSorted() {
         assertTrue(byteArrayOf().isSorted())
         assertTrue(byteArrayOf(1).isSorted())
-        assertTrue(byteArrayOf(1, 2, 3).isSorted())
-        assertFalse(byteArrayOf(3, 2, 1).isSorted())
-        assertFalse(byteArrayOf(2, 1, 3).isSorted())
+        assertTrue(byteArrayOf(1, 2, 3, 4, 5).isSorted())
+        assertFalse(byteArrayOf(5, 4, 3, 2, 1).isSorted())
+        assertFalse(byteArrayOf(2, 1, 3, 4, 5).isSorted())
         assertTrue(byteArrayOf(2, 2, 2).isSorted())
     }
 
@@ -29,31 +29,31 @@ class IsSortedByteArrayTest {
     fun isSortedDescending() {
         assertTrue(byteArrayOf().isSortedDescending())
         assertTrue(byteArrayOf(1).isSortedDescending())
-        assertTrue(byteArrayOf(3, 2, 1).isSortedDescending())
-        assertFalse(byteArrayOf(1, 2, 3).isSortedDescending())
-        assertFalse(byteArrayOf(2, 1, 3).isSortedDescending())
+        assertTrue(byteArrayOf(5, 4, 3, 2, 1).isSortedDescending())
+        assertFalse(byteArrayOf(1, 2, 3, 4, 5).isSortedDescending())
+        assertFalse(byteArrayOf(2, 1, 3, 4, 5).isSortedDescending())
         assertTrue(byteArrayOf(2, 2, 2).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(byteArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(byteArrayOf(1, 2, 3).isSortedWith(naturalOrder()))
-        assertTrue(byteArrayOf(3, 2, 1).isSortedWith(reverseOrder()))
-        assertFalse(byteArrayOf(2, 1, 3).isSortedWith(naturalOrder()))
+        assertTrue(byteArrayOf(1, 2, 3, 4, 5).isSortedWith(naturalOrder()))
+        assertTrue(byteArrayOf(5, 4, 3, 2, 1).isSortedWith(reverseOrder()))
+        assertFalse(byteArrayOf(2, 1, 3, 4, 5).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(byteArrayOf().isSortedBy { it })
-        assertTrue(byteArrayOf(1, 2, 3).isSortedBy { it })
-        assertFalse(byteArrayOf(3, 2, 1).isSortedBy { it })
+        assertTrue(byteArrayOf(1, 2, 3, 4, 5).isSortedBy { it })
+        assertFalse(byteArrayOf(5, 4, 3, 2, 1).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(byteArrayOf().isSortedByDescending { it })
-        assertTrue(byteArrayOf(3, 2, 1).isSortedByDescending { it })
-        assertFalse(byteArrayOf(1, 2, 3).isSortedByDescending { it })
+        assertTrue(byteArrayOf(5, 4, 3, 2, 1).isSortedByDescending { it })
+        assertFalse(byteArrayOf(1, 2, 3, 4, 5).isSortedByDescending { it })
     }
 }

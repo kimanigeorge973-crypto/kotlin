@@ -20,7 +20,7 @@ class IsSortedUShortArraySamples {
         val sorted = ushortArrayOf(1u, 2u, 3u, 4u, 5u)
         assertPrints(sorted.isSorted(), "true")
 
-        val unsorted = ushortArrayOf(1u, 3u, 2u, 4u, 5u)
+        val unsorted = ushortArrayOf(2u, 1u, 3u, 4u, 5u)
         assertPrints(unsorted.isSorted(), "false")
     }
 
@@ -29,7 +29,7 @@ class IsSortedUShortArraySamples {
         val sorted = ushortArrayOf(5u, 4u, 3u, 2u, 1u)
         assertPrints(sorted.isSortedDescending(), "true")
 
-        val unsorted = ushortArrayOf(5u, 3u, 4u, 2u, 1u)
+        val unsorted = ushortArrayOf(4u, 5u, 3u, 2u, 1u)
         assertPrints(unsorted.isSortedDescending(), "false")
     }
 

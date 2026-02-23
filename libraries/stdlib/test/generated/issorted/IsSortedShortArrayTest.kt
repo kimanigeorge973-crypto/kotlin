@@ -19,9 +19,9 @@ class IsSortedShortArrayTest {
     fun isSorted() {
         assertTrue(shortArrayOf().isSorted())
         assertTrue(shortArrayOf(1).isSorted())
-        assertTrue(shortArrayOf(1, 2, 3).isSorted())
-        assertFalse(shortArrayOf(3, 2, 1).isSorted())
-        assertFalse(shortArrayOf(2, 1, 3).isSorted())
+        assertTrue(shortArrayOf(1, 2, 3, 4, 5).isSorted())
+        assertFalse(shortArrayOf(5, 4, 3, 2, 1).isSorted())
+        assertFalse(shortArrayOf(2, 1, 3, 4, 5).isSorted())
         assertTrue(shortArrayOf(2, 2, 2).isSorted())
     }
 
@@ -29,31 +29,31 @@ class IsSortedShortArrayTest {
     fun isSortedDescending() {
         assertTrue(shortArrayOf().isSortedDescending())
         assertTrue(shortArrayOf(1).isSortedDescending())
-        assertTrue(shortArrayOf(3, 2, 1).isSortedDescending())
-        assertFalse(shortArrayOf(1, 2, 3).isSortedDescending())
-        assertFalse(shortArrayOf(2, 1, 3).isSortedDescending())
+        assertTrue(shortArrayOf(5, 4, 3, 2, 1).isSortedDescending())
+        assertFalse(shortArrayOf(1, 2, 3, 4, 5).isSortedDescending())
+        assertFalse(shortArrayOf(2, 1, 3, 4, 5).isSortedDescending())
         assertTrue(shortArrayOf(2, 2, 2).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(shortArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(shortArrayOf(1, 2, 3).isSortedWith(naturalOrder()))
-        assertTrue(shortArrayOf(3, 2, 1).isSortedWith(reverseOrder()))
-        assertFalse(shortArrayOf(2, 1, 3).isSortedWith(naturalOrder()))
+        assertTrue(shortArrayOf(1, 2, 3, 4, 5).isSortedWith(naturalOrder()))
+        assertTrue(shortArrayOf(5, 4, 3, 2, 1).isSortedWith(reverseOrder()))
+        assertFalse(shortArrayOf(2, 1, 3, 4, 5).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(shortArrayOf().isSortedBy { it })
-        assertTrue(shortArrayOf(1, 2, 3).isSortedBy { it })
-        assertFalse(shortArrayOf(3, 2, 1).isSortedBy { it })
+        assertTrue(shortArrayOf(1, 2, 3, 4, 5).isSortedBy { it })
+        assertFalse(shortArrayOf(5, 4, 3, 2, 1).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(shortArrayOf().isSortedByDescending { it })
-        assertTrue(shortArrayOf(3, 2, 1).isSortedByDescending { it })
-        assertFalse(shortArrayOf(1, 2, 3).isSortedByDescending { it })
+        assertTrue(shortArrayOf(5, 4, 3, 2, 1).isSortedByDescending { it })
+        assertFalse(shortArrayOf(1, 2, 3, 4, 5).isSortedByDescending { it })
     }
 }

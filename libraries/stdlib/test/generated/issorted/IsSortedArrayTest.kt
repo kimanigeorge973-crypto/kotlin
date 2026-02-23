@@ -17,7 +17,7 @@ class IsSortedArrayTest {
 
     @Test
     fun isSorted() {
-        assertTrue(arrayOf<Int>().isSorted())
+        assertTrue(arrayOf<String>().isSorted())
         assertTrue(arrayOf("a").isSorted())
         assertTrue(arrayOf("a", "b", "c").isSorted())
         assertFalse(arrayOf("c", "b", "a").isSorted())
@@ -27,7 +27,7 @@ class IsSortedArrayTest {
 
     @Test
     fun isSortedDescending() {
-        assertTrue(arrayOf<Int>().isSortedDescending())
+        assertTrue(arrayOf<String>().isSortedDescending())
         assertTrue(arrayOf("a").isSortedDescending())
         assertTrue(arrayOf("c", "b", "a").isSortedDescending())
         assertFalse(arrayOf("a", "b", "c").isSortedDescending())
@@ -37,7 +37,7 @@ class IsSortedArrayTest {
 
     @Test
     fun isSortedWith() {
-        assertTrue(arrayOf<Int>().isSortedWith(naturalOrder()))
+        assertTrue(arrayOf<String>().isSortedWith(naturalOrder()))
         assertTrue(arrayOf("a", "b", "c").isSortedWith(naturalOrder()))
         assertTrue(arrayOf("c", "b", "a").isSortedWith(reverseOrder()))
         assertFalse(arrayOf("b", "a", "c").isSortedWith(naturalOrder()))
@@ -47,14 +47,14 @@ class IsSortedArrayTest {
 
     @Test
     fun isSortedBy() {
-        assertTrue(arrayOf<Int>().isSortedBy { it })
+        assertTrue(arrayOf<String>().isSortedBy { it })
         assertTrue(arrayOf("a", "bb", "ccc").isSortedBy { it.length })
         assertFalse(arrayOf("ccc", "bb", "a").isSortedBy { it.length })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(arrayOf<Int>().isSortedByDescending { it })
+        assertTrue(arrayOf<String>().isSortedByDescending { it })
         assertTrue(arrayOf("ccc", "bb", "a").isSortedByDescending { it.length })
         assertFalse(arrayOf("a", "bb", "ccc").isSortedByDescending { it.length })
     }

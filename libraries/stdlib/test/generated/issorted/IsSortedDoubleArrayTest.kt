@@ -19,42 +19,42 @@ class IsSortedDoubleArrayTest {
     fun isSorted() {
         assertTrue(doubleArrayOf().isSorted())
         assertTrue(doubleArrayOf(1.0).isSorted())
-        assertTrue(doubleArrayOf(1.0, 2.0, 3.0).isSorted())
-        assertFalse(doubleArrayOf(3.0, 2.0, 1.0).isSorted())
-        assertFalse(doubleArrayOf(2.0, 1.0, 3.0).isSorted())
-        assertTrue(doubleArrayOf(2.0, 2.0, 2.0).isSorted())
+        assertTrue(doubleArrayOf(1.0, 2.5, 3.14).isSorted())
+        assertFalse(doubleArrayOf(3.14, 2.5, 1.0).isSorted())
+        assertFalse(doubleArrayOf(2.5, 1.0, 3.14).isSorted())
+        assertTrue(doubleArrayOf(2.5, 2.5, 2.5).isSorted())
     }
 
     @Test
     fun isSortedDescending() {
         assertTrue(doubleArrayOf().isSortedDescending())
         assertTrue(doubleArrayOf(1.0).isSortedDescending())
-        assertTrue(doubleArrayOf(3.0, 2.0, 1.0).isSortedDescending())
-        assertFalse(doubleArrayOf(1.0, 2.0, 3.0).isSortedDescending())
-        assertFalse(doubleArrayOf(2.0, 1.0, 3.0).isSortedDescending())
-        assertTrue(doubleArrayOf(2.0, 2.0, 2.0).isSortedDescending())
+        assertTrue(doubleArrayOf(3.14, 2.5, 1.0).isSortedDescending())
+        assertFalse(doubleArrayOf(1.0, 2.5, 3.14).isSortedDescending())
+        assertFalse(doubleArrayOf(2.5, 1.0, 3.14).isSortedDescending())
+        assertTrue(doubleArrayOf(2.5, 2.5, 2.5).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(doubleArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(doubleArrayOf(1.0, 2.0, 3.0).isSortedWith(naturalOrder()))
-        assertTrue(doubleArrayOf(3.0, 2.0, 1.0).isSortedWith(reverseOrder()))
-        assertFalse(doubleArrayOf(2.0, 1.0, 3.0).isSortedWith(naturalOrder()))
+        assertTrue(doubleArrayOf(1.0, 2.5, 3.14).isSortedWith(naturalOrder()))
+        assertTrue(doubleArrayOf(3.14, 2.5, 1.0).isSortedWith(reverseOrder()))
+        assertFalse(doubleArrayOf(2.5, 1.0, 3.14).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(doubleArrayOf().isSortedBy { it })
-        assertTrue(doubleArrayOf(1.0, 2.0, 3.0).isSortedBy { it })
-        assertFalse(doubleArrayOf(3.0, 2.0, 1.0).isSortedBy { it })
+        assertTrue(doubleArrayOf(1.0, 2.5, 3.14).isSortedBy { it })
+        assertFalse(doubleArrayOf(3.14, 2.5, 1.0).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(doubleArrayOf().isSortedByDescending { it })
-        assertTrue(doubleArrayOf(3.0, 2.0, 1.0).isSortedByDescending { it })
-        assertFalse(doubleArrayOf(1.0, 2.0, 3.0).isSortedByDescending { it })
+        assertTrue(doubleArrayOf(3.14, 2.5, 1.0).isSortedByDescending { it })
+        assertFalse(doubleArrayOf(1.0, 2.5, 3.14).isSortedByDescending { it })
     }
 
     @Test

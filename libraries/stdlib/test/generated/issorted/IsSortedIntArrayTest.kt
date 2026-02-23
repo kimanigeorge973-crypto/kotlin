@@ -19,9 +19,9 @@ class IsSortedIntArrayTest {
     fun isSorted() {
         assertTrue(intArrayOf().isSorted())
         assertTrue(intArrayOf(1).isSorted())
-        assertTrue(intArrayOf(1, 2, 3).isSorted())
-        assertFalse(intArrayOf(3, 2, 1).isSorted())
-        assertFalse(intArrayOf(2, 1, 3).isSorted())
+        assertTrue(intArrayOf(1, 2, 3, 4, 5).isSorted())
+        assertFalse(intArrayOf(5, 4, 3, 2, 1).isSorted())
+        assertFalse(intArrayOf(2, 1, 3, 4, 5).isSorted())
         assertTrue(intArrayOf(2, 2, 2).isSorted())
     }
 
@@ -29,31 +29,31 @@ class IsSortedIntArrayTest {
     fun isSortedDescending() {
         assertTrue(intArrayOf().isSortedDescending())
         assertTrue(intArrayOf(1).isSortedDescending())
-        assertTrue(intArrayOf(3, 2, 1).isSortedDescending())
-        assertFalse(intArrayOf(1, 2, 3).isSortedDescending())
-        assertFalse(intArrayOf(2, 1, 3).isSortedDescending())
+        assertTrue(intArrayOf(5, 4, 3, 2, 1).isSortedDescending())
+        assertFalse(intArrayOf(1, 2, 3, 4, 5).isSortedDescending())
+        assertFalse(intArrayOf(2, 1, 3, 4, 5).isSortedDescending())
         assertTrue(intArrayOf(2, 2, 2).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(intArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(intArrayOf(1, 2, 3).isSortedWith(naturalOrder()))
-        assertTrue(intArrayOf(3, 2, 1).isSortedWith(reverseOrder()))
-        assertFalse(intArrayOf(2, 1, 3).isSortedWith(naturalOrder()))
+        assertTrue(intArrayOf(1, 2, 3, 4, 5).isSortedWith(naturalOrder()))
+        assertTrue(intArrayOf(5, 4, 3, 2, 1).isSortedWith(reverseOrder()))
+        assertFalse(intArrayOf(2, 1, 3, 4, 5).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(intArrayOf().isSortedBy { it })
-        assertTrue(intArrayOf(1, 2, 3).isSortedBy { it })
-        assertFalse(intArrayOf(3, 2, 1).isSortedBy { it })
+        assertTrue(intArrayOf(1, 2, 3, 4, 5).isSortedBy { it })
+        assertFalse(intArrayOf(5, 4, 3, 2, 1).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(intArrayOf().isSortedByDescending { it })
-        assertTrue(intArrayOf(3, 2, 1).isSortedByDescending { it })
-        assertFalse(intArrayOf(1, 2, 3).isSortedByDescending { it })
+        assertTrue(intArrayOf(5, 4, 3, 2, 1).isSortedByDescending { it })
+        assertFalse(intArrayOf(1, 2, 3, 4, 5).isSortedByDescending { it })
     }
 }

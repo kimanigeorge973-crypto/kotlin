@@ -21,7 +21,7 @@ class IsSortedLongArraySamples {
         val sorted = longArrayOf(1L, 2L, 3L, 4L, 5L)
         assertPrints(sorted.isSorted(), "true")
 
-        val unsorted = longArrayOf(1L, 3L, 2L, 4L, 5L)
+        val unsorted = longArrayOf(2L, 1L, 3L, 4L, 5L)
         assertPrints(unsorted.isSorted(), "false")
     }
 
@@ -30,7 +30,7 @@ class IsSortedLongArraySamples {
         val sorted = longArrayOf(5L, 4L, 3L, 2L, 1L)
         assertPrints(sorted.isSortedDescending(), "true")
 
-        val unsorted = longArrayOf(5L, 3L, 4L, 2L, 1L)
+        val unsorted = longArrayOf(4L, 5L, 3L, 2L, 1L)
         assertPrints(unsorted.isSortedDescending(), "false")
     }
 

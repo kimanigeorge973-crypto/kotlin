@@ -21,7 +21,7 @@ class IsSortedIntArraySamples {
         val sorted = intArrayOf(1, 2, 3, 4, 5)
         assertPrints(sorted.isSorted(), "true")
 
-        val unsorted = intArrayOf(1, 3, 2, 4, 5)
+        val unsorted = intArrayOf(2, 1, 3, 4, 5)
         assertPrints(unsorted.isSorted(), "false")
     }
 
@@ -30,7 +30,7 @@ class IsSortedIntArraySamples {
         val sorted = intArrayOf(5, 4, 3, 2, 1)
         assertPrints(sorted.isSortedDescending(), "true")
 
-        val unsorted = intArrayOf(5, 3, 4, 2, 1)
+        val unsorted = intArrayOf(4, 5, 3, 2, 1)
         assertPrints(unsorted.isSortedDescending(), "false")
     }
 
