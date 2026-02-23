@@ -20,6 +20,7 @@ dependencies {
 
     testFixturesApi(libs.junit4)
     testFixturesApi(testFixtures(project(":compiler:tests-common")))
+    testFixturesApi(testFixtures(project(":compiler:fir:raw-fir:raw-fir.common")))
     testFixturesApi(commonDependency("org.jetbrains.kotlin:kotlin-reflect")) { isTransitive = false }
 
     testCompileOnly(kotlinTest("junit"))
