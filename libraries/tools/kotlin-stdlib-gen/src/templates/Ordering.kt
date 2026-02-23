@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2025 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -578,5 +578,151 @@ object Ordering : TemplateGroupBase() {
                 """
             }
         }
+    }
+
+    private fun MemberBuilder.isSortedSampleRef(methodName: String): String = "samples.generated.issorted." + when (f) {
+        ArraysOfObjects -> "IsSortedArraySamples.$methodName"
+        ArraysOfPrimitives, ArraysOfUnsigned -> "IsSorted${primitive!!.name}ArraySamples.$methodName"
+        else -> "IsSorted${f}Samples.$methodName"
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    val f_isSortedWith = fn("isSortedWith(comparator: Comparator<in T>)") {
+        includeDefault()
+        include(ArraysOfUnsigned)
+    } builder {
+        since("2.4")
+        returns("Boolean")
+        doc {
+            """
+            Returns `true` if all elements in the ${f.collection} are sorted according to the specified [comparator].
+
+            @return `true` if the ${f.collection} is sorted according to the specified [comparator], `false` otherwise.
+            """
+        }
+        sample(isSortedSampleRef("isSortedWith"))
+        body {
+            """
+            val iterator = iterator()
+            if (!iterator.hasNext()) return true
+            var current = iterator.next()
+            while (iterator.hasNext()) {
+                val next = iterator.next()
+                if (comparator.compare(current, next) > 0) return false
+                current = next
+            }
+            return true
+            """
+        }
+        body(ArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned) {
+            """
+            for (i in 1..<size) {
+                if (comparator.compare(this[i - 1], this[i]) > 0) return false
+            }
+            return true
+            """
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    val f_isSorted = fn("isSorted()") {
+        includeDefault()
+        include(ArraysOfUnsigned)
+    } builder {
+        since("2.4")
+        returns("Boolean")
+        typeParam("T : Comparable<T>")
+        doc {
+            """
+            Returns `true` if all elements in the ${f.collection} are sorted according to their natural sort order.
+
+            @return `true` if the ${f.collection} is sorted according to its natural sort order, `false` otherwise.
+            """
+        }
+        sample(isSortedSampleRef("isSorted"))
+        body { "return isSortedWith(naturalOrder())" }
+        body(ArraysOfPrimitives, ArraysOfUnsigned) {
+            val condition = if (primitive?.isFloatingPoint() == true)
+                "this[i - 1].compareTo(this[i]) > 0"
+            else
+                "this[i - 1] > this[i]"
+            """
+            for (i in 1..lastIndex) {
+                if ($condition) return false
+            }
+            return true
+            """
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    val f_isSortedDescending = fn("isSortedDescending()") {
+        includeDefault()
+        include(ArraysOfUnsigned)
+    } builder {
+        since("2.4")
+        returns("Boolean")
+        typeParam("T : Comparable<T>")
+        doc {
+            """
+            Returns `true` if all elements in the ${f.collection} are sorted descending according to their natural sort order.
+
+            @return `true` if the ${f.collection} is sorted in descending order according to its natural sort order, `false` otherwise.
+            """
+        }
+        sample(isSortedSampleRef("isSortedDescending"))
+        body { "return isSortedWith(reverseOrder())" }
+        body(ArraysOfPrimitives, ArraysOfUnsigned) {
+            val condition = if (primitive?.isFloatingPoint() == true)
+                "this[i - 1].compareTo(this[i]) < 0"
+            else
+                "this[i - 1] < this[i]"
+            """
+            for (i in 1..lastIndex) {
+                if ($condition) return false
+            }
+            return true
+            """
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    val f_isSortedBy = fn("isSortedBy(crossinline selector: (T) -> R?)") {
+        includeDefault()
+        include(ArraysOfUnsigned)
+    } builder {
+        since("2.4")
+        inline()
+        returns("Boolean")
+        typeParam("R : Comparable<R>")
+        doc {
+            """
+            Returns `true` if all elements in the ${f.collection} are sorted according to natural sort order of the value returned by specified [selector] function.
+
+            @return `true` if the ${f.collection} is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+            """
+        }
+        sample(isSortedSampleRef("isSortedBy"))
+        body { "return isSortedWith(compareBy(selector))" }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    val f_isSortedByDescending = fn("isSortedByDescending(crossinline selector: (T) -> R?)") {
+        includeDefault()
+        include(ArraysOfUnsigned)
+    } builder {
+        since("2.4")
+        inline()
+        returns("Boolean")
+        typeParam("R : Comparable<R>")
+        doc {
+            """
+            Returns `true` if all elements in the ${f.collection} are sorted descending according to natural sort order of the value returned by specified [selector] function.
+
+            @return `true` if the ${f.collection} is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+            """
+        }
+        sample(isSortedSampleRef("isSortedByDescending"))
+        body { "return isSortedWith(compareByDescending(selector))" }
     }
 }
