@@ -584,6 +584,74 @@ public fun <T> Sequence<T>.takeWhile(predicate: (T) -> Boolean): Sequence<T> {
 }
 
 /**
+ * Returns `true` if all elements in the sequence are sorted according to their natural sort order.
+ * 
+ * @return `true` if the sequence is sorted according to its natural sort order, `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedSequencesSamples.isSorted
+ */
+@SinceKotlin("2.4")
+public fun <T : Comparable<T>> Sequence<T>.isSorted(): Boolean {
+    return isSortedWith(naturalOrder())
+}
+
+/**
+ * Returns `true` if all elements in the sequence are sorted according to natural sort order of the value returned by specified [selector] function.
+ * 
+ * @return `true` if the sequence is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedSequencesSamples.isSortedBy
+ */
+@SinceKotlin("2.4")
+public inline fun <T, R : Comparable<R>> Sequence<T>.isSortedBy(crossinline selector: (T) -> R?): Boolean {
+    return isSortedWith(compareBy(selector))
+}
+
+/**
+ * Returns `true` if all elements in the sequence are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * 
+ * @return `true` if the sequence is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedSequencesSamples.isSortedByDescending
+ */
+@SinceKotlin("2.4")
+public inline fun <T, R : Comparable<R>> Sequence<T>.isSortedByDescending(crossinline selector: (T) -> R?): Boolean {
+    return isSortedWith(compareByDescending(selector))
+}
+
+/**
+ * Returns `true` if all elements in the sequence are sorted descending according to their natural sort order.
+ * 
+ * @return `true` if the sequence is sorted in descending order according to its natural sort order, `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedSequencesSamples.isSortedDescending
+ */
+@SinceKotlin("2.4")
+public fun <T : Comparable<T>> Sequence<T>.isSortedDescending(): Boolean {
+    return isSortedWith(reverseOrder())
+}
+
+/**
+ * Returns `true` if all elements in the sequence are sorted according to the specified [comparator].
+ * 
+ * @return `true` if the sequence is sorted according to the specified [comparator], `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedSequencesSamples.isSortedWith
+ */
+@SinceKotlin("2.4")
+public fun <T> Sequence<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return true
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        if (comparator.compare(current, next) > 0) return false
+        current = next
+    }
+    return true
+}
+
+/**
  * Returns a sequence that yields elements of this sequence sorted according to their natural sort order.
  * 
  * The sort is _stable_. It means that equal elements preserve their order relative to each other after sorting.

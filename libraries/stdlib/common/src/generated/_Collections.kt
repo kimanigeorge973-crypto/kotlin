@@ -982,6 +982,74 @@ public inline fun <T> Iterable<T>.takeWhile(predicate: (T) -> Boolean): List<T> 
 }
 
 /**
+ * Returns `true` if all elements in the collection are sorted according to their natural sort order.
+ * 
+ * @return `true` if the collection is sorted according to its natural sort order, `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedIterablesSamples.isSorted
+ */
+@SinceKotlin("2.4")
+public fun <T : Comparable<T>> Iterable<T>.isSorted(): Boolean {
+    return isSortedWith(naturalOrder())
+}
+
+/**
+ * Returns `true` if all elements in the collection are sorted according to natural sort order of the value returned by specified [selector] function.
+ * 
+ * @return `true` if the collection is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedBy
+ */
+@SinceKotlin("2.4")
+public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (T) -> R?): Boolean {
+    return isSortedWith(compareBy(selector))
+}
+
+/**
+ * Returns `true` if all elements in the collection are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * 
+ * @return `true` if the collection is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedByDescending
+ */
+@SinceKotlin("2.4")
+public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedByDescending(crossinline selector: (T) -> R?): Boolean {
+    return isSortedWith(compareByDescending(selector))
+}
+
+/**
+ * Returns `true` if all elements in the collection are sorted descending according to their natural sort order.
+ * 
+ * @return `true` if the collection is sorted in descending order according to its natural sort order, `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedDescending
+ */
+@SinceKotlin("2.4")
+public fun <T : Comparable<T>> Iterable<T>.isSortedDescending(): Boolean {
+    return isSortedWith(reverseOrder())
+}
+
+/**
+ * Returns `true` if all elements in the collection are sorted according to the specified [comparator].
+ * 
+ * @return `true` if the collection is sorted according to the specified [comparator], `false` otherwise.
+ * 
+ * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedWith
+ */
+@SinceKotlin("2.4")
+public fun <T> Iterable<T>.isSortedWith(comparator: Comparator<in T>): Boolean {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return true
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        if (comparator.compare(current, next) > 0) return false
+        current = next
+    }
+    return true
+}
+
+/**
  * Reverses elements in the list in-place.
  */
 public expect fun <T> MutableList<T>.reverse(): Unit
