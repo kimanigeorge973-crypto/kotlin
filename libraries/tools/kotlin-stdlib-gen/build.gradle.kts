@@ -35,6 +35,7 @@ tasks {
         mainClass = "generators.GenerateStandardLibTestsKt"
         classpath = sourceSets.main.get().runtimeClasspath
         args = listOf("$rootDir")
+        workingDir = rootDir
         systemProperty("line.separator", "\n")
     }
 
