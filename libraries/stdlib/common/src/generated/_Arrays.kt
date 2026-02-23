@@ -6039,7 +6039,7 @@ public fun CharArray.isSortedDescending(): Boolean {
  */
 @SinceKotlin("2.4")
 public fun <T> Array<out T>.isSortedWith(comparator: Comparator<in T>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6054,7 +6054,7 @@ public fun <T> Array<out T>.isSortedWith(comparator: Comparator<in T>): Boolean 
  */
 @SinceKotlin("2.4")
 public fun ByteArray.isSortedWith(comparator: Comparator<in Byte>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6069,7 +6069,7 @@ public fun ByteArray.isSortedWith(comparator: Comparator<in Byte>): Boolean {
  */
 @SinceKotlin("2.4")
 public fun ShortArray.isSortedWith(comparator: Comparator<in Short>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6084,7 +6084,7 @@ public fun ShortArray.isSortedWith(comparator: Comparator<in Short>): Boolean {
  */
 @SinceKotlin("2.4")
 public fun IntArray.isSortedWith(comparator: Comparator<in Int>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6099,7 +6099,7 @@ public fun IntArray.isSortedWith(comparator: Comparator<in Int>): Boolean {
  */
 @SinceKotlin("2.4")
 public fun LongArray.isSortedWith(comparator: Comparator<in Long>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6114,7 +6114,7 @@ public fun LongArray.isSortedWith(comparator: Comparator<in Long>): Boolean {
  */
 @SinceKotlin("2.4")
 public fun FloatArray.isSortedWith(comparator: Comparator<in Float>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6129,7 +6129,7 @@ public fun FloatArray.isSortedWith(comparator: Comparator<in Float>): Boolean {
  */
 @SinceKotlin("2.4")
 public fun DoubleArray.isSortedWith(comparator: Comparator<in Double>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6144,7 +6144,7 @@ public fun DoubleArray.isSortedWith(comparator: Comparator<in Double>): Boolean 
  */
 @SinceKotlin("2.4")
 public fun BooleanArray.isSortedWith(comparator: Comparator<in Boolean>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -6159,7 +6159,7 @@ public fun BooleanArray.isSortedWith(comparator: Comparator<in Boolean>): Boolea
  */
 @SinceKotlin("2.4")
 public fun CharArray.isSortedWith(comparator: Comparator<in Char>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true

@@ -2994,7 +2994,7 @@ public fun UShortArray.isSortedDescending(): Boolean {
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public fun UIntArray.isSortedWith(comparator: Comparator<in UInt>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -3010,7 +3010,7 @@ public fun UIntArray.isSortedWith(comparator: Comparator<in UInt>): Boolean {
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public fun ULongArray.isSortedWith(comparator: Comparator<in ULong>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -3026,7 +3026,7 @@ public fun ULongArray.isSortedWith(comparator: Comparator<in ULong>): Boolean {
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public fun UByteArray.isSortedWith(comparator: Comparator<in UByte>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true
@@ -3042,7 +3042,7 @@ public fun UByteArray.isSortedWith(comparator: Comparator<in UByte>): Boolean {
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public fun UShortArray.isSortedWith(comparator: Comparator<in UShort>): Boolean {
-    for (i in 1..<size) {
+    for (i in 1..lastIndex) {
         if (comparator.compare(this[i - 1], this[i]) > 0) return false
     }
     return true

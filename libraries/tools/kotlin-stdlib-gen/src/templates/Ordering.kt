@@ -616,7 +616,7 @@ object Ordering : TemplateGroupBase() {
         }
         body(ArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned) {
             """
-            for (i in 1..<size) {
+            for (i in 1..lastIndex) {
                 if (comparator.compare(this[i - 1], this[i]) > 0) return false
             }
             return true
