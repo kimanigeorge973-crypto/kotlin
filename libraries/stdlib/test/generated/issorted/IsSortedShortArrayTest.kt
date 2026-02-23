@@ -31,6 +31,7 @@ class IsSortedShortArrayTest {
         assertTrue(shortArrayOf(1).isSortedDescending())
         assertTrue(shortArrayOf(3, 2, 1).isSortedDescending())
         assertFalse(shortArrayOf(1, 2, 3).isSortedDescending())
+        assertFalse(shortArrayOf(2, 1, 3).isSortedDescending())
         assertTrue(shortArrayOf(2, 2, 2).isSortedDescending())
     }
 

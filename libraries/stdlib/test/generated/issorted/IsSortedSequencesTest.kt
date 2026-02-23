@@ -13,7 +13,7 @@ package test.generated.issorted
 
 import kotlin.test.*
 
-class IsSortedSequenceTest {
+class IsSortedSequencesTest {
 
     @Test
     fun isSorted() {
@@ -31,6 +31,7 @@ class IsSortedSequenceTest {
         assertTrue(sequenceOf("a").isSortedDescending())
         assertTrue(sequenceOf("c", "b", "a").isSortedDescending())
         assertFalse(sequenceOf("a", "b", "c").isSortedDescending())
+        assertFalse(sequenceOf("b", "a", "c").isSortedDescending())
         assertTrue(sequenceOf("b", "b", "b").isSortedDescending())
     }
 
@@ -40,26 +41,22 @@ class IsSortedSequenceTest {
         assertTrue(sequenceOf("a", "b", "c").isSortedWith(naturalOrder()))
         assertTrue(sequenceOf("c", "b", "a").isSortedWith(reverseOrder()))
         assertFalse(sequenceOf("b", "a", "c").isSortedWith(naturalOrder()))
-    }
-
-    @Test
-    fun isSortedWithCaseInsensitive() {
-        assertTrue(listOf("Apple", "banana", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
-        assertFalse(listOf("banana", "Apple", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
+        assertTrue(sequenceOf("Apple", "banana", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
+        assertFalse(sequenceOf("banana", "Apple", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
     }
 
     @Test
     fun isSortedBy() {
-        assertTrue(sequenceOf<Int>().isSortedBy { it.toString() })
-        assertTrue(listOf("a", "bb", "ccc").isSortedBy { it.length })
-        assertFalse(listOf("bb", "a", "ccc").isSortedBy { it.length })
+        assertTrue(sequenceOf<Int>().isSortedBy { it })
+        assertTrue(sequenceOf("a", "bb", "ccc").isSortedBy { it.length })
+        assertFalse(sequenceOf("ccc", "bb", "a").isSortedBy { it.length })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(sequenceOf<Int>().isSortedByDescending { it.toString() })
-        assertTrue(listOf("ccc", "bb", "a").isSortedByDescending { it.length })
-        assertFalse(listOf("a", "bb", "ccc").isSortedByDescending { it.length })
+        assertTrue(sequenceOf<Int>().isSortedByDescending { it })
+        assertTrue(sequenceOf("ccc", "bb", "a").isSortedByDescending { it.length })
+        assertFalse(sequenceOf("a", "bb", "ccc").isSortedByDescending { it.length })
     }
 
     @Test

@@ -31,6 +31,7 @@ class IsSortedByteArrayTest {
         assertTrue(byteArrayOf(1).isSortedDescending())
         assertTrue(byteArrayOf(3, 2, 1).isSortedDescending())
         assertFalse(byteArrayOf(1, 2, 3).isSortedDescending())
+        assertFalse(byteArrayOf(2, 1, 3).isSortedDescending())
         assertTrue(byteArrayOf(2, 2, 2).isSortedDescending())
     }
 

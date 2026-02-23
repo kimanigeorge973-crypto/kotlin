@@ -18,41 +18,42 @@ class IsSortedLongArrayTest {
     @Test
     fun isSorted() {
         assertTrue(longArrayOf().isSorted())
-        assertTrue(longArrayOf(1).isSorted())
-        assertTrue(longArrayOf(1, 2, 3).isSorted())
-        assertFalse(longArrayOf(3, 2, 1).isSorted())
-        assertFalse(longArrayOf(2, 1, 3).isSorted())
-        assertTrue(longArrayOf(2, 2, 2).isSorted())
+        assertTrue(longArrayOf(1L).isSorted())
+        assertTrue(longArrayOf(1L, 2L, 3L).isSorted())
+        assertFalse(longArrayOf(3L, 2L, 1L).isSorted())
+        assertFalse(longArrayOf(2L, 1L, 3L).isSorted())
+        assertTrue(longArrayOf(2L, 2L, 2L).isSorted())
     }
 
     @Test
     fun isSortedDescending() {
         assertTrue(longArrayOf().isSortedDescending())
-        assertTrue(longArrayOf(1).isSortedDescending())
-        assertTrue(longArrayOf(3, 2, 1).isSortedDescending())
-        assertFalse(longArrayOf(1, 2, 3).isSortedDescending())
-        assertTrue(longArrayOf(2, 2, 2).isSortedDescending())
+        assertTrue(longArrayOf(1L).isSortedDescending())
+        assertTrue(longArrayOf(3L, 2L, 1L).isSortedDescending())
+        assertFalse(longArrayOf(1L, 2L, 3L).isSortedDescending())
+        assertFalse(longArrayOf(2L, 1L, 3L).isSortedDescending())
+        assertTrue(longArrayOf(2L, 2L, 2L).isSortedDescending())
     }
 
     @Test
     fun isSortedWith() {
         assertTrue(longArrayOf().isSortedWith(naturalOrder()))
-        assertTrue(longArrayOf(1, 2, 3).isSortedWith(naturalOrder()))
-        assertTrue(longArrayOf(3, 2, 1).isSortedWith(reverseOrder()))
-        assertFalse(longArrayOf(2, 1, 3).isSortedWith(naturalOrder()))
+        assertTrue(longArrayOf(1L, 2L, 3L).isSortedWith(naturalOrder()))
+        assertTrue(longArrayOf(3L, 2L, 1L).isSortedWith(reverseOrder()))
+        assertFalse(longArrayOf(2L, 1L, 3L).isSortedWith(naturalOrder()))
     }
 
     @Test
     fun isSortedBy() {
         assertTrue(longArrayOf().isSortedBy { it })
-        assertTrue(longArrayOf(1, 2, 3).isSortedBy { it })
-        assertFalse(longArrayOf(3, 2, 1).isSortedBy { it })
+        assertTrue(longArrayOf(1L, 2L, 3L).isSortedBy { it })
+        assertFalse(longArrayOf(3L, 2L, 1L).isSortedBy { it })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(longArrayOf().isSortedByDescending { it })
-        assertTrue(longArrayOf(3, 2, 1).isSortedByDescending { it })
-        assertFalse(longArrayOf(1, 2, 3).isSortedByDescending { it })
+        assertTrue(longArrayOf(3L, 2L, 1L).isSortedByDescending { it })
+        assertFalse(longArrayOf(1L, 2L, 3L).isSortedByDescending { it })
     }
 }

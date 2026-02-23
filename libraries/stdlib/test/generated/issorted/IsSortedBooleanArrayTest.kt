@@ -31,6 +31,7 @@ class IsSortedBooleanArrayTest {
         assertTrue(booleanArrayOf(false).isSortedDescending())
         assertTrue(booleanArrayOf(true, true, false).isSortedDescending())
         assertFalse(booleanArrayOf(false, true, true).isSortedDescending())
+        assertFalse(booleanArrayOf(true, false, true).isSortedDescending())
         assertTrue(booleanArrayOf(true, true, true).isSortedDescending())
     }
 
@@ -44,14 +45,14 @@ class IsSortedBooleanArrayTest {
 
     @Test
     fun isSortedBy() {
-        assertTrue(booleanArrayOf().isSortedBy { it.toString() })
+        assertTrue(booleanArrayOf().isSortedBy { it })
         assertTrue(booleanArrayOf(false, true, true).isSortedBy { it.compareTo(false) })
         assertFalse(booleanArrayOf(true, true, false).isSortedBy { it.compareTo(false) })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(booleanArrayOf().isSortedByDescending { it.toString() })
+        assertTrue(booleanArrayOf().isSortedByDescending { it })
         assertTrue(booleanArrayOf(true, true, false).isSortedByDescending { it.compareTo(false) })
         assertFalse(booleanArrayOf(false, true, true).isSortedByDescending { it.compareTo(false) })
     }

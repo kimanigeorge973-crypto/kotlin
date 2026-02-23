@@ -31,6 +31,7 @@ class IsSortedDoubleArrayTest {
         assertTrue(doubleArrayOf(1.0).isSortedDescending())
         assertTrue(doubleArrayOf(3.0, 2.0, 1.0).isSortedDescending())
         assertFalse(doubleArrayOf(1.0, 2.0, 3.0).isSortedDescending())
+        assertFalse(doubleArrayOf(2.0, 1.0, 3.0).isSortedDescending())
         assertTrue(doubleArrayOf(2.0, 2.0, 2.0).isSortedDescending())
     }
 

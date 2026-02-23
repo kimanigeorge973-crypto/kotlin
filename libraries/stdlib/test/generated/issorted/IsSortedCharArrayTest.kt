@@ -31,6 +31,7 @@ class IsSortedCharArrayTest {
         assertTrue(charArrayOf('a').isSortedDescending())
         assertTrue(charArrayOf('c', 'b', 'a').isSortedDescending())
         assertFalse(charArrayOf('a', 'b', 'c').isSortedDescending())
+        assertFalse(charArrayOf('b', 'a', 'c').isSortedDescending())
         assertTrue(charArrayOf('b', 'b', 'b').isSortedDescending())
     }
 

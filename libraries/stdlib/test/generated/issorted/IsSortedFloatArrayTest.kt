@@ -31,6 +31,7 @@ class IsSortedFloatArrayTest {
         assertTrue(floatArrayOf(1.0f).isSortedDescending())
         assertTrue(floatArrayOf(3.0f, 2.0f, 1.0f).isSortedDescending())
         assertFalse(floatArrayOf(1.0f, 2.0f, 3.0f).isSortedDescending())
+        assertFalse(floatArrayOf(2.0f, 1.0f, 3.0f).isSortedDescending())
         assertTrue(floatArrayOf(2.0f, 2.0f, 2.0f).isSortedDescending())
     }
 

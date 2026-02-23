@@ -13,7 +13,7 @@ package test.generated.issorted
 
 import kotlin.test.*
 
-class IsSortedIterableTest {
+class IsSortedIterablesTest {
 
     @Test
     fun isSorted() {
@@ -31,6 +31,7 @@ class IsSortedIterableTest {
         assertTrue(listOf("a").isSortedDescending())
         assertTrue(listOf("c", "b", "a").isSortedDescending())
         assertFalse(listOf("a", "b", "c").isSortedDescending())
+        assertFalse(listOf("b", "a", "c").isSortedDescending())
         assertTrue(listOf("b", "b", "b").isSortedDescending())
     }
 
@@ -40,24 +41,20 @@ class IsSortedIterableTest {
         assertTrue(listOf("a", "b", "c").isSortedWith(naturalOrder()))
         assertTrue(listOf("c", "b", "a").isSortedWith(reverseOrder()))
         assertFalse(listOf("b", "a", "c").isSortedWith(naturalOrder()))
-    }
-
-    @Test
-    fun isSortedWithCaseInsensitive() {
         assertTrue(listOf("Apple", "banana", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
         assertFalse(listOf("banana", "Apple", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
     }
 
     @Test
     fun isSortedBy() {
-        assertTrue(listOf<Int>().isSortedBy { it.toString() })
+        assertTrue(listOf<Int>().isSortedBy { it })
         assertTrue(listOf("a", "bb", "ccc").isSortedBy { it.length })
-        assertFalse(listOf("bb", "a", "ccc").isSortedBy { it.length })
+        assertFalse(listOf("ccc", "bb", "a").isSortedBy { it.length })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(listOf<Int>().isSortedByDescending { it.toString() })
+        assertTrue(listOf<Int>().isSortedByDescending { it })
         assertTrue(listOf("ccc", "bb", "a").isSortedByDescending { it.length })
         assertFalse(listOf("a", "bb", "ccc").isSortedByDescending { it.length })
     }

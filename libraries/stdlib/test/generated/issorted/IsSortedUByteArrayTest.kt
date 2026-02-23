@@ -31,6 +31,7 @@ class IsSortedUByteArrayTest {
         assertTrue(ubyteArrayOf(1u).isSortedDescending())
         assertTrue(ubyteArrayOf(3u, 2u, 1u).isSortedDescending())
         assertFalse(ubyteArrayOf(1u, 2u, 3u).isSortedDescending())
+        assertFalse(ubyteArrayOf(2u, 1u, 3u).isSortedDescending())
         assertTrue(ubyteArrayOf(2u, 2u, 2u).isSortedDescending())
     }
 

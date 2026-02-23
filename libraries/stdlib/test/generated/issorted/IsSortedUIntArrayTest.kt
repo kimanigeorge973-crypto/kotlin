@@ -31,6 +31,7 @@ class IsSortedUIntArrayTest {
         assertTrue(uintArrayOf(1u).isSortedDescending())
         assertTrue(uintArrayOf(3u, 2u, 1u).isSortedDescending())
         assertFalse(uintArrayOf(1u, 2u, 3u).isSortedDescending())
+        assertFalse(uintArrayOf(2u, 1u, 3u).isSortedDescending())
         assertTrue(uintArrayOf(2u, 2u, 2u).isSortedDescending())
     }
 

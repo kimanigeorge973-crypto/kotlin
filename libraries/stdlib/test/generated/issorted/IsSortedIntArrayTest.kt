@@ -31,6 +31,7 @@ class IsSortedIntArrayTest {
         assertTrue(intArrayOf(1).isSortedDescending())
         assertTrue(intArrayOf(3, 2, 1).isSortedDescending())
         assertFalse(intArrayOf(1, 2, 3).isSortedDescending())
+        assertFalse(intArrayOf(2, 1, 3).isSortedDescending())
         assertTrue(intArrayOf(2, 2, 2).isSortedDescending())
     }
 

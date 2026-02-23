@@ -8,6 +8,7 @@ package generators.test
 import templates.*
 import templates.Family.*
 import templates.PrimitiveType
+import java.io.BufferedWriter
 import java.io.File
 
 object IsSortedTestGenerator {
@@ -23,228 +24,180 @@ object IsSortedTestGenerator {
         }
     }
 
-    private fun sortedElements(elementType: String) = when (elementType) {
-        "Int", "Byte", "Short", "Long" -> listOf("1", "2", "3")
-        "UInt", "UByte", "UShort" -> listOf("1u", "2u", "3u")
-        "ULong" -> listOf("1uL", "2uL", "3uL")
-        "Double" -> listOf("1.0", "2.0", "3.0")
-        "Float" -> listOf("1.0f", "2.0f", "3.0f")
-        "Char" -> listOf("'a'", "'b'", "'c'")
-        "Boolean" -> listOf("false", "true", "true")
-        "T" -> listOf("\"a\"", "\"b\"", "\"c\"")
-        else -> error(elementType)
-    }
+    private class TestTypeConfig(
+        val sortedValues: List<String>,
+        val unsortedValues: List<String> = listOf(sortedValues[1], sortedValues[0], sortedValues[2]),
+        val selectorExpr: String = "it",
+        val selectorSortedValues: List<String> = sortedValues,
+        val caseInsensitiveValues: Pair<List<String>, List<String>>? = null,
+    )
 
-    private fun equalElements(elementType: String) = when (elementType) {
-        "Int", "Byte", "Short", "Long" -> listOf("2", "2", "2")
-        "UInt", "UByte", "UShort" -> listOf("2u", "2u", "2u")
-        "ULong" -> listOf("2uL", "2uL", "2uL")
-        "Double" -> listOf("2.0", "2.0", "2.0")
-        "Float" -> listOf("2.0f", "2.0f", "2.0f")
-        "Char" -> listOf("'b'", "'b'", "'b'")
-        "Boolean" -> listOf("true", "true", "true")
-        "T" -> listOf("\"b\"", "\"b\"", "\"b\"")
-        else -> error(elementType)
+    private fun configFor(primitive: PrimitiveType?): TestTypeConfig = when (primitive) {
+        PrimitiveType.Char -> TestTypeConfig(
+            sortedValues = listOf("'a'", "'b'", "'c'")
+        )
+        PrimitiveType.Boolean -> TestTypeConfig(
+            sortedValues = listOf("false", "true", "true"),
+            selectorExpr = "it.compareTo(false)"
+        )
+        null -> TestTypeConfig(
+            sortedValues = listOf("\"a\"", "\"b\"", "\"c\""),
+            selectorExpr = "it.length",
+            selectorSortedValues = listOf("\"a\"", "\"bb\"", "\"ccc\""),
+            caseInsensitiveValues = listOf("\"Apple\"", "\"banana\"", "\"Cherry\"") to listOf("\"banana\"", "\"Apple\"", "\"Cherry\""),
+        )
+        else -> {
+            val suffix = when (primitive) {
+                PrimitiveType.Long -> "L"
+                PrimitiveType.ULong -> "uL"
+                in PrimitiveType.unsignedPrimitives -> "u"
+                PrimitiveType.Float -> ".0f"
+                PrimitiveType.Double -> ".0"
+                else -> ""
+            }
+            TestTypeConfig(sortedValues = listOf("1$suffix", "2$suffix", "3$suffix"))
+        }
     }
 
     private fun generate(family: Family, primitive: PrimitiveType? = null) {
         val collectionClass = when (family) {
-            Iterables, Sequences -> family.toString().dropLast(1)
+            Iterables, Sequences -> family.toString()
             ArraysOfObjects -> "Array"
             ArraysOfPrimitives, ArraysOfUnsigned -> "${primitive!!}Array"
             else -> error(family)
         }
 
-        val isGeneric = family in listOf(Iterables, Sequences, ArraysOfObjects)
-        val elementType = when {
-            isGeneric -> "T"
-            else -> primitive!!.toString()
+        val isGeneric = primitive == null
+        val ctor = when (family) {
+            Iterables -> "listOf"
+            Sequences -> "sequenceOf"
+            ArraysOfObjects -> "arrayOf"
+            ArraysOfPrimitives, ArraysOfUnsigned -> "${primitive!!.name.lowercase()}ArrayOf"
         }
-        val sorted = sortedElements(elementType)
-        val equal = equalElements(elementType)
-
-        fun emptyCollection(elementType: String): String {
-            val type = if (elementType == "T") "Int" else elementType
-            return when (family) {
-                Iterables -> "listOf<$type>()"
-                Sequences -> "sequenceOf<$type>()"
-                ArraysOfObjects -> "arrayOf<$type>()"
-                else -> "${collectionClass.let { it.substring(0, 2).lowercase() + it.substring(2) }}Of()"
-            }
-        }
-
-        fun collectionOf(elements: List<String>): String {
-            require(elements.isNotEmpty())
-            val args = elements.joinToString()
-            return when (family) {
-                Iterables -> "listOf($args)"
-                else -> "${collectionClass.let { it.substring(0, 2).lowercase() + it.substring(2) }}Of($args)"
-            }
+        val config = configFor(primitive)
+        val emptyCollection = if (isGeneric) "$ctor<Int>()" else "$ctor()"
+        val fpTypes = when {
+            isGeneric -> listOf(PrimitiveType.Double, PrimitiveType.Float)
+            primitive.isFloatingPoint() -> listOf(primitive)
+            else -> emptyList()
         }
 
         val className = "IsSorted${collectionClass}Test"
         val file = File("libraries/stdlib/test/generated/issorted/$className.kt")
         file.parentFile.mkdirs()
         file.bufferedWriter().use { writer ->
-            writer.appendLine(COPYRIGHT_NOTICE)
-            writer.appendLine()
-            writer.appendLine("package test.generated.issorted")
-            writer.appendLine()
-            writer.appendLine(autoGeneratedWarning("IsSortedTestGenerator.kt"))
-            writer.appendLine()
-            writer.appendLine("import kotlin.test.*")
-            writer.appendLine()
-            writer.appendLine("class $className {")
-            writer.appendLine(
-                """
+            writer.apply {
+                writeHeader(className)
+                writeIsSortedTest(ctor, config, emptyCollection, descending = false)
+                writeIsSortedTest(ctor, config, emptyCollection, descending = true)
+                writeIsSortedWithTest(ctor, config, emptyCollection)
+                writeIsSortedByTest(ctor, config, emptyCollection, descending = false)
+                writeIsSortedByTest(ctor, config, emptyCollection, descending = true)
+                for (fpType in fpTypes) {
+                    writeFpTests(ctor, fpType)
+                }
+                appendLine("}")
+            }
+        }
+    }
+
+    private fun BufferedWriter.writeHeader(className: String) {
+        appendLine(COPYRIGHT_NOTICE)
+        appendLine()
+        appendLine("package test.generated.issorted")
+        appendLine()
+        appendLine(autoGeneratedWarning("IsSortedTestGenerator.kt"))
+        appendLine()
+        appendLine("import kotlin.test.*")
+        appendLine()
+        appendLine("class $className {")
+    }
+
+    private fun BufferedWriter.writeIsSortedTest(ctor: String, config: TestTypeConfig, emptyCollection: String, descending: Boolean) {
+        val funcName = if (descending) "isSortedDescending" else "isSorted"
+        val sorted = config.sortedValues
+        val equalElement = sorted[1]
+        val ascValues = sorted.joinToString()
+        val descValues = sorted.reversed().joinToString()
+        val trueSorted = if (descending) descValues else ascValues
+        val falseSorted = if (descending) ascValues else descValues
+        appendLine(
+            """
     @Test
-    fun isSorted() {
-        assertTrue(${emptyCollection(elementType)}.isSorted())
-        assertTrue(${collectionOf(sorted.take(1))}.isSorted())
-        assertTrue(${collectionOf(sorted)}.isSorted())
-        assertFalse(${collectionOf(sorted.reversed())}.isSorted())
-        assertFalse(${collectionOf(listOf(sorted[1], sorted[0], sorted[2]))}.isSorted())
-        assertTrue(${collectionOf(equal)}.isSorted())
+    fun $funcName() {
+        assertTrue($emptyCollection.$funcName())
+        assertTrue($ctor(${sorted.take(1).joinToString()}).$funcName())
+        assertTrue($ctor($trueSorted).$funcName())
+        assertFalse($ctor($falseSorted).$funcName())
+        assertFalse($ctor(${config.unsortedValues.joinToString()}).$funcName())
+        assertTrue($ctor($equalElement, $equalElement, $equalElement).$funcName())
     }"""
-            )
-            writer.appendLine(
-                """
-    @Test
-    fun isSortedDescending() {
-        assertTrue(${emptyCollection(elementType)}.isSortedDescending())
-        assertTrue(${collectionOf(sorted.take(1))}.isSortedDescending())
-        assertTrue(${collectionOf(sorted.reversed())}.isSortedDescending())
-        assertFalse(${collectionOf(sorted)}.isSortedDescending())
-        assertTrue(${collectionOf(equal)}.isSortedDescending())
-    }"""
-            )
-            writer.appendLine(
-                """
+        )
+    }
+
+    private fun BufferedWriter.writeIsSortedWithTest(ctor: String, config: TestTypeConfig, emptyCollection: String) {
+        val sorted = config.sortedValues
+        val unsorted = config.unsortedValues
+        val caseInsensitiveLines = config.caseInsensitiveValues?.let { (sorted, unsorted) ->
+            """
+        assertTrue($ctor(${sorted.joinToString()}).isSortedWith(String.CASE_INSENSITIVE_ORDER))
+        assertFalse($ctor(${unsorted.joinToString()}).isSortedWith(String.CASE_INSENSITIVE_ORDER))"""
+        } ?: ""
+        appendLine(
+            """
     @Test
     fun isSortedWith() {
-        assertTrue(${emptyCollection(elementType)}.isSortedWith(naturalOrder()))
-        assertTrue(${collectionOf(sorted)}.isSortedWith(naturalOrder()))
-        assertTrue(${collectionOf(sorted.reversed())}.isSortedWith(reverseOrder()))
-        assertFalse(${collectionOf(listOf(sorted[1], sorted[0], sorted[2]))}.isSortedWith(naturalOrder()))
+        assertTrue($emptyCollection.isSortedWith(naturalOrder()))
+        assertTrue($ctor(${sorted.joinToString()}).isSortedWith(naturalOrder()))
+        assertTrue($ctor(${sorted.reversed().joinToString()}).isSortedWith(reverseOrder()))
+        assertFalse($ctor(${unsorted.joinToString()}).isSortedWith(naturalOrder()))$caseInsensitiveLines
     }"""
-            )
-            if (isGeneric) {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedWithCaseInsensitive() {
-        assertTrue(listOf("Apple", "banana", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
-        assertFalse(listOf("banana", "Apple", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
-    }"""
-                )
-            }
-            if (isGeneric) {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedBy() {
-        assertTrue(${emptyCollection(elementType)}.isSortedBy { it.toString() })
-        assertTrue(listOf("a", "bb", "ccc").isSortedBy { it.length })
-        assertFalse(listOf("bb", "a", "ccc").isSortedBy { it.length })
-    }"""
-                )
-            } else if (primitive == PrimitiveType.Boolean) {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedBy() {
-        assertTrue(${emptyCollection(elementType)}.isSortedBy { it.toString() })
-        assertTrue(${collectionOf(sorted)}.isSortedBy { it.compareTo(false) })
-        assertFalse(${collectionOf(sorted.reversed())}.isSortedBy { it.compareTo(false) })
-    }"""
-                )
-            } else {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedBy() {
-        assertTrue(${emptyCollection(elementType)}.isSortedBy { it })
-        assertTrue(${collectionOf(sorted)}.isSortedBy { it })
-        assertFalse(${collectionOf(sorted.reversed())}.isSortedBy { it })
-    }"""
-                )
-            }
-            if (isGeneric) {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedByDescending() {
-        assertTrue(${emptyCollection(elementType)}.isSortedByDescending { it.toString() })
-        assertTrue(listOf("ccc", "bb", "a").isSortedByDescending { it.length })
-        assertFalse(listOf("a", "bb", "ccc").isSortedByDescending { it.length })
-    }"""
-                )
-            } else if (primitive == PrimitiveType.Boolean) {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedByDescending() {
-        assertTrue(${emptyCollection(elementType)}.isSortedByDescending { it.toString() })
-        assertTrue(${collectionOf(sorted.reversed())}.isSortedByDescending { it.compareTo(false) })
-        assertFalse(${collectionOf(sorted)}.isSortedByDescending { it.compareTo(false) })
-    }"""
-                )
-            } else {
-                writer.appendLine(
-                    """
-    @Test
-    fun isSortedByDescending() {
-        assertTrue(${emptyCollection(elementType)}.isSortedByDescending { it })
-        assertTrue(${collectionOf(sorted.reversed())}.isSortedByDescending { it })
-        assertFalse(${collectionOf(sorted)}.isSortedByDescending { it })
-    }"""
-                )
-            }
+        )
+    }
 
-            fun fpCollection(fpType: String, elements: List<String>): String {
-                val args = elements.joinToString()
-                return when (family) {
-                    Iterables -> "listOf($args)"
-                    Sequences -> "sequenceOf($args)"
-                    ArraysOfObjects -> "arrayOf($args)"
-                    ArraysOfPrimitives -> "${fpType.lowercase()}ArrayOf($args)"
-                    else -> error(family)
-                }
-            }
-
-            fun generateFpTests(
-                fpType: String, nanVal: String, zeroPos: String, zeroNeg: String,
-                val1: String, val2: String,
-            ) {
-                writer.appendLine(
-                    """
+    private fun BufferedWriter.writeIsSortedByTest(ctor: String, config: TestTypeConfig, emptyCollection: String, descending: Boolean) {
+        val funcName = if (descending) "isSortedByDescending" else "isSortedBy"
+        val selectorExpr = config.selectorExpr
+        val sortedValues = if (descending) config.selectorSortedValues.reversed() else config.selectorSortedValues
+        val unsortedValues = if (descending) config.selectorSortedValues else config.selectorSortedValues.reversed()
+        appendLine(
+            """
     @Test
-    fun isSortedNaN$fpType() {
-        assertTrue(${fpCollection(fpType, listOf(val1, val2, nanVal))}.isSorted())
-        assertFalse(${fpCollection(fpType, listOf(nanVal, val1, val2))}.isSorted())
-        assertFalse(${fpCollection(fpType, listOf(val1, nanVal, val2))}.isSorted())
-        assertTrue(${fpCollection(fpType, listOf(nanVal, nanVal))}.isSorted())
-        assertTrue(${fpCollection(fpType, listOf(nanVal, val2, val1))}.isSortedDescending())
-        assertFalse(${fpCollection(fpType, listOf(val2, val1, nanVal))}.isSortedDescending())
+    fun $funcName() {
+        assertTrue($emptyCollection.$funcName { it })
+        assertTrue($ctor(${sortedValues.joinToString()}).$funcName { $selectorExpr })
+        assertFalse($ctor(${unsortedValues.joinToString()}).$funcName { $selectorExpr })
+    }"""
+        )
+    }
+
+    private fun BufferedWriter.writeFpTests(ctor: String, fpType: PrimitiveType) {
+        val typeName = fpType.name
+        val suffix = if (fpType == PrimitiveType.Float) "f" else ""
+        val nanVal = "$typeName.NaN"
+        val zeroPos = "0.0$suffix"
+        val zeroNeg = "-0.0$suffix"
+        val val1 = "1.0$suffix"
+        val val2 = "2.0$suffix"
+        appendLine(
+            """
+    @Test
+    fun isSortedNaN$typeName() {
+        assertTrue($ctor($val1, $val2, $nanVal).isSorted())
+        assertFalse($ctor($nanVal, $val1, $val2).isSorted())
+        assertFalse($ctor($val1, $nanVal, $val2).isSorted())
+        assertTrue($ctor($nanVal, $nanVal).isSorted())
+        assertTrue($ctor($nanVal, $val2, $val1).isSortedDescending())
+        assertFalse($ctor($val2, $val1, $nanVal).isSortedDescending())
     }
 
     @Test
-    fun isSortedNegativeZero$fpType() {
-        assertTrue(${fpCollection(fpType, listOf(zeroNeg, zeroPos))}.isSorted())
-        assertFalse(${fpCollection(fpType, listOf(zeroPos, zeroNeg))}.isSorted())
-        assertTrue(${fpCollection(fpType, listOf(zeroPos, zeroNeg))}.isSortedDescending())
-        assertFalse(${fpCollection(fpType, listOf(zeroNeg, zeroPos))}.isSortedDescending())
+    fun isSortedNegativeZero$typeName() {
+        assertTrue($ctor($zeroNeg, $zeroPos).isSorted())
+        assertFalse($ctor($zeroPos, $zeroNeg).isSorted())
+        assertTrue($ctor($zeroPos, $zeroNeg).isSortedDescending())
+        assertFalse($ctor($zeroNeg, $zeroPos).isSortedDescending())
     }"""
-                )
-            }
-
-            if (isGeneric || primitive == PrimitiveType.Double) {
-                generateFpTests("Double", nanVal = "Double.NaN", zeroPos = "0.0", zeroNeg = "-0.0", val1 = "1.0", val2 = "2.0")
-            }
-            if (isGeneric || primitive == PrimitiveType.Float) {
-                generateFpTests("Float", nanVal = "Float.NaN", zeroPos = "0.0f", zeroNeg = "-0.0f", val1 = "1.0f", val2 = "2.0f")
-            }
-            writer.appendLine("}")
-        }
+        )
     }
 }

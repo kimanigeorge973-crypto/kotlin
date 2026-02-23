@@ -31,6 +31,7 @@ class IsSortedArrayTest {
         assertTrue(arrayOf("a").isSortedDescending())
         assertTrue(arrayOf("c", "b", "a").isSortedDescending())
         assertFalse(arrayOf("a", "b", "c").isSortedDescending())
+        assertFalse(arrayOf("b", "a", "c").isSortedDescending())
         assertTrue(arrayOf("b", "b", "b").isSortedDescending())
     }
 
@@ -40,26 +41,22 @@ class IsSortedArrayTest {
         assertTrue(arrayOf("a", "b", "c").isSortedWith(naturalOrder()))
         assertTrue(arrayOf("c", "b", "a").isSortedWith(reverseOrder()))
         assertFalse(arrayOf("b", "a", "c").isSortedWith(naturalOrder()))
-    }
-
-    @Test
-    fun isSortedWithCaseInsensitive() {
-        assertTrue(listOf("Apple", "banana", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
-        assertFalse(listOf("banana", "Apple", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
+        assertTrue(arrayOf("Apple", "banana", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
+        assertFalse(arrayOf("banana", "Apple", "Cherry").isSortedWith(String.CASE_INSENSITIVE_ORDER))
     }
 
     @Test
     fun isSortedBy() {
-        assertTrue(arrayOf<Int>().isSortedBy { it.toString() })
-        assertTrue(listOf("a", "bb", "ccc").isSortedBy { it.length })
-        assertFalse(listOf("bb", "a", "ccc").isSortedBy { it.length })
+        assertTrue(arrayOf<Int>().isSortedBy { it })
+        assertTrue(arrayOf("a", "bb", "ccc").isSortedBy { it.length })
+        assertFalse(arrayOf("ccc", "bb", "a").isSortedBy { it.length })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(arrayOf<Int>().isSortedByDescending { it.toString() })
-        assertTrue(listOf("ccc", "bb", "a").isSortedByDescending { it.length })
-        assertFalse(listOf("a", "bb", "ccc").isSortedByDescending { it.length })
+        assertTrue(arrayOf<Int>().isSortedByDescending { it })
+        assertTrue(arrayOf("ccc", "bb", "a").isSortedByDescending { it.length })
+        assertFalse(arrayOf("a", "bb", "ccc").isSortedByDescending { it.length })
     }
 
     @Test

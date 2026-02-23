@@ -31,6 +31,7 @@ class IsSortedUShortArrayTest {
         assertTrue(ushortArrayOf(1u).isSortedDescending())
         assertTrue(ushortArrayOf(3u, 2u, 1u).isSortedDescending())
         assertFalse(ushortArrayOf(1u, 2u, 3u).isSortedDescending())
+        assertFalse(ushortArrayOf(2u, 1u, 3u).isSortedDescending())
         assertTrue(ushortArrayOf(2u, 2u, 2u).isSortedDescending())
     }
 

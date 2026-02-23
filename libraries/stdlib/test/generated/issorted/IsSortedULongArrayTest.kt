@@ -31,6 +31,7 @@ class IsSortedULongArrayTest {
         assertTrue(ulongArrayOf(1uL).isSortedDescending())
         assertTrue(ulongArrayOf(3uL, 2uL, 1uL).isSortedDescending())
         assertFalse(ulongArrayOf(1uL, 2uL, 3uL).isSortedDescending())
+        assertFalse(ulongArrayOf(2uL, 1uL, 3uL).isSortedDescending())
         assertTrue(ulongArrayOf(2uL, 2uL, 2uL).isSortedDescending())
     }
 
