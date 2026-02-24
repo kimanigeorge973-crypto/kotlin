@@ -586,6 +586,19 @@ object Ordering : TemplateGroupBase() {
         else -> "IsSorted${f}Samples.$methodName"
     }
 
+    private fun MemberBuilder.appendIterationOrderNote() {
+        if (f == Iterables || f == Sequences) {
+            doc {
+                doc + """
+                Note that the result depends on the iteration order of the ${f.collection}.
+                The iteration order of some [${f.toString().dropLast(1)}] implementations may be unstable
+                (change from one invocation to the next),
+                in which case this function may return inconsistent results.
+                """
+            }
+        }
+    }
+
     @Suppress("UNUSED_PARAMETER")
     val f_isSortedWith = fn("isSortedWith(comparator: Comparator<in T>)") {
         includeDefault()
@@ -593,13 +606,19 @@ object Ordering : TemplateGroupBase() {
     } builder {
         since("2.4")
         returns("Boolean")
+        specialFor(Sequences) { sequenceClassification(terminal) }
         doc {
             """
-            Returns `true` if all elements in the ${f.collection} are sorted according to the specified [comparator].
+            Returns `true` if each element in the ${f.collection} is less than or equal
+            to the following element according to the specified [comparator].
+            Returns `true` if the ${f.collection} has fewer than two elements.
 
-            @return `true` if the ${f.collection} is sorted according to the specified [comparator], `false` otherwise.
+            The elements are compared sequentially using [Comparator.compare],
+            and the ${f.collection} is considered sorted if for each pair of adjacent elements
+            the preceding element is not greater than the following one.
             """
         }
+        appendIterationOrderNote()
         sample(isSortedSampleRef("isSortedWith"))
         body {
             """
@@ -632,13 +651,19 @@ object Ordering : TemplateGroupBase() {
         since("2.4")
         returns("Boolean")
         typeParam("T : Comparable<T>")
+        specialFor(Sequences) { sequenceClassification(terminal) }
         doc {
             """
-            Returns `true` if all elements in the ${f.collection} are sorted according to their natural sort order.
+            Returns `true` if each element in the ${f.collection} is less than or equal
+            to the following element according to their natural sort order.
+            Returns `true` if the ${f.collection} has fewer than two elements.
 
-            @return `true` if the ${f.collection} is sorted according to its natural sort order, `false` otherwise.
+            The elements are compared sequentially using [Comparable.compareTo],
+            and the ${f.collection} is considered sorted if for each pair of adjacent elements
+            the preceding element is not greater than the following one.
             """
         }
+        appendIterationOrderNote()
         sample(isSortedSampleRef("isSorted"))
         body { "return isSortedWith(naturalOrder())" }
         body(ArraysOfPrimitives, ArraysOfUnsigned) {
@@ -663,13 +688,19 @@ object Ordering : TemplateGroupBase() {
         since("2.4")
         returns("Boolean")
         typeParam("T : Comparable<T>")
+        specialFor(Sequences) { sequenceClassification(terminal) }
         doc {
             """
-            Returns `true` if all elements in the ${f.collection} are sorted descending according to their natural sort order.
+            Returns `true` if each element in the ${f.collection} is greater than or equal
+            to the following element according to their natural sort order.
+            Returns `true` if the ${f.collection} has fewer than two elements.
 
-            @return `true` if the ${f.collection} is sorted in descending order according to its natural sort order, `false` otherwise.
+            The elements are compared sequentially using [Comparable.compareTo],
+            and the ${f.collection} is considered sorted in descending order if for each
+            pair of adjacent elements the preceding element is not less than the following one.
             """
         }
+        appendIterationOrderNote()
         sample(isSortedSampleRef("isSortedDescending"))
         body { "return isSortedWith(reverseOrder())" }
         body(ArraysOfPrimitives, ArraysOfUnsigned) {
@@ -695,13 +726,20 @@ object Ordering : TemplateGroupBase() {
         inline()
         returns("Boolean")
         typeParam("R : Comparable<R>")
+        specialFor(Sequences) { sequenceClassification(terminal) }
         doc {
             """
-            Returns `true` if all elements in the ${f.collection} are sorted according to natural sort order of the value returned by specified [selector] function.
+            Returns `true` if each element in the ${f.collection} yields a [selector] value
+            that is less than or equal to the [selector] value of the following element
+            according to the natural sort order of the selector values.
+            Returns `true` if the ${f.collection} has fewer than two elements.
 
-            @return `true` if the ${f.collection} is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+            The [selector] values of adjacent elements are compared sequentially,
+            and the ${f.collection} is considered sorted if for each pair of adjacent elements
+            the [selector] value of the preceding element is not greater than that of the following one.
             """
         }
+        appendIterationOrderNote()
         sample(isSortedSampleRef("isSortedBy"))
         body { "return isSortedWith(compareBy(selector))" }
     }
@@ -715,13 +753,21 @@ object Ordering : TemplateGroupBase() {
         inline()
         returns("Boolean")
         typeParam("R : Comparable<R>")
+        specialFor(Sequences) { sequenceClassification(terminal) }
         doc {
             """
-            Returns `true` if all elements in the ${f.collection} are sorted descending according to natural sort order of the value returned by specified [selector] function.
+            Returns `true` if each element in the ${f.collection} yields a [selector] value
+            that is greater than or equal to the [selector] value of the following element
+            according to the natural sort order of the selector values.
+            Returns `true` if the ${f.collection} has fewer than two elements.
 
-            @return `true` if the ${f.collection} is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+            The [selector] values of adjacent elements are compared sequentially,
+            and the ${f.collection} is considered sorted in descending order if for each pair
+            of adjacent elements the [selector] value of the preceding element is not less
+            than that of the following one.
             """
         }
+        appendIterationOrderNote()
         sample(isSortedSampleRef("isSortedByDescending"))
         body { "return isSortedWith(compareByDescending(selector))" }
     }

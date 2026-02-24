@@ -982,9 +982,18 @@ public inline fun <T> Iterable<T>.takeWhile(predicate: (T) -> Boolean): List<T> 
 }
 
 /**
- * Returns `true` if all elements in the collection are sorted according to their natural sort order.
+ * Returns `true` if each element in the collection is less than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the collection has fewer than two elements.
  * 
- * @return `true` if the collection is sorted according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the collection is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
+ * 
+ * Note that the result depends on the iteration order of the collection.
+ * The iteration order of some [Iterable] implementations may be unstable
+ * (change from one invocation to the next),
+ * in which case this function may return inconsistent results.
  * 
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSorted
  */
@@ -994,9 +1003,19 @@ public fun <T : Comparable<T>> Iterable<T>.isSorted(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the collection are sorted according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the collection yields a [selector] value
+ * that is less than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the collection has fewer than two elements.
  * 
- * @return `true` if the collection is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the collection is considered sorted if for each pair of adjacent elements
+ * the [selector] value of the preceding element is not greater than that of the following one.
+ * 
+ * Note that the result depends on the iteration order of the collection.
+ * The iteration order of some [Iterable] implementations may be unstable
+ * (change from one invocation to the next),
+ * in which case this function may return inconsistent results.
  * 
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedBy
  */
@@ -1006,9 +1025,20 @@ public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline sele
 }
 
 /**
- * Returns `true` if all elements in the collection are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the collection yields a [selector] value
+ * that is greater than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the collection has fewer than two elements.
  * 
- * @return `true` if the collection is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the collection is considered sorted in descending order if for each pair
+ * of adjacent elements the [selector] value of the preceding element is not less
+ * than that of the following one.
+ * 
+ * Note that the result depends on the iteration order of the collection.
+ * The iteration order of some [Iterable] implementations may be unstable
+ * (change from one invocation to the next),
+ * in which case this function may return inconsistent results.
  * 
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedByDescending
  */
@@ -1018,9 +1048,18 @@ public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedByDescending(crossi
 }
 
 /**
- * Returns `true` if all elements in the collection are sorted descending according to their natural sort order.
+ * Returns `true` if each element in the collection is greater than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the collection has fewer than two elements.
  * 
- * @return `true` if the collection is sorted in descending order according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the collection is considered sorted in descending order if for each
+ * pair of adjacent elements the preceding element is not less than the following one.
+ * 
+ * Note that the result depends on the iteration order of the collection.
+ * The iteration order of some [Iterable] implementations may be unstable
+ * (change from one invocation to the next),
+ * in which case this function may return inconsistent results.
  * 
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedDescending
  */
@@ -1030,9 +1069,18 @@ public fun <T : Comparable<T>> Iterable<T>.isSortedDescending(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the collection are sorted according to the specified [comparator].
+ * Returns `true` if each element in the collection is less than or equal
+ * to the following element according to the specified [comparator].
+ * Returns `true` if the collection has fewer than two elements.
  * 
- * @return `true` if the collection is sorted according to the specified [comparator], `false` otherwise.
+ * The elements are compared sequentially using [Comparator.compare],
+ * and the collection is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
+ * 
+ * Note that the result depends on the iteration order of the collection.
+ * The iteration order of some [Iterable] implementations may be unstable
+ * (change from one invocation to the next),
+ * in which case this function may return inconsistent results.
  * 
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedWith
  */

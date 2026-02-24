@@ -2753,9 +2753,13 @@ public inline fun UShortArray.takeWhile(predicate: (UShort) -> Boolean): List<US
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to their natural sort order.
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSorted
  */
@@ -2769,9 +2773,13 @@ public fun UIntArray.isSorted(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to their natural sort order.
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSorted
  */
@@ -2785,9 +2793,13 @@ public fun ULongArray.isSorted(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to their natural sort order.
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSorted
  */
@@ -2801,9 +2813,13 @@ public fun UByteArray.isSorted(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to their natural sort order.
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSorted
  */
@@ -2817,9 +2833,14 @@ public fun UShortArray.isSorted(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is less than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the [selector] value of the preceding element is not greater than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSortedBy
  */
@@ -2830,9 +2851,14 @@ public inline fun <R : Comparable<R>> UIntArray.isSortedBy(crossinline selector:
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is less than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the [selector] value of the preceding element is not greater than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSortedBy
  */
@@ -2843,9 +2869,14 @@ public inline fun <R : Comparable<R>> ULongArray.isSortedBy(crossinline selector
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is less than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the [selector] value of the preceding element is not greater than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSortedBy
  */
@@ -2856,9 +2887,14 @@ public inline fun <R : Comparable<R>> UByteArray.isSortedBy(crossinline selector
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is less than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the [selector] value of the preceding element is not greater than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSortedBy
  */
@@ -2869,9 +2905,15 @@ public inline fun <R : Comparable<R>> UShortArray.isSortedBy(crossinline selecto
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is greater than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted in descending order if for each pair
+ * of adjacent elements the [selector] value of the preceding element is not less
+ * than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSortedByDescending
  */
@@ -2882,9 +2924,15 @@ public inline fun <R : Comparable<R>> UIntArray.isSortedByDescending(crossinline
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is greater than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted in descending order if for each pair
+ * of adjacent elements the [selector] value of the preceding element is not less
+ * than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSortedByDescending
  */
@@ -2895,9 +2943,15 @@ public inline fun <R : Comparable<R>> ULongArray.isSortedByDescending(crossinlin
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is greater than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted in descending order if for each pair
+ * of adjacent elements the [selector] value of the preceding element is not less
+ * than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSortedByDescending
  */
@@ -2908,9 +2962,15 @@ public inline fun <R : Comparable<R>> UByteArray.isSortedByDescending(crossinlin
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to natural sort order of the value returned by specified [selector] function.
+ * Returns `true` if each element in the array yields a [selector] value
+ * that is greater than or equal to the [selector] value of the following element
+ * according to the natural sort order of the selector values.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to the natural sort order of the value returned by [selector], `false` otherwise.
+ * The [selector] values of adjacent elements are compared sequentially,
+ * and the array is considered sorted in descending order if for each pair
+ * of adjacent elements the [selector] value of the preceding element is not less
+ * than that of the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSortedByDescending
  */
@@ -2921,9 +2981,13 @@ public inline fun <R : Comparable<R>> UShortArray.isSortedByDescending(crossinli
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to their natural sort order.
+ * Returns `true` if each element in the array is greater than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted in descending order if for each
+ * pair of adjacent elements the preceding element is not less than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSortedDescending
  */
@@ -2937,9 +3001,13 @@ public fun UIntArray.isSortedDescending(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to their natural sort order.
+ * Returns `true` if each element in the array is greater than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted in descending order if for each
+ * pair of adjacent elements the preceding element is not less than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSortedDescending
  */
@@ -2953,9 +3021,13 @@ public fun ULongArray.isSortedDescending(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to their natural sort order.
+ * Returns `true` if each element in the array is greater than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted in descending order if for each
+ * pair of adjacent elements the preceding element is not less than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSortedDescending
  */
@@ -2969,9 +3041,13 @@ public fun UByteArray.isSortedDescending(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted descending according to their natural sort order.
+ * Returns `true` if each element in the array is greater than or equal
+ * to the following element according to their natural sort order.
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted in descending order according to its natural sort order, `false` otherwise.
+ * The elements are compared sequentially using [Comparable.compareTo],
+ * and the array is considered sorted in descending order if for each
+ * pair of adjacent elements the preceding element is not less than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSortedDescending
  */
@@ -2985,9 +3061,13 @@ public fun UShortArray.isSortedDescending(): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to the specified [comparator].
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to the specified [comparator].
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the specified [comparator], `false` otherwise.
+ * The elements are compared sequentially using [Comparator.compare],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSortedWith
  */
@@ -3001,9 +3081,13 @@ public fun UIntArray.isSortedWith(comparator: Comparator<in UInt>): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to the specified [comparator].
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to the specified [comparator].
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the specified [comparator], `false` otherwise.
+ * The elements are compared sequentially using [Comparator.compare],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSortedWith
  */
@@ -3017,9 +3101,13 @@ public fun ULongArray.isSortedWith(comparator: Comparator<in ULong>): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to the specified [comparator].
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to the specified [comparator].
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the specified [comparator], `false` otherwise.
+ * The elements are compared sequentially using [Comparator.compare],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSortedWith
  */
@@ -3033,9 +3121,13 @@ public fun UByteArray.isSortedWith(comparator: Comparator<in UByte>): Boolean {
 }
 
 /**
- * Returns `true` if all elements in the array are sorted according to the specified [comparator].
+ * Returns `true` if each element in the array is less than or equal
+ * to the following element according to the specified [comparator].
+ * Returns `true` if the array has fewer than two elements.
  * 
- * @return `true` if the array is sorted according to the specified [comparator], `false` otherwise.
+ * The elements are compared sequentially using [Comparator.compare],
+ * and the array is considered sorted if for each pair of adjacent elements
+ * the preceding element is not greater than the following one.
  * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSortedWith
  */
