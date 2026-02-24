@@ -6,12 +6,16 @@
 package org.jetbrains.kotlin.analysis.api.fir.projectStructure
 
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.ASTStructure
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.util.ThreeState
 import com.intellij.util.containers.addIfNotNull
 import com.intellij.util.diff.DiffTree
@@ -19,9 +23,11 @@ import com.intellij.util.diff.DiffTreeChangeBuilder
 import com.intellij.util.diff.ShallowNodeComparator
 import org.jetbrains.kotlin.analysis.api.platform.modification.KaElementModificationType
 import org.jetbrains.kotlin.analysis.api.platform.modification.KaSourceModificationLocality
+import org.jetbrains.kotlin.analysis.api.platform.modification.createProjectWideSourceModificationTracker
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaDanglingFileResolutionMode
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaDanglingFileResolutionModeProvider
 import org.jetbrains.kotlin.analysis.api.projectStructure.copyOrigin
+import org.jetbrains.kotlin.analysis.api.projectStructure.isDangling
 import org.jetbrains.kotlin.analysis.low.level.api.fir.LLFirInternals
 import org.jetbrains.kotlin.analysis.low.level.api.fir.file.structure.LLFirDeclarationModificationService
 import org.jetbrains.kotlin.backend.common.pop
@@ -52,6 +58,13 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutionModeProvider {
     @OptIn(KtImplementationDetail::class)
     override fun calculateMode(file: KtFile): KaDanglingFileResolutionMode {
+        return file.getOrComputeMode {
+            computeModeNonCached(file)
+        }
+    }
+
+    @OptIn(KtImplementationDetail::class)
+    private fun computeModeNonCached(file: KtFile): KaDanglingFileResolutionMode {
         val originalFile = file.copyOrigin as? KtFile ?: return KaDanglingFileResolutionMode.PREFER_SELF
         val originalFileStub = originalFile.calcStubTree().root as? KotlinFileStub ?: return KaDanglingFileResolutionMode.PREFER_SELF
         val copyFileStub = file.calcStubTree().root as? KotlinFileStub ?: return KaDanglingFileResolutionMode.PREFER_SELF
@@ -303,3 +316,47 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
 }
 
 private fun PsiElement.isWhitespaceOrComment(): Boolean = this is PsiWhiteSpace || this is PsiComment
+
+
+/**
+ * Retrieves [KaDanglingFileResolutionMode] calculated by [KaDanglingFileResolutionModeProvider] from the file cache
+ * or computes it using [computeMode].
+ *
+ * The cached value is stored in user data properties of [this] and depends
+ * on the value of the project-wide [out-of-block modification tracker][createProjectWideSourceModificationTracker].
+ * If the modification counter is incremented, all previously cached values are dropped.
+ *
+ * The caching is only supported for physical dangling files with non-null [copyOrigin].
+ * Files have to by physical, i.e., support PSI tree change events,
+ * so that the Kotlin modification tracker can reflect potential changes in them.
+ * Otherwise, we could miss OOBM in a dangling file and provide incorrect resolution mode.
+ */
+private fun KtFile.getOrComputeMode(
+    computeMode: () -> KaDanglingFileResolutionMode
+): KaDanglingFileResolutionMode {
+    val cachedMode = getUserData(CALCULATED_DANGLING_FILE_RESOLUTION_MODE_KEY)
+    if (cachedMode != null) {
+        return cachedMode.value
+    }
+
+    if (this.isDangling && this.copyOrigin != null && this.isPhysical) {
+        val cachedValuesManager = CachedValuesManager.getManager(project)
+        val modificationTracker = project.createProjectWideSourceModificationTracker()
+
+        val cachedValue = cachedValuesManager.createCachedValue(
+            {
+                val computedMode = computeMode()
+                CachedValueProvider.Result.create(computedMode, modificationTracker)
+            },
+            /* trackValue = */false
+        )
+
+        putUserData(CALCULATED_DANGLING_FILE_RESOLUTION_MODE_KEY, cachedValue)
+        return cachedValue.value
+    } else {
+        return computeMode()
+    }
+}
+
+private val CALCULATED_DANGLING_FILE_RESOLUTION_MODE_KEY: Key<CachedValue<KaDanglingFileResolutionMode>> =
+    Key.create("CALCULATED_DANGLING_FILE_RESOLUTION_MODE")
