@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.fir.resolve.calls.ExpressionReceiverValue
 import org.jetbrains.kotlin.fir.resolve.calls.candidate.*
 import org.jetbrains.kotlin.fir.resolve.toImplicitResolvedQualifierReceiver
 import org.jetbrains.kotlin.fir.scopes.FirScope
+import org.jetbrains.kotlin.fir.scopes.impl.FirCompanionExtensionScope
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
@@ -198,6 +199,8 @@ internal open class FirTowerResolveTask(
         processQualifierScopes(info, qualifierReceiver)
         processClassifierScope(info, qualifierReceiver)
 
+        enumerateTowerLevelsForCompanionExtensions(info, resolvedQualifier, TowerGroup.QualifierOrClassifier)
+
         if (resolvedQualifier.symbol != null) {
             if (info is CallableReferenceInfo && info.lhs is DoubleColonLHS.Type) {
                 val stubReceiver = buildExpressionStub {
@@ -215,6 +218,26 @@ internal open class FirTowerResolveTask(
                 runResolverForExpressionReceiver(info, resolvedQualifier, parentGroup = TowerGroup.QualifierValue)
             }
 
+        }
+    }
+
+    private suspend fun enumerateTowerLevelsForCompanionExtensions(
+        info: CallInfo,
+        resolvedQualifier: FirResolvedQualifier,
+        parentGroup: TowerGroup,
+    ) {
+        val explicitReceiverValue = ExpressionReceiverValue(resolvedQualifier)
+        for ((depth, lexical) in towerDataElementsForName.nonLocalTowerDataElements.withIndex()) {
+            val scope = lexical.scope
+            if (!lexical.isLocal && scope != null) {
+                processScopeForExplicitReceiver(
+                    FirCompanionExtensionScope(scope),
+                    explicitReceiverValue,
+                    info,
+                    parentGroup.NonLocal(depth),
+                    explicitReceiverKind = ExplicitReceiverKind.NO_EXPLICIT_RECEIVER,
+                )
+            }
         }
     }
 
@@ -358,12 +381,12 @@ internal open class FirTowerResolveTask(
         explicitReceiverValue: ExpressionReceiverValue,
         info: CallInfo,
         towerGroup: TowerGroup,
+        explicitReceiverKind: ExplicitReceiverKind = ExplicitReceiverKind.EXTENSION_RECEIVER,
     ) {
         processLevel(
             scope.toScopeBasedTowerLevel(extensionReceiver = explicitReceiverValue),
-            info, towerGroup, ExplicitReceiverKind.EXTENSION_RECEIVER
+            info, towerGroup, explicitReceiverKind
         )
-
     }
 
     private suspend fun processCandidatesWithGivenImplicitReceiverAsValue(
