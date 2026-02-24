@@ -233,14 +233,8 @@ class LLFirDeclarationModificationService(val project: Project) : Disposable {
      * As it is not a valid contract statement, its removal doesn't need to trigger an out-of-block modification. Nonetheless, as such a
      * situation should not occur frequently, false positives are acceptable and this simplifies the analysis, making it less error-prone.
      */
-    private fun KaElementModificationType.isContractRemoval(): Boolean {
-        val removedElement =
-            (this as? KaElementModificationType.ElementRemoved)?.removedElement
-                ?: (this as? KaElementModificationType.ElementReplaced)?.replacedElement
-                ?: return false
-
-        return (removedElement as? KtExpression)?.isContractDescriptionCallPsiCheck() == true
-    }
+    private fun KaElementModificationType.isContractRemoval(): Boolean =
+        (getRemovedElementIfAny() as? KtExpression)?.isContractDescriptionCallPsiCheck() == true
 
     /**
      * Backing field access changes are always out-of-block modifications.
@@ -252,15 +246,15 @@ class LLFirDeclarationModificationService(val project: Project) : Disposable {
             return false
         }
 
-        val removedElement =
-            (this as? KaElementModificationType.ElementRemoved)?.removedElement
-                ?: (this as? KaElementModificationType.ElementReplaced)?.replacedElement
-                ?: return false
-
-        return removedElement.potentiallyAffectsPropertyBackingFieldResolution()
+        return getRemovedElementIfAny()?.potentiallyAffectsPropertyBackingFieldResolution() ?: false
     }
 
     private fun PsiElement.isWhitespaceOrComment(): Boolean = this is PsiWhiteSpace || this is PsiComment
+    private fun KaElementModificationType.getRemovedElementIfAny(): PsiElement? = when (this) {
+        is KaElementModificationType.ElementReplaced -> replacedElement
+        is KaElementModificationType.ElementRemoved -> removedElement
+        else -> null
+    }
 
     private fun handleDeferredModification(modificationLocality: LLModificationLocality.Deferrable) {
         when (modificationLocality) {
