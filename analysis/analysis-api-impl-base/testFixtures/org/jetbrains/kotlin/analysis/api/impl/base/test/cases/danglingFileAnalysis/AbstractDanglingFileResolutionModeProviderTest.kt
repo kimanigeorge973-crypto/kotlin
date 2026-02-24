@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.analysis.test.framework.projectStructure.ktTestModul
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.assertions
 
-abstract class AbstractDanglingFileResolutionModeTest : AbstractAnalysisApiBasedTest() {
+abstract class AbstractDanglingFileResolutionModeProviderTest : AbstractAnalysisApiBasedTest() {
     override fun doTest(testServices: TestServices) {
         val testModules = testServices.ktTestModuleStructure.mainModules
         val originalFile = testModules.singleOrNull { it.name == "original" }?.ktFiles?.single()
