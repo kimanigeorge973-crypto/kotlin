@@ -30,7 +30,7 @@ public class KotlinPlaceHolderStubImpl<T extends KtElementImplStub<? extends Stu
 
     @Override
     public boolean isEquivalentTo(@NotNull KotlinStubElement<?> other) {
-        if (!(other instanceof KotlinPlaceHolderStub)) return false;
+        if (!(other instanceof KotlinPlaceHolderStubImpl)) return false;
         return this.getElementType() == other.getElementType();
     }
 }

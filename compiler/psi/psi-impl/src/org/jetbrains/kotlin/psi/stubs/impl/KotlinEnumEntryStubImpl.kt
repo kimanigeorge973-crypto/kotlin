@@ -69,6 +69,6 @@ class KotlinEnumEntryStubImpl(
         if (this.isLocal != other.isLocal) return false
         if (this.name != other.name) return false
         if (this.qualifiedName != other.qualifiedName) return false
-        return this.superNames != other.superNames
+        return this.superNames == other.superNames
     }
 }

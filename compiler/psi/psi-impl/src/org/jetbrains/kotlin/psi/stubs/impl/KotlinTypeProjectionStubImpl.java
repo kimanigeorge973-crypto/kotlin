@@ -42,7 +42,7 @@ public class KotlinTypeProjectionStubImpl extends KotlinStubBaseImpl<KtTypeProje
 
     @Override
     public boolean isEquivalentTo(@NotNull KotlinStubElement<?> other) {
-        if (!(other instanceof KotlinTypeProjectionStub)) return false;
-        return this.getProjectionKind() == (((KotlinTypeProjectionStub) other).getProjectionKind());
+        if (!(other instanceof KotlinTypeProjectionStubImpl)) return false;
+        return this.projectionKindOrdinal == ((KotlinTypeProjectionStubImpl) other).projectionKindOrdinal;
     }
 }

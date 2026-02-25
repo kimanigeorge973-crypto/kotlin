@@ -51,6 +51,8 @@ class KotlinFileStubImpl @KtImplementationDetail internal constructor(
     override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
         if (other !is KotlinFileStubImpl) return false
         if (this.kind != other.kind) return false
+        if (this.partSimpleName != other.partSimpleName) return false
+        if (this.facadePartSimpleNames != other.facadePartSimpleNames) return false
         return this.facadeFqName == other.facadeFqName
     }
 
