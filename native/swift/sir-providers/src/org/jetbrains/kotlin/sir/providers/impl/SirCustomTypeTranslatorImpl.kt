@@ -233,19 +233,23 @@ public class SirCustomTypeTranslatorImpl(
             get() = typeList.first().cType
 
         override val inKotlinSources = object : ValueConversion {
+            context(session: SirSession)
             override fun swiftToKotlin(typeNamer: SirTypeNamer, valueExpression: String): String {
                 val operator = if (inclusive) ".." else "..<"
                 return "${valueExpression}_1 $operator ${valueExpression}_2"
             }
 
+            context(session: SirSession)
             override fun kotlinToSwift(typeNamer: SirTypeNamer, valueExpression: String): String =
                 "kotlin.native.internal.ref.createRetainedExternalRCRef($valueExpression)"
         }
 
         override val inSwiftSources = object : ValueConversion {
+            context(session: SirSession)
             override fun swiftToKotlin(typeNamer: SirTypeNamer, valueExpression: String): String =
                 "$valueExpression.lowerBound, $valueExpression.upperBound"
 
+            context(session: SirSession)
             override fun kotlinToSwift(typeNamer: SirTypeNamer, valueExpression: String): String {
                 val startBridge = nativePointerToMultipleObjCBridge(0)
                 val endBridge = nativePointerToMultipleObjCBridge(1)

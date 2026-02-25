@@ -3,6 +3,39 @@
 import kotlinx.cinterop.*
 import kotlinx.cinterop.internal.convertBlockPtrToKotlinFunction
 import kotlin.native.internal.ExportedBridge
+import platform.Foundation.NSError
+import platform.Foundation.NSLocalizedFailureReasonErrorKey
+import platform.Foundation.NSUnderlyingErrorKey
+
+public class SwiftException(error: NSError) : RuntimeException(
+    message = buildMessage(error),
+    cause = (error.userInfo[NSUnderlyingErrorKey] as? NSError)?.let(::SwiftException)
+) {
+    companion object {
+        private fun buildMessage(error: NSError): String {
+            val description = error.localizedDescription
+
+            val details = buildList {
+                add("domain=${error.domain}")
+                add("code=${error.code}")
+
+                ((error.userInfo[NSLocalizedFailureReasonErrorKey] as? String)
+                    ?: error.localizedFailureReason)
+                    ?.takeUnless(String::isBlank)
+                    ?.let { add("reason=$it") }
+            }
+
+            return buildString {
+                append(description)
+                if (details.isNotEmpty()) {
+                    append(" (")
+                    append(details.joinToString())
+                    append(')')
+                }
+            }
+        }
+    }
+}
 
 @ExportedBridge("__root____getExceptionMessage__TypesOfArguments__ExportedKotlinPackages_kotlin_Exception__")
 public fun __root____getExceptionMessage__TypesOfArguments__ExportedKotlinPackages_kotlin_Exception__(exception: kotlin.native.internal.NativePtr): kotlin.native.internal.NativePtr {

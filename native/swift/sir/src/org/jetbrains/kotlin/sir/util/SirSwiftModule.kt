@@ -40,6 +40,7 @@ object SirSwiftModule : SirModule() {
     val never = struct("Never")
     val anyHashable = struct("AnyHashable")
     val string = struct("String")
+    var error = protocol("Error")
 
     val array = struct("Array")
     val set = struct("Set")

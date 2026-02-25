@@ -37,6 +37,10 @@ package final class KotlinTask: KotlinRuntime.KotlinBase {
     public func cancelExternally() -> Swift.Void {
         return __root___SwiftJob_cancelExternally(self.__externalRCRef())
     }
+
+    public func setCallback(_ callback: @escaping @convention(block) (Bool) -> Bool) {
+        __root___SwiftJob_setCallback(self.__externalRCRef(), callback)
+    }
 }
 
 public protocol _KotlinFlow: KotlinRuntime.KotlinBase, AsyncSequence { }

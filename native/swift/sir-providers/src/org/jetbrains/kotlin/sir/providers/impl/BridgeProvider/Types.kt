@@ -42,6 +42,7 @@ internal sealed class CType {
     data object id : Predefined("id")
     data object NSString : Predefined("NSString *")
     data object NSNumber : Predefined("NSNumber *")
+    data object NSError : Predefined("NSError *")
     data object NSObject : Predefined("id<NSObject>") // NSProxy and NSObject conforms to this
 
     sealed class Generic(base: String, vararg args: CType) : Predefined(
@@ -92,6 +93,8 @@ internal enum class KotlinType(val repr: String) {
 
     PointerToKotlinObject("kotlinx.cinterop.COpaquePointerVar"),
 
+    NSError("platform.Foundation.NSError"),
+
     // id, +0
     ObjCObjectUnretained("kotlin.native.internal.NativePtr"),
 
@@ -120,4 +123,5 @@ internal val KotlinType.defaultValue: String
         KotlinType.ObjCObjectUnretained, // This is semantically +0, so we're allowed to simply dismiss the pointer.
             -> "kotlin.native.internal.NativePtr.NULL"
         KotlinType.String -> ""
+        KotlinType.NSError -> "null"
     }

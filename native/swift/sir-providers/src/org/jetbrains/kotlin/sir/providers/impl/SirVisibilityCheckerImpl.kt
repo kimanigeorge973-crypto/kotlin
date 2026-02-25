@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.analysis.api.components.fullyExpandedType
 import org.jetbrains.kotlin.analysis.api.components.isFunctionType
 import org.jetbrains.kotlin.analysis.api.components.isNothingType
 import org.jetbrains.kotlin.analysis.api.components.isPrimitive
+import org.jetbrains.kotlin.analysis.api.components.isSuspendFunctionType
 import org.jetbrains.kotlin.analysis.api.export.utilities.isAllSuperTypesExported
 import org.jetbrains.kotlin.analysis.api.symbols.*
 import org.jetbrains.kotlin.analysis.api.symbols.markers.KaAnnotatedSymbol
@@ -82,7 +83,7 @@ public class SirVisibilityCheckerImpl(
             visibility.value = SirVisibility.PRIVATE
         }
         if (ktSymbol is KaNamedFunctionSymbol && ktSymbol.allParameters.map { it.returnType.fullyExpandedType }
-                .filter { type -> !type.isFunctionType && !sirSession.isTypeSupported(type) }
+                .filter { type -> !type.isFunctionType && !type.isSuspendFunctionType && !sirSession.isTypeSupported(type) }
                 .any { hasUnboundTypeParameters(it) }
         ) {
             return@withSessions SirAvailability.Unavailable("Callables with parameters unbound generic types are not supported yet")
@@ -241,6 +242,28 @@ private fun containsHidesFromObjCAnnotation(symbol: KaAnnotatedSymbol): Boolean 
 
 private val SUPPORTED_SYMBOL_ORIGINS = setOf(KaSymbolOrigin.SOURCE, KaSymbolOrigin.LIBRARY)
 
+/**
+ * Checks whether the given [type] is a class type whose type arguments differ from
+ * the declared upper bounds of the corresponding type parameters.
+ *
+ * A type parameter is considered "unbound" (i.e., explicitly specialized) when its
+ * type argument is not equal to the single upper bound declared on the parameter.
+ * For example, `List<String>` has an unbound type parameter because `String` differs
+ * from `List`'s default upper bound (`Any?`), whereas a raw usage matching the bound
+ * would not.
+ *
+ * Returns `false` if:
+ * - The fully expanded type is not a [KaClassType].
+ * - The class has no type parameters.
+ * - The number of type arguments doesn't match the number of type parameters.
+ * - All type arguments match their corresponding single upper bounds.
+ *
+ * This is used to gate Swift Export availability: functions with parameters containing
+ * non-default generic specializations that are not otherwise supported are marked as unavailable.
+ *
+ * @param type The Kotlin type to inspect.
+ * @return `true` if at least one type argument differs from its parameter's upper bound.
+ */
 @OptIn(KaExperimentalApi::class)
 context(ka: KaSession)
 private fun hasUnboundTypeParameters(type: KaType): Boolean = (type.fullyExpandedType as? KaClassType)?.let { classType ->

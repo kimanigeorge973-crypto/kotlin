@@ -36,9 +36,10 @@ fun Job.alsoCancel(another: Job) {
 @OptIn(InternalCoroutinesApi::class)
 class SwiftJob private constructor(
     val backingJob: Job,
-    val cancellationCallback: (Boolean) -> Boolean,
+    var cancellationCallback: (Boolean) -> Boolean,
 ) : Job by backingJob {
     constructor(cancellationCallback: (Boolean) -> Boolean = { it }) : this(backingJob = Job(), cancellationCallback = cancellationCallback)
+    constructor(parentJob: Job) : this(backingJob = Job(parentJob), cancellationCallback = { it })
 
     init {
         // It is necessary to forward cancellation as soon as it is triggered to make it visible before the job completes,
@@ -75,6 +76,13 @@ public fun __root___SwiftJob_init_initialize(__kt: kotlin.native.internal.Native
 public fun __root___SwiftJob_cancelExternally(self: kotlin.native.internal.NativePtr): Unit {
     val instance = kotlin.native.internal.ref.dereferenceExternalRCRef(self) as SwiftJob
     instance.cancelExternally()
+}
+
+@ExportedBridge("__root___SwiftJob_setCallback")
+public fun __root___SwiftJob_setCallback(self: kotlin.native.internal.NativePtr, _block: kotlin.native.internal.NativePtr): Unit {
+    val instance = kotlin.native.internal.ref.dereferenceExternalRCRef(self) as SwiftJob
+    val block = convertBlockPtrToKotlinFunction<(Boolean)->Boolean>(_block)
+    instance.cancellationCallback = block
 }
 
 /**

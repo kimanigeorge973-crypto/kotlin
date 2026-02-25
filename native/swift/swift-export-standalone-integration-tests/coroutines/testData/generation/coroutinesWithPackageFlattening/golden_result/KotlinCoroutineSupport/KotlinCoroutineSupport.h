@@ -17,4 +17,6 @@ void *_kotlin_swift_SwiftFlowIterator_init_allocate();
 
 void _kotlin_swift_SwiftFlowIterator_init_initialize(void * __kt, void * flow);
 
+void __root___SwiftJob_setCallback(void *, bool (^)(bool));
+
 NS_ASSUME_NONNULL_END

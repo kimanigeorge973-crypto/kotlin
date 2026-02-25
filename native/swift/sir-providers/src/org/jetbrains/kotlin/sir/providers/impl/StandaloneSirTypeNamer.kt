@@ -95,6 +95,7 @@ internal object StandaloneSirTypeNamer : SirTypeNamer {
 
             SirSwiftModule.void -> "Unit"
             SirSwiftModule.never -> "Nothing"
+            SirSwiftModule.error -> "platform.Foundation.NSError"
 
             SirSwiftModule.array -> "kotlin.collections.List<${kotlinParametrizedName(type.typeArguments.first())}>"
             SirSwiftModule.set -> "kotlin.collections.Set<${kotlinParametrizedName(type.typeArguments.first())}>"
