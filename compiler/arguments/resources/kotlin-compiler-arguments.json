@@ -5944,7 +5944,7 @@
                                     "removedVersion": null
                                 },
                                 "argumentType": {
-                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringArrayType",
+                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.LiteralPathType",
                                     "defaultValue": {
                                         "current": null,
                                         "valueInVersions": []
@@ -6238,7 +6238,7 @@
                                     "removedVersion": null
                                 },
                                 "argumentType": {
-                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringArrayType",
+                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.LiteralPathType",
                                     "defaultValue": {
                                         "current": null,
                                         "valueInVersions": []
@@ -6586,13 +6586,13 @@
                                     "removedVersion": null
                                 },
                                 "argumentType": {
-                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringType",
-                                    "isNullable": {
-                                        "current": true,
-                                        "valueInVersions": []
-                                    },
+                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.SystemPathType",
                                     "defaultValue": {
                                         "current": null,
+                                        "valueInVersions": []
+                                    },
+                                    "isNullable": {
+                                        "current": true,
                                         "valueInVersions": []
                                     }
                                 }
@@ -6712,13 +6712,13 @@
                                     "removedVersion": null
                                 },
                                 "argumentType": {
-                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringType",
-                                    "isNullable": {
-                                        "current": true,
-                                        "valueInVersions": []
-                                    },
+                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.SystemPathType",
                                     "defaultValue": {
                                         "current": null,
+                                        "valueInVersions": []
+                                    },
+                                    "isNullable": {
+                                        "current": true,
                                         "valueInVersions": []
                                     }
                                 }
@@ -8054,13 +8054,13 @@
                                     "removedVersion": null
                                 },
                                 "argumentType": {
-                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringType",
-                                    "isNullable": {
-                                        "current": true,
-                                        "valueInVersions": []
-                                    },
+                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.SystemPathType",
                                     "defaultValue": {
                                         "current": null,
+                                        "valueInVersions": []
+                                    },
+                                    "isNullable": {
+                                        "current": true,
                                         "valueInVersions": []
                                     }
                                 }
