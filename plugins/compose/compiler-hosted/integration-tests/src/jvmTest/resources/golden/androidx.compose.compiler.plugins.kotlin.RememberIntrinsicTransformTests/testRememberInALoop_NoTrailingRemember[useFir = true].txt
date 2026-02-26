@@ -18,23 +18,27 @@ val content: Function3<@[ParameterName(name = 'a')] SomeUnstableClass, Composer,
 internal object ComposableSingletons%TestKt {
   val lambda%613241577: Function3<SomeUnstableClass, Composer, Int, Unit> = composableLambdaInstance(<>, false) { it: SomeUnstableClass, %composer: Composer?, %changed: Int ->
     sourceInformation(%composer, "invalid source info at 1: 'CN(it)*5@195L18:Test.kt'")
-    if (isTraceInProgress()) {
-      traceEventStart(<>, %changed, -1, <>)
-    }
-    val <iterator> = 0 until count.iterator()
-    while (<iterator>.hasNext()) {
-      val index = <iterator>.next()
-      val i = <block>{
-        sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
-        val tmp0_group = %composer.cache(false) {
-          index
-        }
-        sourceInformationMarkerEnd(%composer)
-        tmp0_group
+    if (%composer.shouldExecute(%changed and 0b00010001 != 0b00010000, %changed and 0b0001)) {
+      if (isTraceInProgress()) {
+        traceEventStart(<>, %changed, -1, <>)
       }
-    }
-    if (isTraceInProgress()) {
-      traceEventEnd()
+      val <iterator> = 0 until count.iterator()
+      while (<iterator>.hasNext()) {
+        val index = <iterator>.next()
+        val i = <block>{
+          sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
+          val tmp0_group = %composer.cache(false) {
+            index
+          }
+          sourceInformationMarkerEnd(%composer)
+          tmp0_group
+        }
+      }
+      if (isTraceInProgress()) {
+        traceEventEnd()
+      }
+    } else {
+      %composer.skipToGroupEnd()
     }
   }
 }

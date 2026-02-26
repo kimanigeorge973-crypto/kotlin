@@ -29,8 +29,11 @@ import org.junit.Test
 
 class StaticExpressionDetectionTests(useFir: Boolean) : AbstractIrTransformTest(useFir) {
     @Test
-    fun testUnstableTypesAreNeverStatic() = assertUncertain(
-        expression = "Any()"
+    fun testKnownUnstableTypesAreNeverStatic() = assertUncertain(
+        expression = "Unstable(0)",
+        extraSrc = """
+            class Unstable(var x: Int)
+        """
     )
 
     @Test
@@ -68,7 +71,7 @@ class StaticExpressionDetectionTests(useFir: Boolean) : AbstractIrTransformTest(
     )
 
     @Test
-    fun testObjectReferencesAreStatic() = assertStatic(
+    fun testObjectReferencesInTheSameFileAsTheObjectDeclarationAreStatic() = assertStatic(
         expression = "Singleton",
         extraSrc = """
             object Singleton
@@ -280,6 +283,8 @@ class StaticExpressionDetectionTests(useFir: Boolean) : AbstractIrTransformTest(
             ${if (includeUiImports) uiFoundationImports else ""}
             import kotlin.coroutines.EmptyCoroutineContext
 
+            $extraSrc
+
             @Composable fun Receiver(value: Any?) {}
 
             @Composable fun CompositionContext() {
@@ -288,7 +293,6 @@ class StaticExpressionDetectionTests(useFir: Boolean) : AbstractIrTransformTest(
         """.trimIndent()
 
         val files = listOf(
-            SourceFile("ExtraSrc.kt", extraSrc),
             SourceFile("Test.kt", source),
         )
         val irModule = compileToIr(

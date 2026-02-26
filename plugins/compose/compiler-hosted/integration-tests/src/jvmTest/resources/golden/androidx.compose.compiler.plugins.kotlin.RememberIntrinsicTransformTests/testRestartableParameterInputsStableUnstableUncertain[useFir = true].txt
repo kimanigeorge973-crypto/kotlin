@@ -29,14 +29,19 @@ fun test1(x: KnownStable, %composer: Composer?, %changed: Int) {
   sourceInformation(%composer, "C(test1)N(x)<rememb...>:Test.kt")
   val %dirty = %changed
   if (%changed and 0b0110 == 0) {
-    %dirty = %dirty or if (%composer.changed(x)) 0b0100 else 0b0010
+    %dirty = %dirty or if (if (%changed and 0b1000 == 0) {
+      %composer.changed(x)
+    } else {
+      %composer.changedInstance(x)
+    }
+    ) 0b0100 else 0b0010
   }
   if (%composer.shouldExecute(%dirty and 0b0011 != 0b0010, %dirty and 0b0001)) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %dirty, -1, <>)
     }
     sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
-    val tmp0_group = %composer.cache(%dirty and 0b1110 == 0b0100) {
+    val tmp0_group = %composer.cache(%dirty and 0b1110 == 0b0100 || %dirty and 0b1000 != 0 && %composer.changed(x)) {
       1
     }
     sourceInformationMarkerEnd(%composer)
@@ -57,14 +62,19 @@ fun test2(x: KnownUnstable, %composer: Composer?, %changed: Int) {
   sourceInformation(%composer, "C(test2)N(x)<rememb...>:Test.kt")
   val %dirty = %changed
   if (%changed and 0b0110 == 0) {
-    %dirty = %dirty or if (%composer.changedInstance(x)) 0b0100 else 0b0010
+    %dirty = %dirty or if (if (%changed and 0b1000 == 0) {
+      %composer.changed(x)
+    } else {
+      %composer.changedInstance(x)
+    }
+    ) 0b0100 else 0b0010
   }
   if (%composer.shouldExecute(%dirty and 0b0011 != 0b0010, %dirty and 0b0001)) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %dirty, -1, <>)
     }
     sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
-    val tmp0_group = %composer.cache(%composer.changed(x)) {
+    val tmp0_group = %composer.cache(%dirty and 0b1110 == 0b0100 || %dirty and 0b1000 != 0 && %composer.changed(x)) {
       1
     }
     sourceInformationMarkerEnd(%composer)

@@ -39,7 +39,12 @@ fun A(y: Any?, %composer: Composer?, %changed: Int, %default: Int) {
   if (%default and 0b0001 != 0) {
     %dirty = %dirty or 0b0110
   } else if (%changed and 0b0110 == 0) {
-    %dirty = %dirty or if (%composer.changedInstance(y)) 0b0100 else 0b0010
+    %dirty = %dirty or if (if (%changed and 0b1000 == 0) {
+      %composer.changed(y)
+    } else {
+      %composer.changedInstance(y)
+    }
+    ) 0b0100 else 0b0010
   }
   if (%composer.shouldExecute(%dirty and 0b0011 != 0b0010, %dirty and 0b0001)) {
     if (%default and 0b0001 != 0) {
@@ -55,14 +60,14 @@ fun A(y: Any?, %composer: Composer?, %changed: Int, %default: Int) {
     A(SingleStableVal(StableClass()), %composer, SingleStableVal.%stable, 0)
     A(SingleParamProp(StableClass()), %composer, SingleParamProp.%stable or StableClass.%stable, 0)
     A(SingleParamProp(UnstableClass()), %composer, SingleParamProp.%stable or UnstableClass.%stable, 0)
-    A(SingleParamNonProp(StableClass()), %composer, SingleParamNonProp.%stable, 0)
-    A(SingleParamNonProp(UnstableClass()), %composer, SingleParamNonProp.%stable, 0)
-    A(DoubleParamSingleProp(StableClass(), StableClass()), %composer, DoubleParamSingleProp.%stable or StableClass.%stable, 0)
-    A(DoubleParamSingleProp(UnstableClass(), StableClass()), %composer, DoubleParamSingleProp.%stable or UnstableClass.%stable, 0)
-    A(DoubleParamSingleProp(StableClass(), UnstableClass()), %composer, DoubleParamSingleProp.%stable or StableClass.%stable, 0)
-    A(DoubleParamSingleProp(UnstableClass(), UnstableClass()), %composer, DoubleParamSingleProp.%stable or UnstableClass.%stable, 0)
-    A(X(listOf(StableClass())), %composer, X.%stable, 0)
-    A(X(listOf(StableClass())), %composer, X.%stable, 0)
+    A(SingleParamNonProp(StableClass()), %composer, SingleParamNonProp.%stable or StableClass.%stable, 0)
+    A(SingleParamNonProp(UnstableClass()), %composer, SingleParamNonProp.%stable or UnstableClass.%stable, 0)
+    A(DoubleParamSingleProp(StableClass(), StableClass()), %composer, DoubleParamSingleProp.%stable or StableClass.%stable or StableClass.%stable, 0)
+    A(DoubleParamSingleProp(UnstableClass(), StableClass()), %composer, DoubleParamSingleProp.%stable or UnstableClass.%stable or StableClass.%stable, 0)
+    A(DoubleParamSingleProp(StableClass(), UnstableClass()), %composer, DoubleParamSingleProp.%stable or StableClass.%stable or UnstableClass.%stable, 0)
+    A(DoubleParamSingleProp(UnstableClass(), UnstableClass()), %composer, DoubleParamSingleProp.%stable or UnstableClass.%stable or UnstableClass.%stable, 0)
+    A(X(listOf(StableClass())), %composer, X.%stable or StableClass.%stable, 0)
+    A(X(listOf(StableClass())), %composer, X.%stable or StableClass.%stable, 0)
     A(NonBackingFieldUnstableVal(), %composer, NonBackingFieldUnstableVal.%stable, 0)
     A(NonBackingFieldUnstableVar(), %composer, NonBackingFieldUnstableVar.%stable, 0)
     A(StableDelegateProp(), %composer, StableDelegateProp.%stable, 0)

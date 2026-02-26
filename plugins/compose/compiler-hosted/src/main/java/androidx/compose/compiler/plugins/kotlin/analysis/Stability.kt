@@ -22,6 +22,7 @@ import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
 import androidx.compose.compiler.plugins.kotlin.lower.annotationClass
 import androidx.compose.compiler.plugins.kotlin.lower.isSyntheticComposableFunction
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
@@ -128,7 +129,7 @@ fun Stability.normalize(): Stability {
         is Stability.Parameter,
         is Stability.Runtime,
         is Stability.Unknown,
-        -> return this
+            -> return this
 
         is Stability.Combined -> {
             // if combined, we perform the more expensive normalization process
@@ -197,37 +198,59 @@ private data class SymbolForAnalysis(
 )
 
 class StabilityInferencer(
+    private val isTargetJvm: Boolean,
     private val currentModule: ModuleDescriptor,
     externalStableTypeMatchers: Set<FqNameMatcher>,
 ) {
     private val externalTypeMatcherCollection = FqNameMatcherCollection(externalStableTypeMatchers)
 
-    private val cache = mutableMapOf<SymbolForAnalysis, Stability>()
+    private val cache = mutableMapOf<Pair<SymbolForAnalysis, IrFile?>, Stability>()
 
-    fun stabilityOf(irType: IrType): Stability =
-        stabilityOf(irType, emptyMap(), emptySet())
+    /**
+     * Returns the stability of [irType].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
+    fun stabilityOf(irType: IrType, fileContainingDependent: IrFile?): Stability =
+        stabilityOf(irType, emptyMap(), emptySet(), fileContainingDependent)
 
+    /**
+     * Returns the stability of [declaration].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
     private fun stabilityOf(
         declaration: IrClass,
         substitutions: Map<IrTypeParameterSymbol, IrTypeArgument>,
         currentlyAnalyzing: Set<SymbolForAnalysis>,
+        fileContainingDependent: IrFile?,
     ): Stability {
         val symbol = declaration.symbol
         val typeArguments = declaration.typeParameters.map { substitutions[it.symbol] }
         val fullSymbol = SymbolForAnalysis(symbol, typeArguments)
 
-        if (fullSymbol in cache) return cache[fullSymbol]!!
+        val cacheKey = Pair(fullSymbol, fileContainingDependent)
+        if (cacheKey in cache) return cache[cacheKey]!!
 
-        val result = stabilityOf(declaration, fullSymbol, substitutions, currentlyAnalyzing)
-        cache[fullSymbol] = result
+        val result = stabilityOf(declaration, fullSymbol, substitutions, currentlyAnalyzing, fileContainingDependent)
+        cache[cacheKey] = result
         return result
     }
 
+    /**
+     * Returns the stability of [declaration].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
     private fun stabilityOf(
         declaration: IrClass,
         symbol: SymbolForAnalysis,
         substitutions: Map<IrTypeParameterSymbol, IrTypeArgument>,
-        currentlyAnalyzing: Set<SymbolForAnalysis>
+        currentlyAnalyzing: Set<SymbolForAnalysis>,
+        fileContainingDependent: IrFile?,
     ): Stability {
         if (currentlyAnalyzing.contains(symbol)) return Stability.Unstable
         if (declaration.hasStableMarkedDescendant()) return Stability.Stable
@@ -240,10 +263,21 @@ class StabilityInferencer(
         }
 
         val analyzing = currentlyAnalyzing + symbol
+        val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
+        val typeParameters = declaration.typeParameters
+        val fileContainingDeclaration = declaration.fileOrNull
+        // To support incremental compilation, we are forced to use runtime stability when
+        // [declaration] is `public` or `internal` and is contained in a different file than
+        // [fileContainingDependent].
+        val forcedToUseRuntimeStability = isTargetJvm &&
+                (declaration.visibility.isPublicAPI || declaration.visibility == DescriptorVisibilities.INTERNAL) &&
+                (fileContainingDeclaration == null || fileContainingDeclaration != fileContainingDependent)
 
-        if (canInferStability(declaration) || declaration.isExternalStableType()) {
-            val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
-            val typeParameters = declaration.typeParameters
+        if (
+            KnownStableConstructs.stableTypes.contains(fqName) ||
+            declaration.isExternalStableType() ||
+            (!forcedToUseRuntimeStability && declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB)
+        ) {
             val stability: Stability
             val mask: Int
             if (KnownStableConstructs.stableTypes.contains(fqName)) {
@@ -280,19 +314,38 @@ class StabilityInferencer(
                         if (mask and (0b1 shl index) != 0) {
                             val sub = substitutions[irTypeParameter.symbol]
                             if (sub != null)
-                                stabilityOf(sub, substitutions, analyzing)
+                                stabilityOf(sub, substitutions, analyzing, fileContainingDependent)
                             else
                                 Stability.Parameter(irTypeParameter)
                         } else null
                     }
                 )
             }
-        } else if (declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB) {
+        }
+
+        if (declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB) {
             return Stability.Unstable
         }
 
         if (declaration.isInterface) {
             return Stability.Unknown(declaration)
+        }
+
+        if (forcedToUseRuntimeStability) {
+            if (typeParameters.isEmpty()) {
+                return Stability.Runtime(declaration)
+            } else {
+                return Stability.Runtime(declaration) + Stability.Combined(
+                    typeParameters.mapIndexedNotNull { index, irTypeParameter ->
+                        if (index >= 32) return@mapIndexedNotNull null
+                        val sub = substitutions[irTypeParameter.symbol]
+                        if (sub != null)
+                            stabilityOf(sub, substitutions, analyzing, fileContainingDependent)
+                        else
+                            Stability.Parameter(irTypeParameter)
+                    }
+                )
+            }
         }
 
         var stability = Stability.Stable
@@ -302,18 +355,18 @@ class StabilityInferencer(
                 is IrProperty -> {
                     member.backingField?.let {
                         if (member.isVar && !member.isDelegated) return Stability.Unstable
-                        stability += stabilityOf(it.type, substitutions, analyzing)
+                        stability += stabilityOf(it.type, substitutions, analyzing, fileContainingDependent)
                     }
                 }
 
                 is IrField -> {
-                    stability += stabilityOf(member.type, substitutions, analyzing)
+                    stability += stabilityOf(member.type, substitutions, analyzing, fileContainingDependent)
                 }
             }
         }
 
         declaration.superClass?.let {
-            stability += stabilityOf(it, substitutions, analyzing)
+            stability += stabilityOf(it, substitutions, analyzing, fileContainingDependent)
         }
 
         return stability
@@ -337,42 +390,57 @@ class StabilityInferencer(
         return externalTypeMatcherCollection.matches(fqNameWhenAvailable, superTypes)
     }
 
-    private fun canInferStability(declaration: IrClass): Boolean {
-        val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
-        return KnownStableConstructs.stableTypes.contains(fqName) ||
-                declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB
-    }
-
+    /**
+     * Returns the stability of [classifier].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
     private fun stabilityOf(
         classifier: IrClassifierSymbol,
         substitutions: Map<IrTypeParameterSymbol, IrTypeArgument>,
         currentlyAnalyzing: Set<SymbolForAnalysis>,
+        fileContainingDependent: IrFile?,
     ): Stability {
         // if isEnum, return true
         // class hasStableAnnotation()
         return when (val owner = classifier.owner) {
-            is IrClass -> stabilityOf(owner, substitutions, currentlyAnalyzing)
+            is IrClass -> stabilityOf(owner, substitutions, currentlyAnalyzing, fileContainingDependent)
             is IrTypeParameter -> Stability.Unstable
             is IrScript -> Stability.Stable
             else -> error("Unexpected IrClassifier: $owner")
         }
     }
 
+    /**
+     * Returns the stability of [argument].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
     private fun stabilityOf(
         argument: IrTypeArgument,
         substitutions: Map<IrTypeParameterSymbol, IrTypeArgument>,
         currentlyAnalyzing: Set<SymbolForAnalysis>,
+        fileContainingDependent: IrFile?,
     ): Stability {
         return when (argument) {
             is IrStarProjection -> Stability.Unstable
-            is IrTypeProjection -> stabilityOf(argument.type, substitutions, currentlyAnalyzing)
+            is IrTypeProjection -> stabilityOf(argument.type, substitutions, currentlyAnalyzing, fileContainingDependent)
         }
     }
 
+    /**
+     * Returns the stability of [type].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
     private fun stabilityOf(
         type: IrType,
         substitutions: Map<IrTypeParameterSymbol, IrTypeArgument>,
         currentlyAnalyzing: Set<SymbolForAnalysis>,
+        fileContainingDependent: IrFile?,
     ): Stability {
         return when {
             type is IrErrorType -> Stability.Unstable
@@ -389,7 +457,7 @@ class StabilityInferencer(
                 val arg = substitutions[classifier]
                 val symbol = SymbolForAnalysis(classifier, emptyList())
                 if (arg != null && symbol !in currentlyAnalyzing) {
-                    stabilityOf(arg, substitutions, currentlyAnalyzing + symbol)
+                    stabilityOf(arg, substitutions, currentlyAnalyzing + symbol, fileContainingDependent)
                 } else {
                     Stability.Parameter(
                         classifier.owner as IrTypeParameter
@@ -400,7 +468,8 @@ class StabilityInferencer(
             type.isNullable() -> stabilityOf(
                 type.makeNotNull(),
                 substitutions,
-                currentlyAnalyzing
+                currentlyAnalyzing,
+                fileContainingDependent
             )
 
             type.isInlineClassType() -> {
@@ -413,7 +482,8 @@ class StabilityInferencer(
                     stabilityOf(
                         type = getInlineClassUnderlyingType(inlineClassDeclaration),
                         substitutions = substitutions,
-                        currentlyAnalyzing = currentlyAnalyzing
+                        currentlyAnalyzing = currentlyAnalyzing,
+                        fileContainingDependent
                     )
                 }
             }
@@ -422,7 +492,8 @@ class StabilityInferencer(
                 stabilityOf(
                     type.classifier,
                     substitutions + type.substitutionMap(),
-                    currentlyAnalyzing
+                    currentlyAnalyzing,
+                    fileContainingDependent
                 )
             }
 
@@ -439,7 +510,17 @@ class StabilityInferencer(
         }.toMap()
     }
 
-    private fun stabilityOf(expr: IrCall, baseStability: Stability): Stability {
+    /**
+     * Returns the stability of [expr].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
+    private fun stabilityOf(
+        expr: IrCall,
+        baseStability: Stability,
+        fileContainingDependent: IrFile?,
+    ): Stability {
         val function = expr.symbol.owner
         val fqName = function.kotlinFqName
 
@@ -451,7 +532,7 @@ class StabilityInferencer(
                     if (mask and (0b1 shl index) != 0) {
                         val sub = expr.typeArguments[index]
                         if (sub != null)
-                            stabilityOf(sub)
+                            stabilityOf(sub, fileContainingDependent)
                         else
                             Stability.Unstable
                     } else null
@@ -460,17 +541,23 @@ class StabilityInferencer(
         }
     }
 
-    fun stabilityOf(expr: IrExpression): Stability {
+    /**
+     * Returns the stability of [expr].
+     *
+     * @param fileContainingDependent The file containing the element that depends on the returned
+     * result.
+     */
+    fun stabilityOf(expr: IrExpression, fileContainingDependent: IrFile?): Stability {
         // look at type first. if type is stable, whole expression is
-        val stability = stabilityOf(expr.type)
+        val stability = stabilityOf(expr.type, fileContainingDependent)
         if (stability.knownStable()) return stability
         return when (expr) {
             is IrConst -> Stability.Stable
-            is IrCall -> stabilityOf(expr, stability)
+            is IrCall -> stabilityOf(expr, stability, fileContainingDependent)
             is IrGetValue -> {
                 val owner = expr.symbol.owner
                 if (owner is IrVariable && !owner.isVar) {
-                    owner.initializer?.let { stabilityOf(it) } ?: stability
+                    owner.initializer?.let { stabilityOf(it, fileContainingDependent) } ?: stability
                 } else {
                     stability
                 }
@@ -479,7 +566,7 @@ class StabilityInferencer(
             is IrLocalDelegatedPropertyReference -> Stability.Stable
             // some default parameters and consts can be wrapped in composite
             is IrComposite -> {
-                if (expr.statements.all { it is IrExpression && stabilityOf(it).knownStable() }) {
+                if (expr.statements.all { it is IrExpression && stabilityOf(it, fileContainingDependent).knownStable() }) {
                     Stability.Stable
                 } else {
                     stability

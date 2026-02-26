@@ -26,7 +26,12 @@ fun B(values: Array<out Foo>, %composer: Composer?, %changed: Int) {
   val <iterator> = values.iterator()
   while (<iterator>.hasNext()) {
     val value = <iterator>.next()
-    %dirty = %dirty or if (%composer.changedInstance(value)) 0b0100 else 0
+    %dirty = %dirty or if (if (%changed and 0b1000 == 0) {
+      %composer.changed(value)
+    } else {
+      %composer.changedInstance(value)
+    }
+    ) 0b0100 else 0
   }
   %composer.endMovableGroup()
   if (%dirty and 0b1110 == 0) {

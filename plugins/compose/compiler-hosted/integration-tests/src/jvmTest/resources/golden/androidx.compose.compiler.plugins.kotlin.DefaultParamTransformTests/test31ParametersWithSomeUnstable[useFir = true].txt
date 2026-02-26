@@ -138,7 +138,12 @@ fun Example(a00: Int, a01: Int, a02: Int, a03: Int, a04: Int, a05: Int, a06: Int
     %dirty = %dirty or if (%composer.changed(a08)) 0b0100000000000000000000000000 else 0b0010000000000000000000000000
   }
   if (%changed and 0b00110000000000000000000000000000 == 0) {
-    %dirty = %dirty or if (%default and 0b001000000000 == 0 && %composer.changed(a09)) 0b00100000000000000000000000000000 else 0b00010000000000000000000000000000
+    %dirty = %dirty or if (%default and 0b001000000000 == 0 && if (%changed and 0b01000000000000000000000000000000 == 0) {
+      %composer.changed(a09)
+    } else {
+      %composer.changedInstance(a09)
+    }
+    ) 0b00100000000000000000000000000000 else 0b00010000000000000000000000000000
   }
   if (%default and 0b010000000000 != 0) {
     %dirty1 = %dirty1 or 0b0110
@@ -246,7 +251,12 @@ fun Example(a00: Int, a01: Int, a02: Int, a03: Int, a04: Int, a05: Int, a06: Int
     %dirty3 = %dirty3 or if (%composer.changed(a30)) 0b0100 else 0b0010
   }
   if (%changed3 and 0b00110000 == 0) {
-    %dirty3 = %dirty3 or if (%default1 and 0b0001 == 0 && %composer.changed(a31)) 0b00100000 else 0b00010000
+    %dirty3 = %dirty3 or if (%default1 and 0b0001 == 0 && if (%changed3 and 0b01000000 == 0) {
+      %composer.changed(a31)
+    } else {
+      %composer.changedInstance(a31)
+    }
+    ) 0b00100000 else 0b00010000
   }
   if (%composer.shouldExecute(%dirty and 0b00010010010010010010010010010011 != 0b00010010010010010010010010010010 || %dirty1 and 0b00010010010010010010010010010011 != 0b00010010010010010010010010010010 || %dirty2 and 0b00010010010010010010010010010011 != 0b00010010010010010010010010010010 || %dirty3 and 0b00010011 != 0b00010010, %dirty and 0b0001)) {
     %composer.startDefaults()

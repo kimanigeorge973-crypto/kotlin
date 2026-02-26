@@ -33,7 +33,12 @@ fun Test(a: Int, b: Boolean, c: Int, d: Foo?, e: List<Int>?, %composer: Composer
     %dirty = %dirty or if (%composer.changed(c)) 0b000100000000 else 0b10000000
   }
   if (%changed and 0b110000000000 == 0) {
-    %dirty = %dirty or if (%default and 0b1000 == 0 && %composer.changed(d)) 0b100000000000 else 0b010000000000
+    %dirty = %dirty or if (%default and 0b1000 == 0 && if (%changed and 0b0001000000000000 == 0) {
+      %composer.changed(d)
+    } else {
+      %composer.changedInstance(d)
+    }
+    ) 0b100000000000 else 0b010000000000
   }
   if (%default and 0b00010000 != 0) {
     %dirty = %dirty or 0b0110000000000000

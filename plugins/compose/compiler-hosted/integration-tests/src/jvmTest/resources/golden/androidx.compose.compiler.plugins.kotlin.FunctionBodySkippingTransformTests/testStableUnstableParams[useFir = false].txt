@@ -35,7 +35,12 @@ fun CanSkip(a: Int, b: Foo?, %composer: Composer?, %changed: Int, %default: Int)
     %dirty = %dirty or if (%composer.changed(a)) 0b0100 else 0b0010
   }
   if (%changed and 0b00110000 == 0) {
-    %dirty = %dirty or if (%default and 0b0010 == 0 && %composer.changedInstance(b)) 0b00100000 else 0b00010000
+    %dirty = %dirty or if (%default and 0b0010 == 0 && if (%changed and 0b01000000 == 0) {
+      %composer.changed(b)
+    } else {
+      %composer.changedInstance(b)
+    }
+    ) 0b00100000 else 0b00010000
   }
   if (%composer.shouldExecute(%dirty and 0b00010011 != 0b00010010, %dirty and 0b0001)) {
     %composer.startDefaults()
@@ -78,7 +83,12 @@ fun CannotSkip(a: Int, b: Foo, %composer: Composer?, %changed: Int) {
     %dirty = %dirty or if (%composer.changed(a)) 0b0100 else 0b0010
   }
   if (%changed and 0b00110000 == 0) {
-    %dirty = %dirty or if (%composer.changedInstance(b)) 0b00100000 else 0b00010000
+    %dirty = %dirty or if (if (%changed and 0b01000000 == 0) {
+      %composer.changed(b)
+    } else {
+      %composer.changedInstance(b)
+    }
+    ) 0b00100000 else 0b00010000
   }
   if (%composer.shouldExecute(%dirty and 0b00010011 != 0b00010010, %dirty and 0b0001)) {
     if (isTraceInProgress()) {

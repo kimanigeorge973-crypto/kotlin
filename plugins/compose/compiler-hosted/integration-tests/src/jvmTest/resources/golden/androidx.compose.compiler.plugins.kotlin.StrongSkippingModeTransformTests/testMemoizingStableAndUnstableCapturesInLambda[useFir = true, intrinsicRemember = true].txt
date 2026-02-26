@@ -31,7 +31,7 @@ fun Test(%composer: Composer?, %changed: Int) {
     val foo = Foo(0)
     val bar = Bar(1)
     val lambda = <block>{
-      %composer.cache(%composer.changedInstance(foo) or %composer.changed(bar)) {
+      %composer.cache(%composer.changedInstance(foo) or %composer.changedInstance(bar)) {
         {
           foo
           bar

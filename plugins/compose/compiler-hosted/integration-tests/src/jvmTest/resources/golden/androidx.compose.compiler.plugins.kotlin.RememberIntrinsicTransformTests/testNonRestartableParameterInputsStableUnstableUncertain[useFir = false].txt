@@ -54,7 +54,7 @@ fun test2(x: KnownUnstable, %composer: Composer?, %changed: Int) {
     traceEventStart(<>, %changed, -1, <>)
   }
   sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
-  val tmp0_group = %composer.cache(%composer.changed(x)) {
+  val tmp0_group = %composer.cache(%changed and 0b1110 xor 0b0110 > 4 && %composer.changed(x) || %changed and 0b0110 == 0b0100) {
     1
   }
   sourceInformationMarkerEnd(%composer)
