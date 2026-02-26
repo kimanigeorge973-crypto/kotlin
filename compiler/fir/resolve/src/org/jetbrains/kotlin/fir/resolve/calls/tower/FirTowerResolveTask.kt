@@ -225,11 +225,14 @@ internal open class FirTowerResolveTask(
         info: CallInfo,
         resolvedQualifier: FirResolvedQualifier,
         parentGroup: TowerGroup,
+        emptyScopes: MutableSet<FirScope>? = null,
     ) {
         val explicitReceiverValue = ExpressionReceiverValue(resolvedQualifier)
         for ((depth, lexical) in towerDataElementsForName.nonLocalTowerDataElements.withIndex()) {
             val scope = lexical.scope
-            if (!lexical.isLocal && scope != null) {
+            // We check emptyScopes as an optimization, but we don't add to it
+            // because we only partially process the given scope through a FirCompanionExtensionScope.
+            if (!lexical.isLocal && scope != null && emptyScopes?.contains(scope) != true) {
                 processScopeForExplicitReceiver(
                     FirCompanionExtensionScope(scope),
                     explicitReceiverValue,
@@ -319,20 +322,29 @@ internal open class FirTowerResolveTask(
         val implicitReceiverValuesWithEmptyScopes = mutableSetOf<ImplicitReceiverValue<*>>()
 
         enumerateTowerLevels(
-            onScope = l@{ scope, staticScopeOwnerSymbol, group ->
+            onScope = { scope, staticScopeOwnerSymbol, group ->
                 // NB: this check does not work for variables
                 // because we do not search for objects if we have extension receiver
-                if (info.callKind != CallKind.VariableAccess && scope in emptyScopes) return@l
+                if (info.callKind == CallKind.VariableAccess || scope !in emptyScopes) {
+                    processLevel(
+                        scope.toScopeBasedTowerLevelForStaticWithImplicitDispatchReceiver(
+                            staticScopeOwnerSymbol, source = info.callSite.source
+                        ),
+                        info, group,
+                        onEmptyLevel = {
+                            emptyScopes += scope
+                        }
+                    )
+                }
 
-                processLevel(
-                    scope.toScopeBasedTowerLevelForStaticWithImplicitDispatchReceiver(
-                        staticScopeOwnerSymbol, source = info.callSite.source
-                    ),
-                    info, group,
-                    onEmptyLevel = {
-                        emptyScopes += scope
-                    }
-                )
+                if (staticScopeOwnerSymbol != null) {
+                    val receiver = staticScopeOwnerSymbol.toImplicitResolvedQualifierReceiver(
+                        components,
+                        info.callSite.source?.fakeElement(KtFakeSourceElementKind.ImplicitReceiver)
+                    )
+
+                    enumerateTowerLevelsForCompanionExtensions(info, receiver, group, emptyScopes)
+                }
             },
             onImplicitReceiver = { receiver, group ->
                 processCandidatesWithGivenImplicitReceiverAsValue(
