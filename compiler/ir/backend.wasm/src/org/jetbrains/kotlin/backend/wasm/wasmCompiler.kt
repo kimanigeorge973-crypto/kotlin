@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.backend.wasm
 
 import org.jetbrains.kotlin.backend.common.IrModuleInfo
 import org.jetbrains.kotlin.backend.common.linkage.issues.checkNoUnboundSymbols
+import org.jetbrains.kotlin.backend.common.serialization.IrModuleDependencyTrackerImpl
+import org.jetbrains.kotlin.backend.common.serialization.kotlinLibrary
 import org.jetbrains.kotlin.backend.wasm.export.ExportModelGenerator
 import org.jetbrains.kotlin.backend.wasm.ic.overrideBuiltInsSignatures
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.*
@@ -31,6 +33,7 @@ import org.jetbrains.kotlin.js.config.ModuleKind
 import org.jetbrains.kotlin.js.config.generateDts
 import org.jetbrains.kotlin.js.config.sourceMap
 import org.jetbrains.kotlin.js.config.useDebuggerCustomFormatters
+import org.jetbrains.kotlin.library.isWasmStdlib
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.platform.wasm.WasmTarget
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
@@ -77,7 +80,8 @@ class DebugInformation(
 data class LoweredIrWithExtraArtifacts(
     val loweredIr: List<IrModuleFragment>,
     val backendContext: WasmBackendContext,
-    val typeScriptFragment: TypeScriptFragment?
+    val typeScriptFragment: TypeScriptFragment?,
+    val moduleDependencies: (IrModuleFragment) -> Set<IrModuleFragment>,
 )
 
 fun compileToLoweredIr(
@@ -133,7 +137,18 @@ fun compileToLoweredIr(
 
     overrideBuiltInsSignatures(context)
 
-    return LoweredIrWithExtraArtifacts(allModules, context, typeScriptFragment)
+    val dependencyTracker = irLinker.moduleDependencyTracker as IrModuleDependencyTrackerImpl
+    val stdlibFragment = allModules.first { it.kotlinLibrary?.isWasmStdlib == true }
+    allModules.forEach { module ->
+        dependencyTracker.trackDependency(module, stdlibFragment)
+    }
+
+    return LoweredIrWithExtraArtifacts(
+        loweredIr = allModules,
+        backendContext = context,
+        typeScriptFragment = typeScriptFragment,
+        moduleDependencies = dependencyTracker::getAllDependencies
+    )
 }
 
 fun lowerPreservingTags(

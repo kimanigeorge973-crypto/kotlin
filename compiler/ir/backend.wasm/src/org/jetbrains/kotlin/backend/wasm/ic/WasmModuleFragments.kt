@@ -22,6 +22,7 @@ class WasmIrProgramFragmentsMultimodule(
     val dependencyDeclarations: WasmCompiledDeclarationsFileFragment,
     val referencedTypes: ModuleReferencedTypes,
     val referencedDeclarations: ModuleReferencedDeclarations,
+    val referencedModules: MutableSet<String>,
     val codeDeclarations: WasmCompiledDeclarationsFileFragment,
     val linkerData: WasmCompiledLinkerDataFileFragment,
 ) : IrICProgramFragments() {
@@ -31,6 +32,7 @@ class WasmIrProgramFragmentsMultimodule(
             serializeCompiledDeclarations(dependencyDeclarations)
             serialize(referencedTypes)
             serialize(referencedDeclarations)
+            serializeReferencedModules(referencedModules)
             serializeCompiledDeclarations(codeDeclarations)
             serializeCompiledLinkerData(linkerData)
         }

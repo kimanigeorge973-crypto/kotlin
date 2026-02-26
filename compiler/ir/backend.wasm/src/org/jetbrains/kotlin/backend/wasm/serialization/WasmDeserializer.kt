@@ -649,6 +649,9 @@ class WasmDeserializer(inputStream: InputStream, private val skipLocalNames: Boo
         definedRttiSuperType = deserializeRttiSupertype(),
     )
 
+    fun deserializeReferencedModules(): MutableSet<String> =
+        deserializeSet(::deserializeString)
+
     fun deserializeCompiledLinkerDataFragment() = WasmCompiledLinkerDataFileFragment(
         globalLiterals = deserializeGlobalLiterals(),
         globalLiteralsId = deserializeStringLiteralId(),

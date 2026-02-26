@@ -202,7 +202,11 @@ private fun compileSingleModuleToWasmIr(
     fun referenceFunction(functionSymbol: IrFunctionSymbol) {
         val signature = signatureRetriever.declarationSignature(functionSymbol.owner)!!
         referencedDeclarations.functions.add(signature)
-        referencedTypes?.addFunctionTypeToReferenced(functionSymbol, signatureRetriever)
+        referencedTypes?.addFunctionTypeToReferenced(
+            irClass = functionSymbol,
+            referencedModules = null,
+            idSignatureRetriever = signatureRetriever
+        )
     }
 
     val compiledModuleFragments = mutableListOf<WasmCompiledFileFragment>()
@@ -229,7 +233,7 @@ private fun compileSingleModuleToWasmIr(
     }
 
     val dependencyResolutionMap = parseDependencyResolutionMap(configuration)
-    val dependencyModules = loweredIr.loweredIr.filterNot { it == mainModuleFragment }
+    val dependencyModules = loweredIr.moduleDependencies(mainModuleFragment)
     dependencyModules.mapTo(compiledModuleFragments) { irFragment ->
         val dependencyFragment =
             codeGenerator.generateDependencyAsSingleFileFragment(irFragment)

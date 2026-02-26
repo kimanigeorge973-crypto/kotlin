@@ -98,7 +98,7 @@ private fun WasmModuleArtifactMultimodule.loadRecompileAndDependency(
     return loadedFragments to loadedDependencyFragments
 }
 
-private fun compileArtifact(
+private fun compileArtifactMultimodule(
     artifact: WasmModuleArtifactMultimodule,
     dependencyFragments: Map<WasmModuleArtifactMultimodule, List<WasmCompiledDependencyFileFragment>>,
     loadedFragments: List<WasmIrProgramFragmentsMultimodule>,
@@ -121,8 +121,11 @@ private fun compileArtifact(
 
     val currentModuleImports = mutableSetOf<WasmModuleDependencyImport>()
 
+    val referencedModules = loadedFragments.flatMapTo(mutableSetOf()) { it.referencedModules }
+    referencedModules.add(stdlibModuleName)
     for ((dependencyArtifact, dependencyFragments) in dependencyFragments) {
         if (dependencyArtifact == artifact) continue
+        if (dependencyArtifact.moduleName !in referencedModules) continue
 
         var hasImportsFromDependency = false
         dependencyFragments.forEach { fragment ->
@@ -197,13 +200,6 @@ fun compileIncrementallyMultimodule(
 
     val builtInStdlibFragments = mutableListOf<WasmIrProgramFragmentsMultimodule>()
     val dependencyFragments = mutableMapOf<WasmModuleArtifactMultimodule, List<WasmCompiledDependencyFileFragment>>()
-    for (dependency in toDependency) {
-        dependencyFragments[dependency] = dependency.loadDependency(
-            builtInStdlibFragments = builtInStdlibFragments,
-            isStdlibArtifact = dependency == stdLibArtifact
-        )
-    }
-
     val recompileFragments = mutableMapOf<WasmModuleArtifactMultimodule, List<WasmIrProgramFragmentsMultimodule>>()
     for (recompile in toRecompile) {
         val (loadedToRecompile, loadedDependency) = recompile.loadRecompileAndDependency(
@@ -212,6 +208,19 @@ fun compileIncrementallyMultimodule(
         )
         recompileFragments[recompile] = loadedToRecompile
         dependencyFragments[recompile] = loadedDependency
+    }
+
+    val allReferencedModules = mutableSetOf<String>()
+    allReferencedModules.add(stdLibArtifact.moduleName)
+    recompileFragments.values.forEach { fragments ->
+        fragments.flatMapTo(allReferencedModules) { it.referencedModules }
+    }
+    for (dependency in toDependency) {
+        if (dependency.moduleName !in allReferencedModules) continue
+        dependencyFragments[dependency] = dependency.loadDependency(
+            builtInStdlibFragments = builtInStdlibFragments,
+            isStdlibArtifact = dependency == stdLibArtifact
+        )
     }
 
     val dependencyResolutionMap = parseDependencyResolutionMap(configuration)
@@ -227,7 +236,7 @@ fun compileIncrementallyMultimodule(
                 configuration = configuration
             )
         } else {
-            compileArtifact(
+            compileArtifactMultimodule(
                 artifact = currentArtifact,
                 dependencyFragments = dependencyFragments,
                 loadedFragments = currentModuleCodeArtifact,

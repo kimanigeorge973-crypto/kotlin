@@ -49,6 +49,7 @@ class WasmSrcFileArtifactMultimodule(
                         dependencyDeclarations = deserializeCompiledDeclarationsFragment(),
                         referencedTypes = deserializeModuleReferencedTypes(),
                         referencedDeclarations = deserializeModuleReferencedDeclarations(),
+                        referencedModules = deserializeReferencedModules(),
                         codeDeclarations = deserializeCompiledDeclarationsFragment(),
                         linkerData = deserializeCompiledLinkerDataFragment(),
                     )

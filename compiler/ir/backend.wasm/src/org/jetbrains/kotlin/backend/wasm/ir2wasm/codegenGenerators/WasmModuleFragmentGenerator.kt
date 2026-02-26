@@ -88,6 +88,7 @@ class WasmModuleFragmentGenerator(
             WasmTrackedTypeCodegenContext(
                 wasmFileFragment = definedTypes,
                 moduleReferencedTypes = trackedTypes,
+                referencedModules = null,
                 idSignatureRetriever = idSignatureRetriever
             )
         }
@@ -102,6 +103,7 @@ class WasmModuleFragmentGenerator(
             WasmDeclarationCodegenContextWithTrackedReferences(
                 moduleReferencedDeclarations = trackedReferences,
                 moduleReferencedTypes = trackedTypes,
+                referencedModules = null,
                 wasmFileFragment = definedDeclarations,
                 idSignatureRetriever = idSignatureRetriever
             )

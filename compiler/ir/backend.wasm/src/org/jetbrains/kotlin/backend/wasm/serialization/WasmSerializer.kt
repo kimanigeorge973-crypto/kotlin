@@ -80,6 +80,10 @@ class WasmSerializer(outputStream: OutputStream) {
         serializeSet(declarations.rttiGlobal, ::serializeIdSignature)
     }
 
+    fun serializeReferencedModules(set: MutableSet<String>) {
+        serializeSet(set, ::serializeString)
+    }
+
     fun serializeCompiledTypes(definedTypes: WasmCompiledTypesFileFragment) = with(definedTypes) {
         serializeDefinedTypeDeclarations(definedGcTypes)
         serializeDefinedStructDeclarations(definedVTableGcTypes)

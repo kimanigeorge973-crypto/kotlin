@@ -92,10 +92,13 @@ open class WasmCompilerWithICMultimodule(
             definedTypes = codeFileFragment.definedTypes,
         )
 
+        val referencedModules = mutableSetOf<String>()
+
         val moduleReferencedTypes = ModuleReferencedTypes()
         val typeContext = WasmTrackedTypeCodegenContext(
             wasmFileFragment = codeFileFragment.definedTypes,
             moduleReferencedTypes = moduleReferencedTypes,
+            referencedModules = referencedModules,
             idSignatureRetriever = idSignatureRetriever
         )
 
@@ -103,6 +106,7 @@ open class WasmCompilerWithICMultimodule(
         val declarationContext = WasmDeclarationCodegenContextWithTrackedReferences(
             moduleReferencedDeclarations = moduleReferencedDeclarations,
             moduleReferencedTypes = moduleReferencedTypes,
+            referencedModules = referencedModules,
             wasmFileFragment = codeFileFragment.definedDeclarations,
             idSignatureRetriever = idSignatureRetriever,
         )
@@ -143,6 +147,7 @@ open class WasmCompilerWithICMultimodule(
             dependencyDeclarations = dependencyFileFragment.definedDeclarations,
             referencedTypes = moduleReferencedTypes,
             referencedDeclarations = moduleReferencedDeclarations,
+            referencedModules = referencedModules,
             codeDeclarations = codeFileFragment.definedDeclarations,
             linkerData = codeFileFragment.linkerData,
         )
@@ -215,6 +220,7 @@ open class WasmCompilerWithICSingleModule(
         val declarationContext = WasmDeclarationCodegenContextWithTrackedReferences(
             moduleReferencedDeclarations = moduleReferencedDeclarations,
             moduleReferencedTypes = null,
+            referencedModules = null,
             wasmFileFragment = codeFileFragment.definedDeclarations,
             idSignatureRetriever = idSignatureRetriever,
         )
