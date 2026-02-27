@@ -156,7 +156,10 @@ open class GradleArgumentsProvider : ArgumentsProvider {
             }
         }
 
-        if (isTeamcityRunWithoutChanges) return setOf(maxGradleVersion)
+        if (System.getProperty("system.test.mode") == "smoke") {
+            println("Using only max gradle version for tests")
+            return setOf(maxGradleVersion)
+        }
         return setOf(minGradleVersion, *additionalGradleVersions.toTypedArray(), maxGradleVersion)
     }
 
@@ -436,19 +439,3 @@ class DisabledIfNoArgumentsProvided : ExecutionCondition {
         }
     }
 }
-
-private val isTCBuildWithChanges
-    get() : Boolean {
-        if (!isTeamCityRun) return false
-        val changedFilesPath = System.getenv("TEAMCITY_CHANGED_FILES_PATH") ?: return false
-        val changedFiles = Path(changedFilesPath)
-        val changesInSystem = changedFiles.readLines().filter { line ->
-            line.startsWith("libraries/tools/kotlin-gradle")
-        }
-
-        println("Changes in libraries/tools/kotlin-gradle: \n${changesInSystem.joinToString("\n")}")
-
-        return changesInSystem.isNotEmpty()
-    }
-
-private val isTeamcityRunWithoutChanges get() = isTeamCityRun && !isTCBuildWithChanges
