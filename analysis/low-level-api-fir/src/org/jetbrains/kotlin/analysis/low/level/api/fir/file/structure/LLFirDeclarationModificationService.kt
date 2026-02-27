@@ -246,6 +246,7 @@ class LLFirDeclarationModificationService(val project: Project) : Disposable {
     }
 
     private fun PsiElement.isWhitespaceOrComment(): Boolean = this is PsiWhiteSpace || this is PsiComment
+
     private fun KaElementModificationType.getRemovedElementIfAny(): PsiElement? = when (this) {
         is KaElementModificationType.ElementReplaced -> replacedElement
         is KaElementModificationType.ElementRemoved -> removedElement
