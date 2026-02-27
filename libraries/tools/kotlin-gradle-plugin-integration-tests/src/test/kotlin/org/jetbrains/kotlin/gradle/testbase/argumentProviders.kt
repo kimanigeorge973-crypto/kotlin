@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.gradle.testbase
 import org.gradle.api.JavaVersion
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.testbase.TestVersions.AgpCompatibilityMatrix
+import org.jetbrains.kotlin.gradle.util.isTeamCityRun
 import org.junit.jupiter.api.extension.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -19,6 +20,8 @@ import org.junit.platform.commons.util.AnnotationUtils
 import org.junit.platform.commons.util.ReflectionUtils
 import java.io.File
 import java.util.stream.Stream
+import kotlin.io.path.Path
+import kotlin.io.path.readLines
 import kotlin.streams.asStream
 
 
@@ -51,7 +54,7 @@ annotation class GradleTestVersions(
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class GradleTestExtraStringArguments(
-    vararg val values: String
+    vararg val values: String,
 )
 
 /**
@@ -432,3 +435,19 @@ class DisabledIfNoArgumentsProvided : ExecutionCondition {
         }
     }
 }
+
+private val isTCBuildWithChanges
+    get() : Boolean {
+        if (!isTeamCityRun) return false
+        val changedFilesPath = System.getenv("TEAMCITY_CHANGED_FILES_PATH") ?: return false
+        val changedFiles = Path(changedFilesPath)
+        val changesInSystem = changedFiles.readLines().filter { line ->
+            line.startsWith("libraries/tools/kotlin-gradle")
+        }
+
+        println("Changes in libraries/tools/kotlin-gradle: \n${changesInSystem.joinToString("\n")}")
+
+        return changesInSystem.isNotEmpty()
+    }
+
+private val isTeamcityRunWithoutChanges get() = isTeamCityRun && !isTCBuildWithChanges
