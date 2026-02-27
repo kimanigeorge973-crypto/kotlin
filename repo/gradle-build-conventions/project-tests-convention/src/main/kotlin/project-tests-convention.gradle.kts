@@ -52,12 +52,12 @@ tasks.withType<Test>().configureEach {
     }
     ignoreFailures = false
 
-    project.teamcityBuildChangedSystems?.let { changedSystems ->
-        if (project.system !in changedSystems) {
+    project.teamcityBuildChangedTestSystems?.let { changedSystems ->
+        if (project.testSystem !in changedSystems) {
             systemProperty("system.test.mode", "smoke")
             environment("SYSTEM_TEST_MODE", "smoke")
             doFirst {
-                logger.quiet("Running in 'smoke' test mode (changed systems: $changedSystems, this system: ${project.system})")
+                logger.quiet("Running in 'smoke' test mode (changed systems: $changedSystems, this system: ${project.testSystem})")
             }
         }
     }

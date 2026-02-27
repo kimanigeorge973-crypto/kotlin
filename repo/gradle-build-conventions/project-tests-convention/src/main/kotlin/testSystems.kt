@@ -9,32 +9,32 @@ import kotlin.io.path.readLines
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-enum class System {
+enum class TestSystem {
     KotlinGradlePlugin,
     Compiler,
     Other
 }
 
-internal val Project.system: System
+internal val Project.testSystem: TestSystem
     get() {
         return when {
-            this.path.contains("gradle") -> System.KotlinGradlePlugin
-            this.path.contains("compiler") -> System.Compiler
-            else -> System.Other
+            this.path.contains("gradle") -> TestSystem.KotlinGradlePlugin
+            this.path.contains("compiler") -> TestSystem.Compiler
+            else -> TestSystem.Other
         }
     }
 
 
 @get:Synchronized
-internal val Project.teamcityBuildChangedSystems: Set<System>?
+internal val Project.teamcityBuildChangedTestSystems: Set<TestSystem>?
     get() {
         val key = "teamcityBuildAffectedSystems"
         if (gradle.extraProperties.has(key)) {
             @Suppress("UNCHECKED_CAST")
-            return gradle.extraProperties[key] as Set<System>?
+            return gradle.extraProperties[key] as Set<TestSystem>?
         }
 
-        val affectedSystems = run {
+        val affectedTestSystems = run {
             if (!isCiBuild()) return@run null
             val changedFilesPath = java.lang.System.getenv("TEAMCITY_CHANGED_FILES_PATH")
             if (changedFilesPath == null) {
@@ -43,22 +43,22 @@ internal val Project.teamcityBuildChangedSystems: Set<System>?
             }
 
             val changedFiles = Path(changedFilesPath).readLines()
-            val changedSystems = System.entries.associateWith { false }.toMutableMap()
+            val changedSystems = TestSystem.entries.associateWith { false }.toMutableMap()
 
             changedFiles.forEach { changeEntry ->
                 if (changeEntry.startsWith("libraries/tools/kotlin-gradle")) {
-                    changedSystems[System.KotlinGradlePlugin] = true
+                    changedSystems[TestSystem.KotlinGradlePlugin] = true
                 } else if (changeEntry.startsWith("compiler/")) {
-                    changedSystems[System.Compiler] = true
+                    changedSystems[TestSystem.Compiler] = true
                 } else {
-                    changedSystems[System.Other] = true
+                    changedSystems[TestSystem.Other] = true
                 }
             }
 
             changedSystems.filterValues { it }.keys.toSet()
         }
 
-        logger.quiet("Changed Systems: $affectedSystems")
-        gradle.extraProperties[key] = affectedSystems
-        return affectedSystems
+        logger.quiet("Changed Systems: $affectedTestSystems")
+        gradle.extraProperties[key] = affectedTestSystems
+        return affectedTestSystems
     }
