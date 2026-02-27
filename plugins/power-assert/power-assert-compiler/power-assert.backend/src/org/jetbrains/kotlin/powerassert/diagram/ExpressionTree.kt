@@ -80,6 +80,13 @@ class HiddenNode(
     override fun toString() = "HiddenNode(${expression.dumpKotlinLike()})"
 }
 
+class SyntheticNode(
+    val expression: IrExpression,
+) : Node() {
+    override fun isVisible(): Boolean = false
+    override fun toString() = "SyntheticNode(${expression.dumpKotlinLike()})"
+}
+
 class ExpressionNode(
     val expression: IrExpression,
 ) : Node() {
@@ -209,10 +216,10 @@ fun <T> buildTree(
 
                         // Make sure each branch results in 2 child nodes: condition and result.
                         val whenNode = WhenNode(conditional, null).also { elvisNode.addChild(it) }
-                        whenNode.addChild(ConstantNode(nullBranch.condition)) // Constant node for the synthetic nullable condition.
+                        whenNode.addChild(SyntheticNode(nullBranch.condition)) // Synthetic node for the nullable condition.
                         nullBranch.result.accept(this, whenNode)
-                        whenNode.addChild(ConstantNode(notNullBranch.condition)) // Constant node for the synthetic non-null condition.
-                        whenNode.addChild(ConstantNode(notNullBranch.result)) // Constant node for the synthetic non-null result.
+                        whenNode.addChild(SyntheticNode(notNullBranch.condition)) // Synthetic node for the non-null condition.
+                        whenNode.addChild(SyntheticNode(notNullBranch.result)) // Synthetic node for the non-null result.
 
                         // Make sure elvis resulted in 4 child nodes.
                         check(whenNode.children.size == 4) {

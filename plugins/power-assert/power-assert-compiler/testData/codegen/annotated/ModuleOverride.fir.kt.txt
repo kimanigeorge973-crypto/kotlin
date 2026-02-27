@@ -107,8 +107,10 @@ fun callTypeB(): String {
     val tmp_1: String? = { // BLOCK
       val tmp0_Explain: TypeB = type
       { // BLOCK
-        val tmp1_Explain: Boolean = EQEQ(arg0 = 1, arg1 = 2)
-        tmp0_Explain.describe$powerassert(value = tmp1_Explain, $explanation = CallExplanation(offset = 392, source = "           type.describe(1 == 2)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 15, kind = Kind.DISPATCH, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 11, endOffset = 15, displayOffset = 11, value = tmp0_Explain)])), Argument(startOffset = 25, endOffset = 31, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [EqualityExpression(startOffset = 25, endOffset = 31, displayOffset = 27, value = tmp1_Explain, lhs = 1, rhs = 2)]))])))
+        val tmp1_Explain: Int = 1
+        val tmp2_Explain: Int = 2
+        val tmp3_Explain: Boolean = EQEQ(arg0 = tmp1_Explain, arg1 = tmp2_Explain)
+        tmp0_Explain.describe$powerassert(value = tmp3_Explain, $explanation = CallExplanation(offset = 392, source = "           type.describe(1 == 2)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 15, kind = Kind.DISPATCH, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 11, endOffset = 15, displayOffset = 11, value = tmp0_Explain)])), Argument(startOffset = 25, endOffset = 31, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ConstantExpression(startOffset = 25, endOffset = 26, displayOffset = 25, value = tmp1_Explain), ConstantExpression(startOffset = 30, endOffset = 31, displayOffset = 30, value = tmp2_Explain), EqualityExpression(startOffset = 25, endOffset = 31, displayOffset = 27, value = tmp3_Explain, lhs = tmp1_Explain, rhs = tmp2_Explain)]))])))
       }
     }
     when {
@@ -124,8 +126,10 @@ fun callTypeC(): String {
     val tmp_2: String? = { // BLOCK
       val tmp0_Explain: TypeC = type
       { // BLOCK
-        val tmp1_Explain: Boolean = EQEQ(arg0 = 1, arg1 = 2)
-        tmp0_Explain.describe$powerassert(value = tmp1_Explain, $explanation = CallExplanation(offset = 502, source = "           type.describe(1 == 2)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 15, kind = Kind.DISPATCH, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 11, endOffset = 15, displayOffset = 11, value = tmp0_Explain)])), Argument(startOffset = 25, endOffset = 31, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [EqualityExpression(startOffset = 25, endOffset = 31, displayOffset = 27, value = tmp1_Explain, lhs = 1, rhs = 2)]))])))
+        val tmp1_Explain: Int = 1
+        val tmp2_Explain: Int = 2
+        val tmp3_Explain: Boolean = EQEQ(arg0 = tmp1_Explain, arg1 = tmp2_Explain)
+        tmp0_Explain.describe$powerassert(value = tmp3_Explain, $explanation = CallExplanation(offset = 502, source = "           type.describe(1 == 2)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 15, kind = Kind.DISPATCH, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 11, endOffset = 15, displayOffset = 11, value = tmp0_Explain)])), Argument(startOffset = 25, endOffset = 31, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ConstantExpression(startOffset = 25, endOffset = 26, displayOffset = 25, value = tmp1_Explain), ConstantExpression(startOffset = 30, endOffset = 31, displayOffset = 30, value = tmp2_Explain), EqualityExpression(startOffset = 25, endOffset = 31, displayOffset = 27, value = tmp3_Explain, lhs = tmp1_Explain, rhs = tmp2_Explain)]))])))
       }
     }
     when {
@@ -141,8 +145,10 @@ fun callTypeD(): String {
     val tmp_3: String? = { // BLOCK
       val tmp0_Explain: TypeD = type
       { // BLOCK
-        val tmp1_Explain: Boolean = EQEQ(arg0 = 1, arg1 = 2)
-        tmp0_Explain.describe$powerassert(value = tmp1_Explain, $explanation = CallExplanation(offset = 612, source = "           type.describe(1 == 2)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 15, kind = Kind.DISPATCH, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 11, endOffset = 15, displayOffset = 11, value = tmp0_Explain)])), Argument(startOffset = 25, endOffset = 31, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [EqualityExpression(startOffset = 25, endOffset = 31, displayOffset = 27, value = tmp1_Explain, lhs = 1, rhs = 2)]))])))
+        val tmp1_Explain: Int = 1
+        val tmp2_Explain: Int = 2
+        val tmp3_Explain: Boolean = EQEQ(arg0 = tmp1_Explain, arg1 = tmp2_Explain)
+        tmp0_Explain.describe$powerassert(value = tmp3_Explain, $explanation = CallExplanation(offset = 612, source = "           type.describe(1 == 2)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 15, kind = Kind.DISPATCH, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 11, endOffset = 15, displayOffset = 11, value = tmp0_Explain)])), Argument(startOffset = 25, endOffset = 31, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ConstantExpression(startOffset = 25, endOffset = 26, displayOffset = 25, value = tmp1_Explain), ConstantExpression(startOffset = 30, endOffset = 31, displayOffset = 30, value = tmp2_Explain), EqualityExpression(startOffset = 25, endOffset = 31, displayOffset = 27, value = tmp3_Explain, lhs = tmp1_Explain, rhs = tmp2_Explain)]))])))
       }
     }
     when {

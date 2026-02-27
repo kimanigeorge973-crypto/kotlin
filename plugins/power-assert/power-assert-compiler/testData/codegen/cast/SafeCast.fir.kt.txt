@@ -14,9 +14,10 @@ fun test1(a: Any): String {
           else -> tmp_0 /*as String */.<get-length>()
         }
       }
-      val tmp3_Explain: Boolean = EQEQ(arg0 = tmp2_Explain, arg1 = 5)
-      assert(value = tmp3_Explain, lazyMessage = local fun <anonymous>(): String {
-        return "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 216, source = "    assert((a as? String)?.length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 38, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 12, endOffset = 13, displayOffset = 12, value = tmp0_Explain), ValueExpression(startOffset = 12, endOffset = 24, displayOffset = 14, value = tmp1_Explain), ValueExpression(startOffset = 12, endOffset = 33, displayOffset = 27, value = tmp2_Explain), EqualityExpression(startOffset = 11, endOffset = 38, displayOffset = 34, value = tmp3_Explain, lhs = tmp2_Explain, rhs = 5)]))])) */)
+      val tmp3_Explain: Int = 5
+      val tmp4_Explain: Boolean = EQEQ(arg0 = tmp2_Explain, arg1 = tmp3_Explain)
+      assert(value = tmp4_Explain, lazyMessage = local fun <anonymous>(): String {
+        return "\n" + toDefaultMessage(/* <this> = CallExplanation(offset = 216, source = "    assert((a as? String)?.length == 5)", arguments = listOf</* null */>(elements = [Argument(startOffset = 11, endOffset = 38, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 12, endOffset = 13, displayOffset = 12, value = tmp0_Explain), ValueExpression(startOffset = 12, endOffset = 24, displayOffset = 14, value = tmp1_Explain), ValueExpression(startOffset = 12, endOffset = 33, displayOffset = 27, value = tmp2_Explain), ConstantExpression(startOffset = 37, endOffset = 38, displayOffset = 37, value = tmp3_Explain), EqualityExpression(startOffset = 11, endOffset = 38, displayOffset = 34, value = tmp4_Explain, lhs = tmp2_Explain, rhs = tmp3_Explain)]))])) */)
       }
 )
     }

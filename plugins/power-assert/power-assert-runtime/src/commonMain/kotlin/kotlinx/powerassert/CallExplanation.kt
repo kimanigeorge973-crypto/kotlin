@@ -5,6 +5,8 @@
 
 package kotlinx.powerassert
 
+// TODO ArgumentsExplanation?
+@ExperimentalPowerAssert
 public class CallExplanation(
     override val offset: Int,
     override val source: String,

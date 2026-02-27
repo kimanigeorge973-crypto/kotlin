@@ -62,12 +62,12 @@ class PowerAssertCallTransformer(
 
         val function = expression.symbol.owner
         return when {
-            // Call has no parameters to transform.
-            function.parameters.isEmpty() -> expression
             // Never transform calls to super instance. TODO is there a better check for this?
             expression.symbol in (currentFunction?.irElement as? IrSimpleFunction)?.overriddenSymbols.orEmpty() -> expression
             // Called function is annotated with @PowerAssert so should be transformed with CallExplanation.
             function.hasAnnotationOrOverridden(PowerAssertBuiltIns.powerAssertClassId) -> buildForAnnotated(expression, function)
+            // Call has no parameters to transform.
+            function.parameters.isEmpty() -> expression
             // Called function is part of configuration so should be transformed with raw string diagram.
             function.kotlinFqName in configuration.functions -> buildForOverride(expression, function)
             // Not a transformable function call.
@@ -98,7 +98,8 @@ class PowerAssertCallTransformer(
 
         val diagramBuilder = CallExplanationParameterBuilder(explanationFactory, sourceFile, originalCall)
         val callBuilder = SimpleCallBuilder(synthetic, originalCall)
-        return buildPowerAssertCall(originalCall, function, callBuilder, diagramBuilder)
+        val roots = buildArgumentTrees(callBuilder, function, originalCall)
+        return buildPowerAssertCall(originalCall, callBuilder, diagramBuilder, roots)
     }
 
     private fun buildForOverride(originalCall: IrCall, function: IrSimpleFunction): IrExpression {
@@ -137,21 +138,7 @@ class PowerAssertCallTransformer(
         } else {
             StringParameterBuilder(sourceFile, originalCall, function, messageArgument)
         }
-        return buildPowerAssertCall(originalCall, function, callBuilder, parameterBuilder)
-    }
-
-    private fun buildPowerAssertCall(
-        originalCall: IrCall,
-        function: IrSimpleFunction,
-        callBuilder: CallBuilder,
-        parameterBuilder: ParameterBuilder,
-    ): IrExpression {
-        val argumentsSize = when (callBuilder.function.parameters.size) {
-            function.parameters.size -> originalCall.arguments.size - 1
-            else -> originalCall.arguments.size
-        }
-        val roots = (0..<argumentsSize)
-            .map { buildTree(function.parameters[it], originalCall.arguments[it]) }
+        val roots = buildArgumentTrees(callBuilder, function, originalCall)
 
         // If all roots are null or non-visible, there are no transformable parameters
         if (roots.all { it.child == null }) {
@@ -159,6 +146,16 @@ class PowerAssertCallTransformer(
             return super.visitCall(originalCall)
         }
 
+        val call = buildPowerAssertCall(originalCall, callBuilder, parameterBuilder, roots)
+        return call
+    }
+
+    private fun buildPowerAssertCall(
+        originalCall: IrCall,
+        callBuilder: CallBuilder,
+        parameterBuilder: ParameterBuilder,
+        roots: List<RootNode<IrValueParameter>>
+    ): IrExpression {
         val symbol = currentScope!!.scope.scopeOwnerSymbol
         val builder = DeclarationIrBuilder(context, symbol, originalCall.startOffset, originalCall.endOffset)
         return builder.diagram(
@@ -167,6 +164,19 @@ class PowerAssertCallTransformer(
             parameterBuilder = parameterBuilder,
             roots = roots,
         )
+    }
+
+    private fun buildArgumentTrees(
+        callBuilder: CallBuilder,
+        function: IrSimpleFunction,
+        originalCall: IrCall,
+    ): List<RootNode<IrValueParameter>> {
+        val argumentsSize = when (callBuilder.function.parameters.size) {
+            function.parameters.size -> originalCall.arguments.size - 1
+            else -> originalCall.arguments.size
+        }
+        return (0..<argumentsSize)
+            .map { buildTree(function.parameters[it], originalCall.arguments[it]) }
     }
 
     private fun buildTree(parameter: IrValueParameter, argument: IrExpression?): RootNode<IrValueParameter> {
@@ -199,7 +209,7 @@ class PowerAssertCallTransformer(
                 return callBuilder.buildCall(this, arguments, diagram)
             } else {
                 val root = roots[index]
-                val child = root.child
+                val child = root.children.singleOrNull()
                 if (child == null) {
                     val newArguments = arguments.add(originalCall.arguments[index])
                     val newArgumentVariables = argumentVariables

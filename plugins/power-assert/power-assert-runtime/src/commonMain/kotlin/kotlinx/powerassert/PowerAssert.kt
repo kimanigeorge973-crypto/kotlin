@@ -21,6 +21,7 @@ import kotlin.jvm.JvmStatic
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
+@ExperimentalPowerAssert
 public annotation class PowerAssert {
     public companion object {
         @Suppress("RedundantNullableReturnType")
@@ -34,7 +35,7 @@ public annotation class PowerAssert {
      * @PowerAssert
      * fun assert(
      *     condition: Boolean,
-     *     // Parameter `message` will not have an explanation generated at call-site.
+     *     // Parameter `message` will not be included in generated explanation at call-site.
      *     @PowerAssert.Ignore message: String? = null,
      * )
      * ```

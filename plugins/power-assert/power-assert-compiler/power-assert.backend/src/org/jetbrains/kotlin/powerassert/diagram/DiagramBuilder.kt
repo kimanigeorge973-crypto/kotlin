@@ -22,8 +22,6 @@ package org.jetbrains.kotlin.powerassert.diagram
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.kotlin.ir.builders.*
-import org.jetbrains.kotlin.ir.builders.irGet
-import org.jetbrains.kotlin.ir.builders.irTemporary
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -54,8 +52,9 @@ private fun IrBlockBuilder.buildExpression(
     variables: PersistentList<IrDiagramVariable>,
     call: IrBlockBuilder.(IrExpression, PersistentList<IrDiagramVariable>) -> IrExpression,
 ): IrExpression = when (node) {
-    is ConstantNode -> add(node, variables, call)
+    is ConstantNode -> add(sourceFile, node, variables, call)
     is HiddenNode -> add(node, variables, call)
+    is SyntheticNode -> add(node, variables, call)
     is ExpressionNode -> add(sourceFile, node, variables, call)
     is ChainNode -> nest(sourceFile, node, index = 0, variables, call)
     is WhenNode -> nest(sourceFile, node, index = 0, variables, call)
@@ -71,18 +70,26 @@ private fun IrBlockBuilder.buildExpression(
  * Should be transformed into:
  *
  * ```
- * val result = call(a)
+ * val tmp0 = a
+ * val result = call(tmp0, <diagram maybe with tmp0>)
  * ```
  */
 private fun IrBlockBuilder.add(
+    sourceFile: SourceFile,
     node: ConstantNode,
     variables: PersistentList<IrDiagramVariable>,
     call: IrBlockBuilder.(IrExpression, PersistentList<IrDiagramVariable>) -> IrExpression,
 ): IrExpression {
     val expression = node.expression
+    val sourceRangeInfo = sourceFile.getSourceRangeInfo(expression)
+    val text = sourceFile.getText(sourceRangeInfo)
+
     val transformer = IrTemporaryExtractionTransformer(this@add, variables)
     val copy = expression.deepCopyWithSymbols(scope.getLocalDeclarationParent()).transform(transformer, null)
-    return call(copy, variables)
+
+    val temporary = irTemporary(copy, nameHint = "Explain", origin = EXPLAIN_TEMPORARY)
+    val variable = IrDiagramVariable.Displayable(temporary, expression, sourceRangeInfo, text, constant = true)
+    return call(irGet(temporary), variables.add(variable))
 }
 
 /**
@@ -107,14 +114,36 @@ private fun IrBlockBuilder.add(
     val transformer = IrTemporaryExtractionTransformer(this@add, variables)
     val copy = expression.deepCopyWithSymbols(scope.getLocalDeclarationParent()).transform(transformer, null)
 
-    val variable = if (expression is IrGetValue && expression.symbol.owner.isExplained()) {
+    val temporary = if (expression is IrGetValue && expression.symbol.owner.isExplained()) {
         // Value will have already been transformed by PowerAssert and is safe to access multiple times.
         expression.symbol.owner as IrVariable
     } else {
         irTemporary(copy, nameHint = "Explain", origin = EXPLAIN_TEMPORARY)
     }
-    val newVariables = variables.add(IrDiagramVariable.Hidden(variable, expression))
-    return call(irGet(variable), newVariables)
+    val variable = IrDiagramVariable.Hidden(temporary, expression)
+    return call(irGet(temporary), variables.add(variable))
+}
+
+/**
+ * ```
+ * val result = call(a)
+ * ```
+ *
+ * Should be transformed into:
+ *
+ * ```
+ * val result = call(a)
+ * ```
+ */
+private fun IrBlockBuilder.add(
+    node: SyntheticNode,
+    variables: PersistentList<IrDiagramVariable>,
+    call: IrBlockBuilder.(IrExpression, PersistentList<IrDiagramVariable>) -> IrExpression,
+): IrExpression {
+    val expression = node.expression
+    val transformer = IrTemporaryExtractionTransformer(this@add, variables)
+    val copy = expression.deepCopyWithSymbols(scope.getLocalDeclarationParent()).transform(transformer, null)
+    return call(copy, variables)
 }
 
 /**
@@ -142,9 +171,9 @@ private fun IrBlockBuilder.add(
     val transformer = IrTemporaryExtractionTransformer(this, variables)
     val copy = expression.deepCopyWithSymbols(scope.getLocalDeclarationParent()).transform(transformer, null)
 
-    val variable = irTemporary(copy, nameHint = "Explain", origin = EXPLAIN_TEMPORARY)
-    val newVariables = variables.add(IrDiagramVariable.Displayable(variable, expression, sourceRangeInfo, text))
-    return call(irGet(variable), newVariables)
+    val temporary = irTemporary(copy, nameHint = "Explain", origin = EXPLAIN_TEMPORARY)
+    val variable = IrDiagramVariable.Displayable(temporary, expression, sourceRangeInfo, text, constant = false)
+    return call(irGet(temporary), variables.add(variable))
 }
 
 /**

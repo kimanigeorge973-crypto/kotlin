@@ -353,6 +353,7 @@ fun Project.configureTests() {
             ":kotlin-native:libclangInterop",
             ":kotlin-native:llvmInterop",
             ":kotlin-native:tools:kdumputil",
+            ":kotlin-power-assert-runtime",
             ":kotlin-scripting-common",
             ":kotlin-scripting-compiler",
             ":kotlin-scripting-dependencies",

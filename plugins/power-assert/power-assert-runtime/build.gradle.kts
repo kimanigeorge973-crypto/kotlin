@@ -135,17 +135,16 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(kotlinStdlib())
-            }
+        commonMain.dependencies {
+            implementation(kotlinStdlib())
+        }
+        commonTest.dependencies {
+            api(kotlinTest())
+        }
+        jvmTest.dependencies {
+            api(kotlinTest("junit"))
         }
     }
-}
-
-sourceSets {
-    "main" { projectDefault() }
-    "test" { none() }
 }
 
 tasks {
