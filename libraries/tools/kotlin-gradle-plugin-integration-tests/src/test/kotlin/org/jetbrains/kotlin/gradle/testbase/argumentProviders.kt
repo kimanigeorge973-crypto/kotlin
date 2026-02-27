@@ -156,6 +156,7 @@ open class GradleArgumentsProvider : ArgumentsProvider {
             }
         }
 
+        if (isTeamcityRunWithoutChanges) return setOf(maxGradleVersion)
         return setOf(minGradleVersion, *additionalGradleVersions.toTypedArray(), maxGradleVersion)
     }
 
