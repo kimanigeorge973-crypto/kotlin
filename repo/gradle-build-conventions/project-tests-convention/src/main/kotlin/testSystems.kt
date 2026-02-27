@@ -36,7 +36,7 @@ internal val Project.teamcityBuildChangedTestSystems: Set<TestSystem>?
 
         val affectedTestSystems = run {
             if (!isCiBuild()) return@run null
-            val changedFilesPath = java.lang.System.getenv("TEAMCITY_CHANGED_FILES_PATH")
+            val changedFilesPath = System.getenv("TEAMCITY_CHANGED_FILES_PATH")
             if (changedFilesPath == null) {
                 logger.warn("'TEAMCITY_CHANGED_FILES_PATH' is not set")
                 return@run null
@@ -46,9 +46,9 @@ internal val Project.teamcityBuildChangedTestSystems: Set<TestSystem>?
             val changedSystems = TestSystem.entries.associateWith { false }.toMutableMap()
 
             changedFiles.forEach { changeEntry ->
-                if (changeEntry.startsWith("libraries/tools/kotlin-gradle")) {
+                if (changeEntry.contains("libraries/tools/kotlin-gradle")) {
                     changedSystems[TestSystem.KotlinGradlePlugin] = true
-                } else if (changeEntry.startsWith("compiler/")) {
+                } else if (changeEntry.contains("compiler/")) {
                     changedSystems[TestSystem.Compiler] = true
                 } else {
                     changedSystems[TestSystem.Other] = true
