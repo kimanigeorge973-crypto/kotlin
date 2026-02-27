@@ -22,6 +22,7 @@ internal object NothingKClass : KClass<Void> by Void::class, TypeConstructorMark
     override val qualifiedName: String
         get() = "kotlin.Nothing"
 
+    // NOTE: the implementations of KClass.equals/ClassReference.equals are currently not compatible with NothingKCLass
     override fun equals(other: Any?): Boolean = this === other
     override fun hashCode(): Int = System.identityHashCode(this)
     override fun toString(): String = "NothingKClass"

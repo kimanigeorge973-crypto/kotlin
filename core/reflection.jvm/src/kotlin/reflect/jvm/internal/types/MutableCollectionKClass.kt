@@ -38,6 +38,7 @@ internal class MutableCollectionKClass<T : Any>(
     override val simpleName: String
         get() = qualifiedName.substringAfterLast(".")
 
+    // NOTE: the implementations of KClass.equals/ClassReference.equals are currently not compatible with MutableCollectionKClass
     override fun equals(other: Any?): Boolean =
         other is MutableCollectionKClass<*> && klass == other.klass
 

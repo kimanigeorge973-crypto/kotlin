@@ -154,8 +154,8 @@ internal class DescriptorKType(
         }
 
     override fun equals(other: Any?): Boolean =
-        if (useK1Implementation) {
-            other is DescriptorKType && type == other.type && classifier == other.classifier && arguments == other.arguments
+        if (useK1Implementation && other is DescriptorKType) {
+            type == other.type && classifier == other.classifier && arguments == other.arguments
         } else super.equals(other)
 
     override fun hashCode(): Int =

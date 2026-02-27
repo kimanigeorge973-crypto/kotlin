@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeArgumentListMarker
 import java.lang.reflect.Type
 import kotlin.jvm.internal.KTypeBase
+import kotlin.jvm.internal.Reflection
+import kotlin.jvm.internal.TypeReference
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.internal.ReflectProperties
@@ -42,8 +44,11 @@ internal abstract class AbstractKType(
     abstract fun lowerBoundIfFlexible(): AbstractKType?
     abstract fun upperBoundIfFlexible(): AbstractKType?
 
-    override fun equals(other: Any?): Boolean =
-        other is AbstractKType && AbstractStrictEqualityTypeChecker.strictEqualTypes(ReflectTypeSystemContext, this, other)
+    override fun equals(other: Any?): Boolean = when (other) {
+        is AbstractKType -> AbstractStrictEqualityTypeChecker.strictEqualTypes(ReflectTypeSystemContext, this, other)
+        is TypeReference -> Reflection.typesEqual(other, this)
+        else -> false
+    }
 
     override fun hashCode(): Int =
         (31 * ((31 * classifier.hashCode()) + arguments.hashCode())) + isMarkedNullable.hashCode()

@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.typeUtil.builtIns
+import kotlin.jvm.internal.LightReflection
+import kotlin.jvm.internal.TypeReference
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.internal.KotlinReflectionInternalError
@@ -95,3 +97,32 @@ internal fun createNothingType(type: KType): KType {
         type.mutableCollectionClass,
     )
 }
+
+// Converts a type from full reflection implementation to `TypeReference` for a further
+// equality comparison. The conversion is "shallow", so inner boundaries and type arguments
+// of the resulting reference may remain of the full reflection implementation.
+internal fun KType.asTypeReferenceOrNull(): TypeReference? = when (this) {
+    is TypeReference -> this
+    is AbstractKType -> {
+        val lower = lowerBoundIfFlexible()
+        if (lower != null) {
+            val upper = upperBoundIfFlexible()!!
+            val lowerRef = lower.asTypeReferenceOrNull() ?: return null
+            val upperRef = upper.asTypeReferenceOrNull() ?: return null
+            LightReflection.platformType(lowerRef, upperRef) as TypeReference
+        } else {
+            val classifier = classifier ?: return null
+            var result: KType = TypeReference(classifier, arguments, isMarkedNullable)
+            if (mutableCollectionClass != null) {
+                result = LightReflection.mutableCollectionType(result)
+            }
+            if (isNothingType) {
+                result = LightReflection.nothingType(result)
+            }
+            result as TypeReference
+        }
+    }
+    else -> null
+}
+
+internal fun typesEqual(reference: TypeReference, type: KType) = type.asTypeReferenceOrNull() == reference

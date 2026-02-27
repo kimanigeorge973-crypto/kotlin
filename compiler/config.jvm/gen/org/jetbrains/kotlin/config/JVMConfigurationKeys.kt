@@ -175,6 +175,10 @@ object JVMConfigurationKeys {
     @JvmField
     val IGNORED_ANNOTATIONS_FOR_BRIDGES = CompilerConfigurationKey.create<List<String>>("IGNORED_ANNOTATIONS_FOR_BRIDGES")
 
+    // Force using light stdlib Reflection instead of kotlin-reflect.
+    @JvmField
+    val FORCE_LIGHT_REFLECTION = CompilerConfigurationKey.create<Boolean>("FORCE_LIGHT_REFLECTION")
+
 }
 
 var CompilerConfiguration.outputDirectory: File?
@@ -364,4 +368,8 @@ var CompilerConfiguration.whenGenerationScheme: JvmWhenGenerationScheme?
 var CompilerConfiguration.ignoredAnnotationsForBridges: List<String>
     get() = getList(JVMConfigurationKeys.IGNORED_ANNOTATIONS_FOR_BRIDGES)
     set(value) { put(JVMConfigurationKeys.IGNORED_ANNOTATIONS_FOR_BRIDGES, value) }
+
+var CompilerConfiguration.forceLightReflection: Boolean
+    get() = getBoolean(JVMConfigurationKeys.FORCE_LIGHT_REFLECTION)
+    set(value) { put(JVMConfigurationKeys.FORCE_LIGHT_REFLECTION, value) }
 
