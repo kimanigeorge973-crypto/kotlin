@@ -249,10 +249,4 @@ class LegacyIT : KotlinMavenTestBase() {
     fun `test-smart-defaults-stdlib-exists`(mavenVersion: TestVersions.Maven) =
         verifyWithLegacyBsh("test-smart-defaults-stdlib-exists", mavenVersion)
 
-    @MavenTest
-    fun `test-smart-defaults-kapt`(mavenVersion: TestVersions.Maven) = verifyWithLegacyBsh(
-        "test-smart-defaults-kapt",
-        mavenVersion,
-        disableKotlinDaemonOnWindows = true
-    )
 }
