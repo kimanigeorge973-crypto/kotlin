@@ -185,6 +185,7 @@ public interface KotlinToolchains {
          * Returns the version of the Build Tools API library.
          *
          * @return A string representing the version of the library, for example `2.3.0`.
+         * @since 2.4.0
          */
         @JvmStatic
         public fun getLibraryVersion(): String = BUILD_TOOLS_API_VERSION
