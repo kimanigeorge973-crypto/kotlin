@@ -24,6 +24,10 @@ dependencies {
 
 kotlin {
     explicitApi()
+
+    sourceSets.main {
+        kotlin.srcDir(generateVersionFileTask())
+    }
 }
 
 publish()
@@ -158,5 +162,27 @@ fun Project.generatedSourcesTask(
 
 private val Project.sourceSets: SourceSetContainer
     get() = extensions.getByType<JavaPluginExtension>().sourceSets
+
+fun Project.generateVersionFileTask(): TaskProvider<Task> {
+    return tasks.register("generateVersionFile") {
+        val versionValue = project.version.toString()
+        inputs.property("version", versionValue)
+
+        val outputDir = layout.buildDirectory.dir("generated/sources/version")
+        outputs.dir(outputDir)
+
+        doLast {
+            val versionFile = outputDir.get().file("org/jetbrains/kotlin/buildtools/api/BuildToolsApiVersion.kt").asFile
+            versionFile.parentFile.mkdirs()
+            versionFile.writeText(
+                """
+                package org.jetbrains.kotlin.buildtools.api
+
+                public const val BUILD_TOOLS_API_VERSION: String = "$versionValue"
+                """.trimIndent()
+            )
+        }
+    }
+}
 
 
