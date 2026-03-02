@@ -94,7 +94,11 @@ open class UserVisibleIrModulesSupport(externalDependenciesLoader: ExternalDepen
                 artifactPaths = hashSetOf()
             )
 
-            val outgoingDependencyIds = deserializer.moduleDependencies.map { getUserVisibleModuleId(it) }
+            val outgoingDependencyIds = deserializer.moduleDescriptor.allDependencyModules
+                .map { dependencyModule ->
+                    deserializers.find { it.moduleDescriptor == dependencyModule }
+                        ?: error("Dependency `${dependencyModule.name}` not found for `${deserializer.moduleDescriptor.name}`")
+                }.map { getUserVisibleModuleId(it) }
 
             moduleId to ModuleWithUninitializedDependencies(module, outgoingDependencyIds)
         }.toMap()
