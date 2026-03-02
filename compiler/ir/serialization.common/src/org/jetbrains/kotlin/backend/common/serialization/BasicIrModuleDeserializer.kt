@@ -220,11 +220,6 @@ abstract class BasicIrModuleDeserializer(
     }
 }
 
-fun IrModuleDeserializer.findModuleDeserializerForTopLevelId(idSignature: IdSignature): IrModuleDeserializer? {
-    if (idSignature in this) return this
-    return moduleDependencies.firstOrNull { idSignature in it }
-}
-
 val ByteArray.codedInputStream: CodedInputStream
     get() {
         val codedInputStream = CodedInputStream.newInstance(this)

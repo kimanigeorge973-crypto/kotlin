@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.konan.serialization
 
+import org.jetbrains.kotlin.backend.common.linkage.IrDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.IrModuleDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.IrModuleDeserializerKind
 import org.jetbrains.kotlin.backend.common.serialization.KotlinIrLinker
@@ -73,9 +74,7 @@ internal class KonanForwardDeclarationModuleDeserializer(
         val descriptor = resolveDescriptor(idSig) ?: return null
         val actualModule = descriptor.module
         if (actualModule !== moduleDescriptor) {
-            val moduleDeserializer = linker.resolveModuleDeserializer(actualModule, idSig)
-            moduleDeserializer.addModuleReachableTopLevel(idSig)
-            return linker.symbolTable.referenceClass(idSig)
+            return linker.resolveBySignatureInModule(idSig, IrDeserializer.TopLevelSymbolKind.CLASS_SYMBOL, actualModule.name)
         }
 
         return declaredDeclaration.getOrPut(idSig) { buildForwardDeclarationStub(descriptor) }.symbol
