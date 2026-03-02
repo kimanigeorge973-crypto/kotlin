@@ -29,6 +29,7 @@ internal constructor(
 ) :
     KotlinJsIrNpmBasedSubTarget(target, "node"),
     KotlinJsNodeDsl {
+
     override val testTaskDescription: String
         get() = "Run all ${target.name} tests inside nodejs using the builtin test framework"
 

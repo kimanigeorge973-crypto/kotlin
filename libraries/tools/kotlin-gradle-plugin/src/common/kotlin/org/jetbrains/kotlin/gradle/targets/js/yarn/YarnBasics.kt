@@ -22,21 +22,6 @@ abstract class YarnBasics internal constructor(
     private val objects: ObjectFactory,
 ) : NpmApiExecution<YarnEnvironment> {
 
-    /**
-     * Extending this class is deprecated. See [YarnWorkspaces] for details.
-     *
-     * @see org.jetbrains.kotlin.gradle.targets.js.yarn.YarnWorkspaces
-     */
-    @Deprecated(
-        message = "Extending this class is deprecated. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR,
-    )
-    @Suppress("UNREACHABLE_CODE", "unused")
-    constructor() : this(
-        execOps = error("Cannot create instance of YarnBasics. Constructor is deprecated."),
-        objects = error("Cannot create instance of YarnBasics. Constructor is deprecated."),
-    )
-
     @Deprecated(
         "Updated to remove ServiceRegistry. Scheduled for removal in Kotlin 2.4.",
         ReplaceWith("packageManagerExec(logger, nodeJs, yarn, dir, description, args)"),

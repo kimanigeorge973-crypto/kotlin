@@ -27,6 +27,7 @@ internal constructor(
 ) :
     KotlinJsIrSubTarget(target, "d8"),
     KotlinWasmD8Dsl {
+
     private val d8 = D8Plugin.applyWithEnvSpec(project)
 
     override val testTaskDescription: String

@@ -2956,7 +2956,6 @@ public abstract interface class org/jetbrains/kotlin/gradle/targets/js/ir/Kotlin
 }
 
 public abstract class org/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrTarget : org/jetbrains/kotlin/gradle/plugin/mpp/KotlinTargetWithBinaries, org/jetbrains/kotlin/gradle/plugin/KotlinTargetWithTests, org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsSubTargetContainerDsl, org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsTargetDsl, org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinWasmJsTargetDsl, org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinWasmSubTargetContainerDsl, org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinWasmWasiTargetDsl {
-	public fun <init> (Lorg/gradle/api/Project;Lorg/jetbrains/kotlin/gradle/plugin/KotlinPlatformType;)V
 	public fun <init> (Lorg/gradle/api/Project;Lorg/jetbrains/kotlin/gradle/plugin/KotlinPlatformType;Z)V
 	public fun applyBinaryen ()V
 	public fun applyBinaryen (Lkotlin/jvm/functions/Function1;)V
@@ -3375,7 +3374,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment 
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/npm/Npm : org/jetbrains/kotlin/gradle/targets/js/npm/NpmApiExecution {
-	public fun <init> ()V
 	public final fun npmExec (Lorg/gradle/internal/service/ServiceRegistry;Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NpmEnvironment;Ljava/io/File;Ljava/lang/String;Ljava/util/List;)V
 	public synthetic fun packageManagerExec (Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/nodejs/PackageManagerEnvironment;Lorg/gradle/api/provider/Provider;Ljava/lang/String;Ljava/util/List;)V
 	public fun packageManagerExec (Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NpmEnvironment;Lorg/gradle/api/provider/Provider;Ljava/lang/String;Ljava/util/List;)V
@@ -4209,7 +4207,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/testing/karma/KarmaSta
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/testing/karma/KotlinKarma : org/jetbrains/kotlin/gradle/targets/js/testing/KotlinJsTestFramework {
-	public fun <init> (Lorg/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrCompilation;Lkotlin/jvm/functions/Function0;Ljava/lang/String;)V
 	public fun createTestExecutionSpec (Lorg/jetbrains/kotlin/gradle/targets/js/testing/KotlinJsTest;Lorg/gradle/process/ProcessForkOptions;Ljava/util/List;Z)Lorg/jetbrains/kotlin/gradle/internal/testing/TCServiceMessagesTestExecutionSpec;
 	public fun createTestExecutionSpec (Lorg/jetbrains/kotlin/gradle/targets/js/testing/KotlinJsTest;Lorg/jetbrains/kotlin/gradle/utils/processes/ProcessLaunchOptions;Ljava/util/List;Z)Lorg/jetbrains/kotlin/gradle/internal/testing/TCServiceMessagesTestExecutionSpec;
 	public fun getCompilation ()Lorg/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrCompilation;
@@ -4247,7 +4244,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/testing/karma/KotlinKa
 
 public final class org/jetbrains/kotlin/gradle/targets/js/testing/mocha/KotlinMocha : org/jetbrains/kotlin/gradle/targets/js/testing/KotlinJsTestFramework {
 	public static final field Companion Lorg/jetbrains/kotlin/gradle/targets/js/testing/mocha/KotlinMocha$Companion;
-	public fun <init> (Lorg/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrCompilation;Ljava/lang/String;)V
 	public fun createTestExecutionSpec (Lorg/jetbrains/kotlin/gradle/targets/js/testing/KotlinJsTest;Lorg/gradle/process/ProcessForkOptions;Ljava/util/List;Z)Lorg/jetbrains/kotlin/gradle/internal/testing/TCServiceMessagesTestExecutionSpec;
 	public fun createTestExecutionSpec (Lorg/jetbrains/kotlin/gradle/targets/js/testing/KotlinJsTest;Lorg/jetbrains/kotlin/gradle/utils/processes/ProcessLaunchOptions;Ljava/util/List;Z)Lorg/jetbrains/kotlin/gradle/internal/testing/TCServiceMessagesTestExecutionSpec;
 	public fun getCompilation ()Lorg/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrCompilation;
@@ -4674,7 +4670,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/yarn/LockCopyTaskKt {
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/yarn/Yarn : org/jetbrains/kotlin/gradle/targets/js/npm/NpmApiExecution {
-	public fun <init> ()V
 	public synthetic fun packageManagerExec (Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/nodejs/PackageManagerEnvironment;Lorg/gradle/api/provider/Provider;Ljava/lang/String;Ljava/util/List;)V
 	public fun packageManagerExec (Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/yarn/YarnEnvironment;Lorg/gradle/api/provider/Provider;Ljava/lang/String;Ljava/util/List;)V
 	public synthetic fun prepareRootProject (Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/nodejs/PackageManagerEnvironment;Ljava/lang/String;Ljava/lang/String;Ljava/util/Collection;)V
@@ -4688,7 +4683,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/yarn/Yarn : org/jetbra
 }
 
 public abstract class org/jetbrains/kotlin/gradle/targets/js/yarn/YarnBasics : org/jetbrains/kotlin/gradle/targets/js/npm/NpmApiExecution {
-	public fun <init> ()V
 	public synthetic fun packageManagerExec (Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/nodejs/PackageManagerEnvironment;Lorg/gradle/api/provider/Provider;Ljava/lang/String;Ljava/util/List;)V
 	public fun packageManagerExec (Lorg/gradle/api/logging/Logger;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/yarn/YarnEnvironment;Lorg/gradle/api/provider/Provider;Ljava/lang/String;Ljava/util/List;)V
 	public fun prepareTooling (Ljava/io/File;)V
@@ -4840,7 +4834,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/yarn/YarnSetupTask$Com
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/yarn/YarnWorkspaces : org/jetbrains/kotlin/gradle/targets/js/yarn/YarnBasics {
-	public fun <init> ()V
 	public synthetic fun prepareRootProject (Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/nodejs/PackageManagerEnvironment;Ljava/lang/String;Ljava/lang/String;Ljava/util/Collection;)V
 	public fun prepareRootProject (Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;Lorg/jetbrains/kotlin/gradle/targets/js/yarn/YarnEnvironment;Ljava/lang/String;Ljava/lang/String;Ljava/util/Collection;)V
 	public fun preparedFiles (Lorg/jetbrains/kotlin/gradle/targets/js/npm/NodeJsEnvironment;)Ljava/util/Collection;

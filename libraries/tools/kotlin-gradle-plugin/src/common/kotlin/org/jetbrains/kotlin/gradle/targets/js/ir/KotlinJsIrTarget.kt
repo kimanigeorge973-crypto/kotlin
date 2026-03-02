@@ -19,14 +19,14 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.resources.publication.setUpResourc
 import org.jetbrains.kotlin.gradle.targets.js.*
 import org.jetbrains.kotlin.gradle.targets.js.dsl.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTargetConfigurator.Companion.configureJsDefaultOptions
-import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
-import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin.Companion.kotlinNodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.wasm.npm.WasmNpmResolverPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.NpmResolverPlugin
 import org.jetbrains.kotlin.gradle.targets.js.typescript.TypeScriptValidationTask
 import org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenExec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsRootPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.npm.WasmNpmResolverPlugin
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.*
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
@@ -46,7 +46,7 @@ abstract class KotlinJsIrTarget
 constructor(
     project: Project,
     platformType: KotlinPlatformType,
-    internal val isMpp: Boolean
+    internal val isMpp: Boolean,
 ) :
     KotlinTargetWithBinaries<KotlinJsIrCompilation, KotlinJsBinaryContainer>(project, platformType),
     KotlinTargetWithTests<JsAggregatingExecutionSource, KotlinJsReportAggregatingTestRun>,
@@ -55,15 +55,6 @@ constructor(
     KotlinWasmWasiTargetDsl,
     KotlinJsSubTargetContainerDsl,
     KotlinWasmSubTargetContainerDsl {
-
-    @Deprecated(
-        message = "Internal Kotlin Gradle Plugin API. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR
-    )
-    constructor(
-        project: Project,
-        platformType: KotlinPlatformType,
-    ) : this(project, platformType, true)
 
     private val propertiesProvider = PropertiesProvider(project)
     internal val shouldGenerateTypeScriptDefinitions: Property<Boolean> = project.objects.property<Boolean>(false)

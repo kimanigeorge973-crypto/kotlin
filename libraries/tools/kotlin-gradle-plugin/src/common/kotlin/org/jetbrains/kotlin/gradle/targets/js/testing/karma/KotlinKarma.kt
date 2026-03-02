@@ -16,7 +16,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.internal.logging.progress.ProgressLogger
-import org.gradle.internal.service.ServiceRegistry
 import org.gradle.process.ProcessForkOptions
 import org.jetbrains.kotlin.gradle.internal.*
 import org.jetbrains.kotlin.gradle.internal.testing.TCServiceMessagesClientSettings
@@ -63,22 +62,6 @@ class KotlinKarma internal constructor(
     private val objects: ObjectFactory,
     private val providers: ProviderFactory,
 ) : KotlinJsTestFramework {
-
-    @Deprecated(
-        "Manually creating instances of this class is deprecated. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR
-    )
-    constructor(
-        compilation: KotlinJsIrCompilation,
-        @Suppress("UNUSED_PARAMETER")
-        services: () -> ServiceRegistry,
-        basePath: String,
-    ) : this(
-        compilation = compilation,
-        basePath = basePath,
-        objects = compilation.target.project.objects,
-        providers = compilation.target.project.providers,
-    )
 
     @Transient
     private val project: Project = compilation.target.project

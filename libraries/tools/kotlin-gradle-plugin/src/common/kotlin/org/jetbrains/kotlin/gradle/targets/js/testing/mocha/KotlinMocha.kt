@@ -41,20 +41,6 @@ class KotlinMocha internal constructor(
 ) :
     KotlinJsTestFramework {
 
-    @Deprecated(
-        "Manually creating instances of this class is deprecated. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR
-    )
-    constructor(
-        compilation: KotlinJsIrCompilation,
-        basePath: String,
-    ) : this(
-        compilation = compilation,
-        basePath = basePath,
-        objects = compilation.target.project.objects,
-        providers = compilation.target.project.providers,
-    )
-
     @Transient
     private val project: Project = compilation.target.project
     private val npmProject = compilation.npmProject
