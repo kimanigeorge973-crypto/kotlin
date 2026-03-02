@@ -2276,10 +2276,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/RequiredKotlinJsDepend
 	public static synthetic fun createDependency$default (Lorg/jetbrains/kotlin/gradle/targets/js/RequiredKotlinJsDependency;Lorg/gradle/api/model/ObjectFactory;Lorg/jetbrains/kotlin/gradle/targets/js/npm/NpmDependency$Scope;ILjava/lang/Object;)Lorg/gradle/api/artifacts/Dependency;
 }
 
-public final class org/jetbrains/kotlin/gradle/targets/js/StringsKt {
-	public static final fun jsQuoted (Ljava/lang/String;)Ljava/lang/String;
-}
-
 public final class org/jetbrains/kotlin/gradle/targets/js/UtilsKt {
 	public static final field HTML Ljava/lang/String;
 	public static final field JS Ljava/lang/String;
@@ -2287,9 +2283,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/UtilsKt {
 	public static final field META_JS Ljava/lang/String;
 	public static final field MJS Ljava/lang/String;
 	public static final field WASM Ljava/lang/String;
-	public static final fun appendConfigsFromDir (Ljava/lang/Appendable;Ljava/io/File;)V
-	public static final fun calculateDirHash (Lorg/gradle/internal/hash/FileHasher;Ljava/io/File;)Ljava/lang/String;
-	public static final fun toHex ([B)Ljava/lang/String;
 }
 
 public abstract class org/jetbrains/kotlin/gradle/targets/js/binaryen/BinaryenEnvSpec : org/jetbrains/kotlin/gradle/targets/js/EnvSpec {
