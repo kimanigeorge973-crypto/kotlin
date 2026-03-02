@@ -15,6 +15,7 @@ import com.intellij.psi.impl.CheckUtil
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
 import org.jetbrains.kotlin.KtStubBasedElementTypes
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.ClassId
@@ -68,8 +69,37 @@ abstract class KtClassOrObject :
         @Suppress("DEPRECATION") // KT-78356
         getStubOrPsiChild(KtStubBasedElementTypes.CLASS_BODY)
 
+    /**
+     * If this is an enum [KtClass] ([KtClass.isEnum]), this adds a semicolon to the last [KtEnumEntry].
+     * If there are no enum entries, this adds a semicolon to the class body.
+     *
+     * This is used to add other declarations to enum classes ([KtFunction], [KtProperty],
+     * a companion [KtObjectDeclaration], etc.)
+     */
+    fun addSemicolonToLastEnumEntry(body: KtClassBody) {
+        val lastEnumEntry = body.children.filterIsInstance<KtEnumEntry>().lastOrNull()
+
+        if (lastEnumEntry != null) {
+            lastEnumEntry.addSemicolon()
+        } else {
+            val anchor = PsiTreeUtil.skipSiblingsBackward(body.rBrace ?: body.lastChild!!, PsiWhiteSpace::class.java)
+            if (anchor != null && anchor.elementType == KtTokens.SEMICOLON) {
+                // there's already a semicolon
+                return
+            }
+            val psiFactory = KtPsiFactory(project)
+            val semicolon = body.addAfter(psiFactory.createSemicolon(), anchor)
+            if (anchor == body.lBrace) {
+                body.addBefore(psiFactory.createNewLine(), semicolon)
+            }
+        }
+    }
+
     inline fun <reified T : KtDeclaration> addDeclaration(declaration: T): T {
         val body = getOrCreateBody()
+        if (this is KtClass && isEnum() && declaration !is KtEnumEntry) {
+            addSemicolonToLastEnumEntry(body)
+        }
         val anchor = PsiTreeUtil.skipSiblingsBackward(body.rBrace ?: body.lastChild!!, PsiWhiteSpace::class.java)
         return if (anchor?.nextSibling is PsiErrorElement) {
             body.addBefore(declaration, anchor)
@@ -79,13 +109,21 @@ abstract class KtClassOrObject :
     }
 
     inline fun <reified T : KtDeclaration> addDeclarationAfter(declaration: T, anchor: PsiElement?): T {
+        val body = getOrCreateBody()
+        if (this is KtClass && isEnum() && declaration !is KtEnumEntry) {
+            addSemicolonToLastEnumEntry(body)
+        }
         val anchorBefore = anchor ?: declarations.lastOrNull() ?: return addDeclaration(declaration)
-        return getOrCreateBody().addAfter(declaration, anchorBefore) as T
+        return body.addAfter(declaration, anchorBefore) as T
     }
 
     inline fun <reified T : KtDeclaration> addDeclarationBefore(declaration: T, anchor: PsiElement?): T {
+        val body = getOrCreateBody()
+        if (this is KtClass && isEnum() && declaration !is KtEnumEntry) {
+            addSemicolonToLastEnumEntry(body)
+        }
         val anchorAfter = anchor ?: declarations.firstOrNull() ?: return addDeclaration(declaration)
-        return getOrCreateBody().addBefore(declaration, anchorAfter) as T
+        return body.addBefore(declaration, anchorAfter) as T
     }
 
     fun isTopLevel(): Boolean = greenStub?.isTopLevel ?: isKtFile(parent)

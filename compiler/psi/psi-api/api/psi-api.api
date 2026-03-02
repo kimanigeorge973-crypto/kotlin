@@ -1057,6 +1057,7 @@ public class org/jetbrains/kotlin/psi/KtClassLiteralExpression : org/jetbrains/k
 public abstract class org/jetbrains/kotlin/psi/KtClassOrObject : org/jetbrains/kotlin/psi/KtTypeParameterListOwnerStub, org/jetbrains/kotlin/psi/KtClassLikeDeclaration, org/jetbrains/kotlin/psi/KtDeclarationContainer, org/jetbrains/kotlin/psi/KtNamedDeclaration, org/jetbrains/kotlin/psi/KtPureClassOrObject {
 	public fun <init> (Lcom/intellij/lang/ASTNode;)V
 	public fun <init> (Lorg/jetbrains/kotlin/psi/stubs/KotlinClassOrObjectStub;Lcom/intellij/psi/stubs/IStubElementType;)V
+	public final fun addSemicolonToLastEnumEntry (Lorg/jetbrains/kotlin/psi/KtClassBody;)V
 	public final fun addSuperTypeListEntry (Lorg/jetbrains/kotlin/psi/KtSuperTypeListEntry;)Lorg/jetbrains/kotlin/psi/KtSuperTypeListEntry;
 	public fun delete ()V
 	public final fun getAnonymousInitializers ()Ljava/util/List;
@@ -1533,8 +1534,12 @@ public class org/jetbrains/kotlin/psi/KtEnumEntry : org/jetbrains/kotlin/psi/KtC
 	public fun <init> (Lcom/intellij/lang/ASTNode;)V
 	public fun <init> (Lorg/jetbrains/kotlin/psi/stubs/KotlinClassStub;)V
 	public fun accept (Lorg/jetbrains/kotlin/psi/KtVisitor;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun addSemicolon ()Lcom/intellij/psi/PsiElement;
+	public fun delete ()V
 	public fun getClassId ()Lorg/jetbrains/kotlin/name/ClassId;
+	public fun getComma ()Lcom/intellij/psi/PsiElement;
 	public fun getInitializerList ()Lorg/jetbrains/kotlin/psi/KtInitializerList;
+	public fun getSemicolon ()Lcom/intellij/psi/PsiElement;
 	public fun getSuperTypeListEntries ()Ljava/util/List;
 	public fun getTypeReference ()Lorg/jetbrains/kotlin/psi/KtTypeReference;
 	public fun hasInitializer ()Z
