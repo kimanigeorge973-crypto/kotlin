@@ -630,7 +630,8 @@ private fun Project.commonVariantAttributes(): Action<Configuration> = Action<Co
  */
 fun KotlinCompile.configureGradleCompatibility() {
     compilerOptions {
-        val variant = GradlePluginVariant.GRADLE_MIN
+        //val variant = GradlePluginVariant.GRADLE_MIN
+        val variant = GradlePluginVariant.GRADLE_80
         // we should keep control of the language version for compatibility with bundled Kotlin compiler for Gradle Kotlin scripts.
         languageVersion.set(KotlinVersion.fromVersion(variant.bundledKotlinVersion))
         // we should not use stdlib symbols not available in the bundled Kotlin runtime
