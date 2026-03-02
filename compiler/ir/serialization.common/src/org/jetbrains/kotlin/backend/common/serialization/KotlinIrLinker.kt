@@ -120,9 +120,8 @@ abstract class KotlinIrLinker(
         }
     }
 
-    private fun resolveModuleDeserializer(idSignature: IdSignature?): IrModuleDeserializer? {
-        if (idSignature == null) return null
-        return deserializersForModules.values.firstOrNull { idSignature in it }
+    private fun resolveModuleDeserializer(idSignature: IdSignature): IrModuleDeserializer? {
+        return deserializersForModules.values.firstOrNull() { idSignature in it }
     }
 
     protected abstract fun createModuleDeserializer(
@@ -148,7 +147,9 @@ abstract class KotlinIrLinker(
     private fun findDeserializedDeclarationForSymbol(symbol: IrSymbol): Boolean {
         if (!triedToDeserializeDeclarationForSymbol.add(symbol)) return false
 
-        val moduleDeserializer = resolveModuleDeserializer(symbol.signature) ?: return false
+        val signature = symbol.signature ?: return false
+        val moduleDeserializer = resolveModuleDeserializer(signature)
+            ?: return false
         moduleDeserializer.declareIrSymbol(symbol)
 
         deserializeAllReachableTopLevels()

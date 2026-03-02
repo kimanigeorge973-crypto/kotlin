@@ -74,7 +74,7 @@ internal class KonanForwardDeclarationModuleDeserializer(
         val descriptor = resolveDescriptor(idSig) ?: return null
         val actualModule = descriptor.module
         if (actualModule !== moduleDescriptor) {
-            return linker.resolveBySignatureInModule(idSig, IrDeserializer.TopLevelSymbolKind.CLASS_SYMBOL, actualModule.name)
+            return null
         }
 
         return declaredDeclaration.getOrPut(idSig) { buildForwardDeclarationStub(descriptor) }.symbol
