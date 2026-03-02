@@ -2248,7 +2248,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/NpmVersions : java/io/
 	public final fun getKarmaIeLauncher ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
 	public final fun getKarmaMocha ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
 	public final fun getKarmaOperaLauncher ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
-	public final fun getKarmaPhantomjsLauncher ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
 	public final fun getKarmaSafariLauncher ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
 	public final fun getKarmaSourcemapLoader ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
 	public final fun getKarmaWebpack ()Lorg/jetbrains/kotlin/gradle/targets/js/NpmPackageVersion;
@@ -4226,7 +4225,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/testing/karma/KotlinKa
 	public final fun useFirefoxNightlyHeadless ()V
 	public final fun useIe ()V
 	public final fun useOpera ()V
-	public final fun usePhantomJS ()V
 	public final fun useSafari ()V
 	public final fun useSourceMapSupport ()V
 }

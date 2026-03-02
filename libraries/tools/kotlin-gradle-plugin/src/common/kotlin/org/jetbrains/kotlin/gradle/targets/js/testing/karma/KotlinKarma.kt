@@ -190,7 +190,6 @@ class KotlinKarma internal constructor(
                 "firefox-nightly-headless" -> useFirefoxNightlyHeadless()
                 "ie" -> useIe()
                 "opera" -> useOpera()
-                "phantom-js" -> usePhantomJS()
                 "safari" -> useSafari()
                 else -> project.logger.warn("Unrecognised `kotlin.js.browser.karma.browsers` value [$it]. Ignoring...")
             }
@@ -280,14 +279,6 @@ class KotlinKarma internal constructor(
         }
 
         useChromeLike(debuggableChrome)
-    }
-
-    @Deprecated(
-        "It is not supported anymore. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR
-    )
-    fun usePhantomJS() {
-        project.logger.warn("PhantomJS is not supported anymore. Use other browsers instead.")
     }
 
     private fun useFirefoxLike(id: String) = useBrowser(id, versions.karmaFirefoxLauncher)

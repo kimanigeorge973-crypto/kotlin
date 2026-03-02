@@ -37,13 +37,6 @@ class NpmVersions : Serializable {
     val typescript = NpmPackageVersion("typescript", "5.9.3")
     val kotlinWebHelpers = NpmPackageVersion("kotlin-web-helpers", "3.0.0")
 
-    @Deprecated(
-        "Phantom JS is deprecated. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR
-    )
-    @Suppress("unused")
-    val karmaPhantomjsLauncher = NpmPackageVersion("karma-phantomjs-launcher", "1.0.4")
-
     val allDependencies = listOf(
         webpack,
         karma,
