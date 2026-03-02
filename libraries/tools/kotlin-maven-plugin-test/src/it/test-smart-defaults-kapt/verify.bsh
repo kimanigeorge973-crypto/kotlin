@@ -1,0 +1,26 @@
+source(new File(basedir, "verify-common.bsh").getAbsolutePath());
+
+// 1. Build succeeded and JAR was produced
+assertFileExists("app/target/app-1.0-SNAPSHOT.jar");
+
+// 2. KAPT ran and generated a Java source file from @Anno on KotlinService
+assertFileExists("app/target/generated-sources/kapt/compile/app/KotlinServiceGenerated.java");
+
+// 3. KAPT ran and generated a Kotlin extension file from @Anno on KotlinService
+assertFileExists("app/target/generated-sources/kaptKotlin/compile/KotlinServiceExtensions.kt");
+
+// 4. KAPT-generated Java class was compiled and is present in classes
+assertFileExists("app/target/classes/app/KotlinServiceGenerated.class");
+
+// 5. Java class that references KAPT-generated code compiled successfully
+assertFileExists("app/target/classes/app/JavaConsumer.class");
+
+// 6. Kotlin class compiled successfully
+assertFileExists("app/target/classes/app/KotlinService.class");
+
+// 7. Build log confirms kapt goal was executed
+assertBuildLogHasLineThatContains("kotlin-maven-plugin");
+assertBuildLogHasLineThatContains("kapt");
+
+// 8. Build succeeded
+assertBuildLogHasLineThatContains("BUILD SUCCESS");
