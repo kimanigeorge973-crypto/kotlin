@@ -72,16 +72,6 @@ internal constructor(
     override val rules: KotlinWebpackRulesContainer =
         project.objects.webpackRulesContainer()
 
-    @get:Internal
-    @Deprecated(
-        "ExecHandleFactory is an internal Gradle API and must be removed to support Gradle 9.0. Please remove usages of this property. Scheduled for removal in Kotlin 2.4.",
-        ReplaceWith("TODO(\"ExecHandleFactory is an internal Gradle API and must be removed to support Gradle 9.0. Please remove usages of this property.\")"),
-        level = DeprecationLevel.ERROR
-    )
-    @Suppress("unused")
-    open val execHandleFactory: Nothing
-        get() = injected
-
     private val metrics: Property<BuildMetricsReporter<BuildTimeMetric, BuildPerformanceMetric>> = project.objects
         .property(BuildMetricsReporterImpl())
 
@@ -161,45 +151,12 @@ internal constructor(
         clean = true,
     )
 
-    @get:Internal
-    @Deprecated(
-        "Use `outputDirectory` instead. Scheduled for removal in Kotlin 2.3.",
-        ReplaceWith("outputDirectory"),
-        level = DeprecationLevel.ERROR
-    )
-    var destinationDirectory: File
-        get() = outputDirectory.asFile.get()
-        set(value) {
-            outputDirectory.set(value)
-        }
-
     @get:OutputDirectory
     @get:Optional
     abstract val outputDirectory: DirectoryProperty
 
     @get:Internal
-    @Deprecated(
-        "Use `mainOutputFileName` instead. Scheduled for removal in Kotlin 2.3.",
-        ReplaceWith("mainOutputFileName"),
-        level = DeprecationLevel.ERROR
-    )
-    var outputFileName: String
-        get() = mainOutputFileName.get()
-        set(value) {
-            mainOutputFileName.set(value)
-        }
-
-    @get:Internal
     abstract val mainOutputFileName: Property<String>
-
-    @get:Internal
-    @Deprecated(
-        "Use `mainOutputFile` instead. Scheduled for removal in Kotlin 2.3.",
-        ReplaceWith("mainOutputFile"),
-        level = DeprecationLevel.ERROR
-    )
-    open val outputFile: File
-        get() = mainOutputFile.get().asFile
 
     @get:Internal
     val mainOutputFile: Provider<RegularFile> =
@@ -233,16 +190,6 @@ internal constructor(
     @Input
     @Optional
     val devServerProperty: Property<KotlinWebpackConfig.DevServer> = project.objects.property(KotlinWebpackConfig.DevServer::class.java)
-
-    @get:Internal
-    @Deprecated(
-        "Use devServerProperty instead. Scheduled for removal in Kotlin 2.3.",
-        replaceWith = ReplaceWith("devServerProperty"),
-        level = DeprecationLevel.ERROR,
-    )
-    var devServer: KotlinWebpackConfig.DevServer
-        get() = devServerProperty.get()
-        set(value) = devServerProperty.set(value)
 
     @Input
     @Optional

@@ -3452,7 +3452,6 @@ public final class org/jetbrains/kotlin/gradle/targets/js/npm/NpmDependencyKt {
 }
 
 public abstract interface class org/jetbrains/kotlin/gradle/targets/js/npm/NpmDependencyWithExternalsExtension : org/jetbrains/kotlin/gradle/targets/js/npm/BaseNpmDependencyExtension {
-	public abstract fun invoke (Ljava/lang/String;Ljava/lang/String;Z)Lorg/jetbrains/kotlin/gradle/targets/js/npm/NpmDependency;
 }
 
 public abstract interface class org/jetbrains/kotlin/gradle/targets/js/npm/NpmDirectoryDependencyExtension : org/jetbrains/kotlin/gradle/targets/js/npm/BaseNpmDependencyExtension {
@@ -3461,8 +3460,6 @@ public abstract interface class org/jetbrains/kotlin/gradle/targets/js/npm/NpmDi
 }
 
 public abstract interface class org/jetbrains/kotlin/gradle/targets/js/npm/NpmDirectoryDependencyWithExternalsExtension : org/jetbrains/kotlin/gradle/targets/js/npm/NpmDirectoryDependencyExtension {
-	public abstract fun invoke (Ljava/io/File;Z)Lorg/jetbrains/kotlin/gradle/targets/js/npm/NpmDependency;
-	public abstract fun invoke (Ljava/lang/String;Ljava/io/File;Z)Lorg/jetbrains/kotlin/gradle/targets/js/npm/NpmDependency;
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/npm/NpmEnv {
@@ -4275,14 +4272,11 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpa
 	public fun getConfigDirectory ()Ljava/io/File;
 	public fun getConfigFile ()Lorg/gradle/api/provider/Provider;
 	public final fun getDebug ()Z
-	public final fun getDestinationDirectory ()Ljava/io/File;
-	public final fun getDevServer ()Lorg/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpackConfig$DevServer;
 	public final fun getDevServerProperty ()Lorg/gradle/api/provider/Property;
 	public final fun getDevtool ()Ljava/lang/String;
 	public final fun getEntry ()Lorg/gradle/api/provider/Provider;
 	public abstract fun getEntryModuleName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getEsModules ()Lorg/gradle/api/provider/Property;
-	public fun getExecHandleFactory ()Ljava/lang/Void;
 	public final fun getGenerateConfigOnly ()Z
 	public final fun getInputFiles ()Lorg/gradle/api/file/FileTree;
 	public abstract fun getInputFilesDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -4293,8 +4287,6 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpa
 	public final fun getNpmProjectDir ()Lorg/gradle/api/provider/Provider;
 	public final fun getOutput ()Lorg/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpackOutput;
 	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
-	public fun getOutputFile ()Ljava/io/File;
-	public final fun getOutputFileName ()Ljava/lang/String;
 	public fun getRequiredNpmDependencies ()Ljava/util/Set;
 	public fun getRules ()Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinWebpackRulesContainer;
 	public final fun getSourceMaps ()Z
@@ -4304,13 +4296,10 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpa
 	public final fun setArgs (Ljava/util/List;)V
 	public final fun setBin (Ljava/lang/String;)V
 	public final fun setDebug (Z)V
-	public final fun setDestinationDirectory (Ljava/io/File;)V
-	public final fun setDevServer (Lorg/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpackConfig$DevServer;)V
 	public final fun setDevtool (Ljava/lang/String;)V
 	public final fun setGenerateConfigOnly (Z)V
 	public final fun setMode (Lorg/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpackConfig$Mode;)V
 	public final fun setNodeArgs (Ljava/util/List;)V
-	public final fun setOutputFileName (Ljava/lang/String;)V
 	public final fun setSourceMaps (Z)V
 	public final fun setWatchOptions (Lorg/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpackConfig$WatchOptions;)V
 	public final fun webpackConfigApplier (Lorg/gradle/api/Action;)V

@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.gradle.plugin
 
-import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.gradle.api.Action
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
@@ -388,23 +387,6 @@ interface KotlinDependencyHandler : HasProject {
         project.dependencies.platform(notation, configureAction)
 
     /**
-     * @suppress
-     */
-    @Deprecated(
-        "Dukat integration is being reevaluated. It currently does not work. See KT-54395. Scheduled for removal in Kotlin 2.3.",
-        level = DeprecationLevel.ERROR
-    )
-    fun npm(
-        name: String,
-        version: String,
-        generateExternals: Boolean
-    ): Dependency {
-        @Suppress("deprecation_error")
-        (warnNpmGenerateExternals(project.logger))
-        return npm(name, version)
-    }
-
-    /**
      * Creates a dependency on the [NPM](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#dependencies) module.
      *
      * Note: The created dependency should be manually added to this entity using other methods from this DSL:
@@ -421,25 +403,8 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun npm(
         name: String,
-        version: String
+        version: String,
     ): Dependency
-
-    /**
-     * @suppress
-     */
-    @Deprecated(
-        "Dukat integration is being reevaluated. It currently does not work. See KT-54395. Scheduled for removal in Kotlin 2.3.",
-        level = DeprecationLevel.ERROR
-    )
-    fun npm(
-        name: String,
-        directory: File,
-        generateExternals: Boolean
-    ): Dependency {
-        @Suppress("deprecation_error")
-        (warnNpmGenerateExternals(project.logger))
-        return npm(name, directory)
-    }
 
     /**
      * Creates a dependency on the [NPM](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#dependencies) module.
@@ -459,24 +424,8 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun npm(
         name: String,
-        directory: File
-    ): Dependency
-
-    /**
-     * @suppress
-     */
-    @Deprecated(
-        "Dukat integration is being reevaluated. It currently does not work. See KT-54395. Scheduled for removal in Kotlin 2.3.",
-        level = DeprecationLevel.ERROR
-    )
-    fun npm(
         directory: File,
-        generateExternals: Boolean
-    ): Dependency {
-        @Suppress("deprecation_error")
-        (warnNpmGenerateExternals(project.logger))
-        return npm(directory)
-    }
+    ): Dependency
 
     /**
      * Creates a dependency on the [NPM](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#dependencies) module.
@@ -495,7 +444,7 @@ interface KotlinDependencyHandler : HasProject {
      * (See NPM [directory](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#local-paths) keyword)
      */
     fun npm(
-        directory: File
+        directory: File,
     ): Dependency
 
     /**
@@ -516,7 +465,7 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun devNpm(
         name: String,
-        version: String
+        version: String,
     ): Dependency
 
     /**
@@ -538,7 +487,7 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun devNpm(
         name: String,
-        directory: File
+        directory: File,
     ): Dependency
 
     /**
@@ -559,25 +508,8 @@ interface KotlinDependencyHandler : HasProject {
      * (See NPM [directory](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#repository) keyword)
      */
     fun devNpm(
-        directory: File
+        directory: File,
     ): Dependency
-
-    /**
-     * @suppress
-     */
-    @Deprecated(
-        "Dukat integration is being reevaluated. It currently does not work. See KT-54395. Scheduled for removal in Kotlin 2.3.",
-        level = DeprecationLevel.ERROR
-    )
-    fun optionalNpm(
-        name: String,
-        version: String,
-        generateExternals: Boolean
-    ): Dependency {
-        @Suppress("deprecation_error")
-        (warnNpmGenerateExternals(project.logger))
-        return optionalNpm(name, version)
-    }
 
     /**
      * Creates a dependency to a NPM module that is added
@@ -597,25 +529,8 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun optionalNpm(
         name: String,
-        version: String
+        version: String,
     ): Dependency
-
-    /**
-     * @suppress
-     */
-    @Deprecated(
-        "Dukat integration is being reevaluated. It currently does not work. See KT-54395. Scheduled for removal in Kotlin 2.3.",
-        level = DeprecationLevel.ERROR
-    )
-    fun optionalNpm(
-        name: String,
-        directory: File,
-        generateExternals: Boolean
-    ): Dependency {
-        @Suppress("deprecation_error")
-        (warnNpmGenerateExternals(project.logger))
-        return optionalNpm(name, directory)
-    }
 
     /**
      * Creates a dependency to a NPM module that is added
@@ -636,24 +551,8 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun optionalNpm(
         name: String,
-        directory: File
-    ): Dependency
-
-    /**
-     * @suppress
-     */
-    @Deprecated(
-        "Dukat integration is being reevaluated. It currently does not work. See KT-54395. Scheduled for removal in Kotlin 2.3.",
-        level = DeprecationLevel.ERROR
-    )
-    fun optionalNpm(
         directory: File,
-        generateExternals: Boolean
-    ): Dependency {
-        @Suppress("deprecation_error")
-        (warnNpmGenerateExternals(project.logger))
-        return optionalNpm(directory)
-    }
+    ): Dependency
 
     /**
      * Creates a dependency to a NPM module that is added
@@ -673,7 +572,7 @@ interface KotlinDependencyHandler : HasProject {
      * (See NPM [directory](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#local-paths) keyword)
      */
     fun optionalNpm(
-        directory: File
+        directory: File,
     ): Dependency
 
     /**
@@ -694,6 +593,6 @@ interface KotlinDependencyHandler : HasProject {
      */
     fun peerNpm(
         name: String,
-        version: String
+        version: String,
     ): Dependency
 }
