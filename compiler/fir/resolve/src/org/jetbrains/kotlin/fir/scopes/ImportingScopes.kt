@@ -7,13 +7,10 @@ package org.jetbrains.kotlin.fir.scopes
 
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.FirScript
 import org.jetbrains.kotlin.fir.extensions.extensionService
 import org.jetbrains.kotlin.fir.extensions.firScriptResolutionConfigurators
 import org.jetbrains.kotlin.fir.extensions.replSnippetResolveExtensions
-import org.jetbrains.kotlin.fir.importTracker
 import org.jetbrains.kotlin.fir.packageFqName
-import org.jetbrains.kotlin.fir.reportImportDirectives
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.scopeSessionKey
 import org.jetbrains.kotlin.fir.resolve.transformers.FirImportResolveTransformer
@@ -60,15 +57,6 @@ internal fun computeImportingScopes(
         excludedImportNames.mapNotNullTo(mutableSetOf()) {
             if (it.parent() == file.packageFqName) it.shortName() else null
         }
-
-    session.importTracker?.let { tracker ->
-        file.imports.map { import ->
-            val importString = import.importedFqName?.asString()?.let {
-                if (import.isAllUnder) "$it.*" else it
-            }
-            tracker.reportImportDirectives(file.sourceFile?.path, importString)
-        }
-    }
 
     val scriptingDefaultImports = getDefaultImportsForScripting(session, file)
 
