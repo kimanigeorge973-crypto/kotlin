@@ -7,8 +7,10 @@ package org.jetbrains.kotlin.maven.test
 
 import org.apache.maven.shared.verifier.Verifier
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.File
-import kotlin.sequences.forEach
+import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 fun Verifier.printLog() {
     println("====LOG BEGIN====")
@@ -50,4 +52,12 @@ fun Verifier.assertBuildLogContains(vararg substring: String) {
             substrings.forEach { appendLine("'$it'") }
         }
     }
+}
+
+fun Verifier.assertFileExists(
+    relativePath: String,
+    messageSupplier: () -> String = { "Expected file not found: $relativePath" },
+) {
+    val path = Path(basedir).resolve(relativePath)
+    assertTrue(path.exists(), messageSupplier)
 }

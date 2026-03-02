@@ -6,10 +6,8 @@
 package org.jetbrains.kotlin.maven.plugin.test
 
 import org.jetbrains.kotlin.maven.test.*
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
-import kotlin.io.path.exists
 
 @Execution(ExecutionMode.CONCURRENT)
 class SmartDefaultsIT : KotlinMavenTestBase() {
@@ -20,36 +18,24 @@ class SmartDefaultsIT : KotlinMavenTestBase() {
         testProject("test-smart-defaults-kapt", mavenVersion, buildOptions) {
             build("verify") {
                 // Build succeeded and JAR was produced
-                assertTrue(
-                    workDir
-                        .resolve("app/target/app-1.0-SNAPSHOT.jar")
-                        .exists()
-                ) { "App JAR was not produced" }
+                assertFileExists("app/target/app-1.0-SNAPSHOT.jar") { "App JAR was not produced" }
 
                 // KAPT ran and generated a Java source file from @Anno on KotlinService
-                assertTrue(
-                    workDir
-                        .resolve("app/target/generated-sources/kapt/compile/app/KotlinServiceGenerated.java")
-                        .exists()
+                assertFileExists(
+                    "app/target/generated-sources/kapt/compile/app/KotlinServiceGenerated.java"
                 ) { "KAPT-generated Java source file was not found" }
 
                 // KAPT ran and generated a Kotlin extension file from @Anno on KotlinService
-                assertTrue(
-                    workDir
-                        .resolve("app/target/generated-sources/kaptKotlin/compile/KotlinServiceExtensions.kt")
-                        .exists()
+                assertFileExists(
+                    "app/target/generated-sources/kaptKotlin/compile/KotlinServiceExtensions.kt"
                 ) { "KAPT-generated Kotlin extension file was not found" }
 
                 // Tests successfully ran and produced Surefire XML reports
-                assertTrue(
-                    workDir
-                        .resolve("app/target/surefire-reports/TEST-app.KotlinServiceTest.xml")
-                        .exists()
+                assertFileExists(
+                    "app/target/surefire-reports/TEST-app.KotlinServiceTest.xml"
                 ) { "Surefire report for KotlinServiceTest not found" }
-                assertTrue(
-                    workDir
-                        .resolve("app/target/surefire-reports/TEST-app.JavaConsumerTest.xml")
-                        .exists()
+                assertFileExists(
+                    "app/target/surefire-reports/TEST-app.JavaConsumerTest.xml"
                 ) { "Surefire report for JavaConsumerTest not found" }
 
                 assertBuildLogContains(
@@ -57,9 +43,8 @@ class SmartDefaultsIT : KotlinMavenTestBase() {
                     "Tests run: 2, Failures: 0, Errors: 0, Skipped: 0",
                     // 3 tests in the `JavaConsumerTest`
                     "Tests run: 3, Failures: 0, Errors: 0, Skipped: 0",
+                    "BUILD SUCCESS",
                 )
-
-                assertBuildLogContains("BUILD SUCCESS")
             }
         }
     }
