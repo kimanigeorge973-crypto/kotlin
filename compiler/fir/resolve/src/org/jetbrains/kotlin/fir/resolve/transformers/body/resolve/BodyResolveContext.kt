@@ -589,13 +589,13 @@ class BodyResolveContext(
         val base = towerDataContext.addNonLocalTowerDataElements(towerElementsForClass.superClassesStaticsAndCompanionReceivers)
 
         val statics = base
-            .addNonLocalScopesIfNotNull(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope)
+            .addCompanionAndStaticScopes(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope, towerElementsForClass.staticScopeOwnerSymbol)
 
         val staticsAndCompanion = when (val companionReceiver = towerElementsForClass.companionReceiver) {
             null -> statics
             else -> base
                 .addReceiver(null, companionReceiver)
-                .addNonLocalScopesIfNotNull(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope)
+                .addCompanionAndStaticScopes(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope, towerElementsForClass.staticScopeOwnerSymbol)
         }
 
         val typeParameterScope = (owner as? FirRegularClass)?.typeParameterScope()
@@ -607,7 +607,7 @@ class BodyResolveContext(
             towerDataContext
                 .addNonLocalTowerDataElements(towerElementsForClass.superClassesStaticsAndCompanionReceivers)
                 .addReceiverIfNotNull(null, towerElementsForClass.companionReceiver)
-                .addNonLocalScopesIfNotNull(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope)
+                .addCompanionAndStaticScopes(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope, towerElementsForClass.staticScopeOwnerSymbol)
                 // Note: scopes here are in reverse order, so type parameter scope is the most prioritized
                 .addNonLocalScope(typeParameterScope)
         } else {
@@ -671,7 +671,7 @@ class BodyResolveContext(
                 .addReceiver(labelName, inaccessibleThisInHeader)
                 .addNonLocalTowerDataElements(towerElementsForClass.superClassesStaticsAndCompanionReceivers)
                 .addReceiverIfNotNull(null, towerElementsForClass.companionReceiver)
-                .addNonLocalScopesIfNotNull(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope)
+                .addCompanionAndStaticScopes(towerElementsForClass.companionStaticScope, towerElementsForClass.staticScope, towerElementsForClass.staticScopeOwnerSymbol)
                 .addNonLocalScopeIfNotNull(typeParameterScope)
         } else {
             withTypeParameters
