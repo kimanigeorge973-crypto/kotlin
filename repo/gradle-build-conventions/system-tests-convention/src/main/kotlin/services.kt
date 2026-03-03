@@ -39,7 +39,7 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
             val out = ByteArrayOutputStream()
             val err = ByteArrayOutputStream()
             val result = exec.exec {
-                commandLine("git", "diff", "--name-only", "origin/master...HEAD")
+                commandLine("git", "diff", "--name-only", "master...HEAD")
                 isIgnoreExitValue = true
                 standardOutput = out
                 errorOutput = err
