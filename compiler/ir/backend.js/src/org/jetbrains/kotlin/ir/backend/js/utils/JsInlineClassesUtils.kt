@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.utils
 
-import org.jetbrains.kotlin.backend.common.compilationException
+import org.jetbrains.kotlin.ir.backend.js.ir.isExported
 import org.jetbrains.kotlin.ir.backend.js.JsCommonInlineClassesUtils
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -45,8 +45,10 @@ class JsInlineClassesUtils(val context: JsIrBackendContext) : JsCommonInlineClas
     // Char is declared as a regular class, but we want to treat it as an inline class.
     // We can't declare it as an inline/value class for compatibility reasons.
     // For example, applying the === operator will stop working if Char becomes an inline class.
+    // Additionally, in the scope of KT-80734 we haven't found any reasonable way to make @JsExport inline classes
+    // boxed/unboxed, so why we also treat them as regular classes
     override fun isClassInlineLike(klass: IrClass): Boolean =
-        super.isClassInlineLike(klass) || klass.symbol.signature == IdSignatureValues._char
+        klass.symbol.signature == IdSignatureValues._char || super.isClassInlineLike(klass) && !klass.isExported(context)
 
     override val boxIntrinsic: IrSimpleFunctionSymbol
         get() = context.symbols.jsBoxIntrinsic
