@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.systemTest.currentAffectedTestSystems
 import org.jetbrains.kotlin.systemTest.currentSystemTestModeOrNull
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
+import kotlin.io.path.Path
 
 /*
  * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
@@ -19,14 +20,8 @@ import javax.inject.Inject
  */
 
 
-internal val Project.testSystem: TestSystem
-    get() {
-        return when {
-            this.path.contains("gradle") -> TestSystem.Gradle
-            this.path.contains("compiler") -> TestSystem.Compiler
-            else -> TestSystem.Unknown
-        }
-    }
+internal val Project.affectedSystemBuildService: Provider<AffectedSystemBuildService>
+    get() = gradle.sharedServices.registerIfAbsent("affectedSystemBuildService", AffectedSystemBuildService::class.java)
 
 abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.None> {
     @get:Inject
@@ -36,32 +31,17 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
         /* Precedence goes to currentAffectedTestSystems, which is provided by the current environment (e.g. by command line) */
         currentAffectedTestSystems?.let { return@lazy it }
 
-        val changedSystems = TestSystem.entries.associateWith { false }.toMutableMap()
-
-        changedSystems.filterValues { it }.keys.toSet()
         val out = ByteArrayOutputStream()
         exec.exec {
             commandLine("git", "diff", "--name-only", "origin/master...HEAD")
             standardOutput = out
         }.assertNormalExitValue().rethrowFailure()
 
-        out.toByteArray().decodeToString().lines().forEach { changeEntry ->
-            if (changeEntry.contains("libraries/tools/kotlin-gradle")) {
-                changedSystems[TestSystem.Gradle] = true
-            } /*else if (changeEntry.contains("compiler/")) {
-                changedSystems[TestSystem.Compiler] = true
-            }*/ else {
-                changedSystems[TestSystem.Unknown] = true
-            }
-        }
-
-        val affectedSystems = changedSystems.filterValues { it }.keys.sorted().toSet()
-        affectedSystems
+        val changedFiles = out.toByteArray().decodeToString().lines().map { changeEntry -> Path(changeEntry) }
+        affectedTestSystems(changedFiles).toSet()
     }
 }
 
-private val Project.affectedSystemBuildService: Provider<AffectedSystemBuildService>
-    get() = gradle.sharedServices.registerIfAbsent("affectedSystemBuildService", AffectedSystemBuildService::class.java)
 
 abstract class SystemTestModeValueSource : ValueSource<SystemTestMode, SystemTestModeValueSource.Params> {
     interface Params : ValueSourceParameters {
@@ -93,15 +73,3 @@ abstract class AffectedTestSystemValueSource : ValueSource<Set<TestSystem>, Affe
         return parameters.service.get().affectedTestSystems
     }
 }
-
-val Project.systemTestMode: Provider<SystemTestMode>
-    get() = project.project.providers.of(SystemTestModeValueSource::class.java) {
-        parameters.testSystem.set(project.testSystem)
-        parameters.service.set(project.affectedSystemBuildService)
-    }
-
-
-val Project.affectedTestSystems: Provider<Set<TestSystem>>
-    get() = project.providers.of(AffectedTestSystemValueSource::class.java) {
-        parameters.service.set(project.affectedSystemBuildService)
-    }
