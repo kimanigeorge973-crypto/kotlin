@@ -31,10 +31,13 @@ val powerAssertNativeRuntimeClasspath: Configuration by configurations.creating 
 }
 
 dependencies {
+    embedded(project(":kotlin-power-assert-compiler-plugin.common")) { isTransitive = false }
     embedded(project(":kotlin-power-assert-compiler-plugin.backend")) { isTransitive = false }
+    embedded(project(":kotlin-power-assert-compiler-plugin.frontend")) { isTransitive = false }
     embedded(project(":kotlin-power-assert-compiler-plugin.cli")) { isTransitive = false }
 
     testFixturesApi(project(":kotlin-power-assert-compiler-plugin.backend"))
+    testFixturesApi(project(":kotlin-power-assert-compiler-plugin.frontend"))
 
     testFixturesApi(platform(libs.junit.bom))
     testFixturesApi(libs.junit.jupiter.api)

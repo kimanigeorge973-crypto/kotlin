@@ -10,9 +10,14 @@ import org.jetbrains.kotlin.diagnostics.KtDiagnosticRenderers.TO_STRING
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExpression
 
 object PowerAssertDiagnostics : KtDiagnosticsContainer() {
     override fun getRendererFactory(): BaseDiagnosticRendererFactory = PowerAssertRenderFactory
+
+    // ===== ERRORS ===== //
+
+    val POWER_ASSERT_ILLEGAL_EXPLANATION_ACCESS by error0<KtExpression>()
 
     // ===== WARNINGS ===== //
 
@@ -29,6 +34,10 @@ object PowerAssertDiagnostics : KtDiagnosticsContainer() {
 
 object PowerAssertRenderFactory : BaseDiagnosticRendererFactory() {
     override val MAP by KtDiagnosticFactoryToRendererMap("Power-Assert") { map ->
+        map.put(
+            factory = PowerAssertDiagnostics.POWER_ASSERT_ILLEGAL_EXPLANATION_ACCESS,
+            message = "'PowerAssert.explanation' can only be accessed from within a function annotated with '@PowerAssert'.",
+        )
         map.put(
             factory = PowerAssertDiagnostics.POWER_ASSERT_RUNTIME_UNAVAILABLE,
             message = "Power-Assert runtime library not available.",

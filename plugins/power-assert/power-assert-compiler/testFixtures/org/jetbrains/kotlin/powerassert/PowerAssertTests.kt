@@ -8,7 +8,9 @@ package org.jetbrains.kotlin.powerassert
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.codegen.forTestCompile.ForTestCompileRuntime
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
+import org.jetbrains.kotlin.compiler.plugin.registerExtension
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.powerassert.PowerAssertConfigurationDirectives.DISABLE_PLUGIN
 import org.jetbrains.kotlin.test.backend.handlers.IrPrettyKotlinDumpHandler
@@ -24,6 +26,7 @@ import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.RegisteredDirectives
 import org.jetbrains.kotlin.test.model.TestFile
 import org.jetbrains.kotlin.test.model.TestModule
+import org.jetbrains.kotlin.test.runners.AbstractPhasedJvmDiagnosticPsiTest
 import org.jetbrains.kotlin.test.runners.codegen.AbstractFirLightTreeBlackBoxCodegenTest
 import org.jetbrains.kotlin.test.runners.codegen.AbstractIrBlackBoxCodegenTest
 import org.jetbrains.kotlin.test.services.AdditionalSourceProvider
@@ -41,6 +44,13 @@ open class AbstractIrBlackBoxCodegenTestForPowerAssert : AbstractIrBlackBoxCodeg
 }
 
 open class AbstractFirLightTreeBlackBoxCodegenTestForPowerAssert : AbstractFirLightTreeBlackBoxCodegenTest() {
+    override fun configure(builder: TestConfigurationBuilder) {
+        super.configure(builder)
+        builder.configurePlugin()
+    }
+}
+
+abstract class AbstractPowerAssertPluginFirPsiDiagnosticTest : AbstractPhasedJvmDiagnosticPsiTest() {
     override fun configure(builder: TestConfigurationBuilder) {
         super.configure(builder)
         builder.configurePlugin()
@@ -93,6 +103,7 @@ class PowerAssertEnvironmentConfigurator(testServices: TestServices) : Environme
                 )
             )
         )
+        FirExtensionRegistrar.registerExtension(PowerAssertFirExtensionRegistrar())
     }
 }
 
