@@ -49,7 +49,7 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
                 "Inferring changed fails (git diff) failed with exit code ${result.exitValue}\n" + err.toByteArray().decodeToString()
             )
 
-            val changedFiles = out.toByteArray().decodeToString().lines().map { changeEntry -> Path(changeEntry) }
+            val changedFiles = out.toByteArray().decodeToString().lines()
             val value = affectedTestSystems(changedFiles).toSet()
             cachedValue = value
             return value
