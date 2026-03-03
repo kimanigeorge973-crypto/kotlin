@@ -15,19 +15,13 @@ inline fun multipleReturnsRequireDeeperAnalysis(useShorterRange: Boolean): Itera
     return 0..10
 }
 
-// TODO: complex analysis of IrReturnableBlock is required to find out actual return type is IntRange.
-// Meanwhile, iterator is used in every fun which invokes `iterableInt()`
 inline fun iterableInt(): Iterable<Int> = (0..10)
 
-// TODO: complex analysis of IrReturnableBlock is required to find out actual return type is IntRange.
-// Meanwhile, iterator is used in every fun which invokes `iterableIntWithTempVal()`
 inline fun iterableIntWithTempVal(): Iterable<Int> {
     val iterableInt: Iterable<Int> = 0..10
     return iterableInt
 }
 
-// TODO: complex analysis of IrReturnableBlock is required to find out actual return type is IntRange.
-// Meanwhile, iterator is used in every fun which invokes `iterableIntWithTempValIterableInt()`
 inline fun iterableIntWithTempValIterableInt(): Iterable<Int> {
     val iterableInt: Iterable<Int> = iterableInt()
     return iterableInt
