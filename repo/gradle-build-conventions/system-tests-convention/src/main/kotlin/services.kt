@@ -27,14 +27,15 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
     @get:Inject
     abstract val exec: ExecOperations
 
-    val affectedTestSystems: Set<TestSystem> by lazy {
+    val affectedTestSystems: Set<TestSystem> get() {
         /* Precedence goes to currentAffectedTestSystems, which is provided by the current environment (e.g. by command line) */
-        currentAffectedTestSystems?.let { return@lazy it }
+        currentAffectedTestSystems?.let { return it }
 
         val out = ByteArrayOutputStream()
         val err = ByteArrayOutputStream()
         val result = exec.exec {
             commandLine("git", "diff", "--name-only", "origin/master...HEAD")
+            isIgnoreExitValue = true
             standardOutput = out
             errorOutput = err
         }
