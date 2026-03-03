@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.systemTest.currentAffectedTestSystems
 import org.jetbrains.kotlin.systemTest.currentSystemTestModeOrNull
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
-import kotlin.io.path.Path
 
 /*
  * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
@@ -22,6 +21,7 @@ import kotlin.io.path.Path
 
 internal val Project.affectedSystemBuildService: Provider<AffectedSystemBuildService>
     get() = gradle.sharedServices.registerIfAbsent("affectedSystemBuildService", AffectedSystemBuildService::class.java)
+
 
 abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.None>, AutoCloseable {
     @get:Inject
