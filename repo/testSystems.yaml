@@ -1,1 +1,21 @@
 $schema: testSystems.schema.json
+
+Compiler:
+  includeProjects:
+    - "compiler:.*"
+    - "core:.*"
+  includeFiles:
+    - ".*compiler.*"
+    - ".*core.*"
+
+Gradle:
+  includeProjects:
+    - "gradle:.*"
+  includeFiles:
+    - ".*gradle.*"
+
+Unknown:
+  includeProjects:
+    - ".*"
+  dependencies:
+    - "Compiler"

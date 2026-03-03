@@ -11,14 +11,35 @@
     "^[A-Za-z0-9_]+$": {
       "type": "object",
       "properties": {
-        "affectedByFiles": {
+        "includeProjects": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "projectPattern": {
-          "type": "string"
+        "excludeProjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "includeFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excludeFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

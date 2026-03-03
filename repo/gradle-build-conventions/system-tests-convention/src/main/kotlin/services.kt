@@ -32,10 +32,16 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
         currentAffectedTestSystems?.let { return@lazy it }
 
         val out = ByteArrayOutputStream()
-        exec.exec {
+        val err = ByteArrayOutputStream()
+        val result = exec.exec {
             commandLine("git", "diff", "--name-only", "origin/master...HEAD")
             standardOutput = out
-        }.assertNormalExitValue().rethrowFailure()
+            errorOutput = err
+        }
+
+        if (result.exitValue != 0) throw Exception(
+            "Inferring changed fails (git diff) failed with exit code ${result.exitValue}\n" + err.toByteArray().decodeToString()
+        )
 
         val changedFiles = out.toByteArray().decodeToString().lines().map { changeEntry -> Path(changeEntry) }
         affectedTestSystems(changedFiles).toSet()
