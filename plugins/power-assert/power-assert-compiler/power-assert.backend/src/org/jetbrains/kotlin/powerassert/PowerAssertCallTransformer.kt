@@ -53,6 +53,7 @@ class PowerAssertCallTransformer(
     private val sourceFile: SourceFile,
     private val context: IrPluginContext,
     private val configuration: PowerAssertConfiguration,
+    private val builtIns: PowerAssertBuiltIns?,
     private val factory: PowerAssertFunctionFactory?,
     private val explanationFactory: ExplanationFactory?
 ) : IrElementTransformerVoidWithContext() {
@@ -80,7 +81,7 @@ class PowerAssertCallTransformer(
         originalCall: IrCall,
         function: IrSimpleFunction,
     ): IrExpression {
-        if (explanationFactory == null || factory == null) {
+        if (builtIns == null || explanationFactory == null || factory == null) {
             // An IrAnnotation is never created for an unknown annotation.
             // This means this check is entirely pointless as we cannot have an annotated function
             // if the runtime library is missing.
@@ -97,7 +98,7 @@ class PowerAssertCallTransformer(
         }
 
         val diagramBuilder = CallExplanationParameterBuilder(explanationFactory, sourceFile, originalCall)
-        val callBuilder = SimpleCallBuilder(synthetic, originalCall)
+        val callBuilder = LambdaCallBuilder(synthetic, originalCall, builtIns.function0CallExplanationType, builtIns.callExplanationType)
         val roots = buildArgumentTrees(callBuilder, function, originalCall)
         return buildPowerAssertCall(originalCall, callBuilder, diagramBuilder, roots)
     }
@@ -275,7 +276,7 @@ class PowerAssertCallTransformer(
             val messageType = parameters.last().type
             return@mapNotNull when {
                 isStringSupertype(messageType) -> SimpleCallBuilder(overload, original)
-                isStringFunction(messageType) -> LambdaCallBuilder(overload, original, messageType)
+                isStringFunction(messageType) -> LambdaCallBuilder(overload, original, messageType, context.irBuiltIns.stringType)
                 isStringJavaSupplierFunction(messageType) -> SamConversionLambdaCallBuilder(overload, original, messageType)
                 else -> null
             }

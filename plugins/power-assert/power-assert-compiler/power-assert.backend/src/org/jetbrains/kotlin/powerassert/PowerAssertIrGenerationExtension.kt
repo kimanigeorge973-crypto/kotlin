@@ -40,7 +40,7 @@ class PowerAssertIrGenerationExtension(
 
         for (file in moduleFragment.files) {
             val source = SourceFile.findSource(file) ?: continue
-            PowerAssertCallTransformer(source, pluginContext, configuration, factory, explanationFactory)
+            PowerAssertCallTransformer(source, pluginContext, configuration, builtIns, factory, explanationFactory)
                 .visitFile(file)
         }
     }

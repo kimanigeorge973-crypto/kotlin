@@ -1,7 +1,7 @@
 @JvmSynthetic
-fun explain$powerassert(value: Any, $explanation: CallExplanation): String? {
+fun explain$powerassert(value: Any, $explanation: Function0<CallExplanation>): String? {
   return { // BLOCK
-    val tmp_0: CallExplanation? = $explanation
+    val tmp_0: CallExplanation? = $explanation.invoke()
     when {
       EQEQ(arg0 = tmp_0, arg1 = null) -> null
       else -> toDefaultMessage(/* <this> = tmp_0 */)
@@ -13,7 +13,10 @@ fun box(): String {
   return { // BLOCK
     val tmp_1: String? = { // BLOCK
       val tmp0_Explain: String = "OK"
-      explain$powerassert(value = tmp0_Explain, $explanation = CallExplanation(offset = 65, source = "           explain(\"OK\")", arguments = listOf</* null */>(elements = [Argument(startOffset = 19, endOffset = 23, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ConstantExpression(startOffset = 19, endOffset = 23, displayOffset = 19, value = tmp0_Explain)]))])))
+      explain$powerassert(value = tmp0_Explain, $explanation = local fun <anonymous>(): CallExplanation {
+        return CallExplanation(offset = 65, source = "           explain(\"OK\")", arguments = listOf</* null */>(elements = [Argument(startOffset = 19, endOffset = 23, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ConstantExpression(startOffset = 19, endOffset = 23, displayOffset = 19, value = tmp0_Explain)]))]))
+      }
+)
     }
     when {
       EQEQ(arg0 = tmp_1, arg1 = null) -> "FAIL"
@@ -32,3 +35,4 @@ fun explain(value: Any): String? {
     }
   }
 }
+

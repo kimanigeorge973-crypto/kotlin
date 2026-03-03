@@ -9,14 +9,19 @@ import org.jetbrains.kotlin.backend.common.extensions.DeclarationFinder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.fir.backend.utils.defaultTypeWithoutArguments
+import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.isVararg
+import org.jetbrains.kotlin.ir.util.simpleFunctions
 import org.jetbrains.kotlin.name.*
+import org.jetbrains.kotlin.util.OperatorNameConventions
 
 class PowerAssertBuiltIns private constructor(
+    private val irBuiltIns: IrBuiltIns,
     finder: DeclarationFinder,
     val metadata: PowerAssertMetadata,
     val powerAssertClass: IrClassSymbol,
@@ -25,7 +30,12 @@ class PowerAssertBuiltIns private constructor(
         fun from(context: IrPluginContext): PowerAssertBuiltIns? {
             val finder = context.finderForBuiltins()
             val powerAssertClass = finder.findClass(powerAssertClassId) ?: return null
-            return PowerAssertBuiltIns(finder, PowerAssertMetadata(context.languageVersionSettings.languageVersion), powerAssertClass)
+            return PowerAssertBuiltIns(
+                context.irBuiltIns,
+                finder,
+                PowerAssertMetadata(context.languageVersionSettings.languageVersion),
+                powerAssertClass
+            )
         }
 
         const val PLUGIN_ID = "org.jetbrains.kotlin.powerassert"
@@ -92,6 +102,7 @@ class PowerAssertBuiltIns private constructor(
     val callExplanationClass = finder.findClassOrError(callExplanationClassId)
     val callExplanationType = callExplanationClass.defaultTypeWithoutArguments
     val callExplanationConstructor = callExplanationClass.primaryConstructor()
+    val function0CallExplanationType = irBuiltIns.functionN(0).typeWith(callExplanationType)
     val toDefaultMessageFunction = finder.findFunctionOrError(callableId("toDefaultMessage"))
 
     val argumentClass = finder.findClassOrError(argumentClassId)
@@ -108,4 +119,8 @@ class PowerAssertBuiltIns private constructor(
 
     val jvmSyntheticAnnotation = finder.findConstructors(JvmStandardClassIds.JVM_SYNTHETIC_ANNOTATION_CLASS_ID)
         .single()
+
+    val function0invoke = irBuiltIns.functionN(0)
+        .simpleFunctions()
+        .single { it.name == OperatorNameConventions.INVOKE }
 }

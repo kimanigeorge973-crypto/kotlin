@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.types.makeNullable
@@ -25,7 +26,16 @@ class PowerAssertGetExplanationTransformer(
         return when {
             isGetExplanation(expression) -> when (parameter) {
                 null -> IrConstImpl.constNull(expression.startOffset, expression.endOffset, builtIns.callExplanationType.makeNullable())
-                else -> IrGetValueImpl(expression.startOffset, expression.endOffset, parameter.type, parameter.symbol)
+                else -> {
+                    val callee = builtIns.function0invoke
+                    IrCallImpl(
+                        expression.startOffset, expression.endOffset, callee.returnType, callee.symbol,
+                        typeArgumentsCount = callee.typeParameters.size,
+                        origin = null
+                    ).apply {
+                        dispatchReceiver = IrGetValueImpl(expression.startOffset, expression.endOffset, parameter.type, parameter.symbol)
+                    }
+                }
             }
             else -> super.visitExpression(expression)
         }

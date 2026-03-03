@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrAnnotationImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.irAttribute
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
@@ -54,7 +55,7 @@ class PowerAssertFunctionFactory(
             annotations += createJvmSyntheticAnnotation() // TODO is this needed?
             val explanationParameter = addValueParameter {
                 name = Name.identifier("\$explanation") // TODO what if there's another property with this name?
-                type = builtIns.callExplanationType
+                type = builtIns.function0CallExplanationType
             }
 
             overriddenSymbols = originalFunction.overriddenSymbols.map { generate(it.owner).symbol }

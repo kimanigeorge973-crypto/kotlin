@@ -2,9 +2,9 @@
 // FILE: A.kt
 
 @JvmSynthetic
-fun describe$powerassert(value: Any, $explanation: CallExplanation): String? {
+fun describe$powerassert(value: Any, $explanation: Function0<CallExplanation>): String? {
   return { // BLOCK
-    val tmp_0: CallExplanation? = $explanation
+    val tmp_0: CallExplanation? = $explanation.invoke()
     when {
       EQEQ(arg0 = tmp_0, arg1 = null) -> null
       else -> toDefaultMessage(/* <this> = tmp_0 /*as CallExplanation */ */)
@@ -34,7 +34,10 @@ fun box(): String {
       val tmp1_Explain: List<String> = reversed<String>(/* <this> = tmp0_Explain */)
       val tmp2_Explain: List<String> = emptyList<String>()
       val tmp3_Explain: Boolean = EQEQ(arg0 = tmp1_Explain, arg1 = tmp2_Explain)
-      describe$powerassert(value = tmp3_Explain, $explanation = CallExplanation(offset = 111, source = "           describe(reallyLongList.reversed() == emptyList<String>())", arguments = listOf</* null */>(elements = [Argument(startOffset = 20, endOffset = 68, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 20, endOffset = 34, displayOffset = 20, value = tmp0_Explain), ValueExpression(startOffset = 20, endOffset = 45, displayOffset = 35, value = tmp1_Explain), ValueExpression(startOffset = 49, endOffset = 68, displayOffset = 49, value = tmp2_Explain), EqualityExpression(startOffset = 20, endOffset = 68, displayOffset = 46, value = tmp3_Explain, lhs = tmp1_Explain, rhs = tmp2_Explain)]))])))
+      describe$powerassert(value = tmp3_Explain, $explanation = local fun <anonymous>(): CallExplanation {
+        return CallExplanation(offset = 111, source = "           describe(reallyLongList.reversed() == emptyList<String>())", arguments = listOf</* null */>(elements = [Argument(startOffset = 20, endOffset = 68, kind = Kind.VALUE, expressions = listOf</* null */>(elements = [ValueExpression(startOffset = 20, endOffset = 34, displayOffset = 20, value = tmp0_Explain), ValueExpression(startOffset = 20, endOffset = 45, displayOffset = 35, value = tmp1_Explain), ValueExpression(startOffset = 49, endOffset = 68, displayOffset = 49, value = tmp2_Explain), EqualityExpression(startOffset = 20, endOffset = 68, displayOffset = 46, value = tmp3_Explain, lhs = tmp1_Explain, rhs = tmp2_Explain)]))]))
+      }
+)
     }
     when {
       EQEQ(arg0 = tmp_0, arg1 = null) -> "FAIL"
@@ -42,3 +45,4 @@ fun box(): String {
     }
   }
 }
+
