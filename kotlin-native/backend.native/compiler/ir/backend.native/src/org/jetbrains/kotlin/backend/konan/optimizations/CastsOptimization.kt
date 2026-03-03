@@ -538,7 +538,11 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                 )
             }
 
-            fun finishControlFlowMerging(irElement: IrElement, cfmpInfo: ControlFlowMergePointInfo): VisitorResult {
+            fun finishControlFlowMerging(
+                    irElement: IrElement,
+                    cfmpInfo: ControlFlowMergePointInfo,
+                    optimizeAwayComplexTerms: Boolean = true,
+            ): VisitorResult {
                 variableAliases.clear()
                 for ((variable, alias) in cfmpInfo.variableAliases) {
                     variableAliases[variable] = if (alias != multipleValuesMarker)
@@ -547,7 +551,9 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                         createPhantomVariable(variable, createPhantomValueAt(variable, irElement)) // This is basically a phi node.
                 }
                 return VisitorResult(
-                        Predicates.optimizeAwayComplexTerms(cfmpInfo.predicate, complexTermsMask),
+                        if (optimizeAwayComplexTerms)
+                            Predicates.optimizeAwayComplexTerms(cfmpInfo.predicate, complexTermsMask)
+                        else cfmpInfo.predicate,
                         cfmpInfo.phiNodeAlias.takeIf { it != multipleValuesMarker }
                 )
             }
@@ -902,7 +908,8 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                         controlFlowMergePoint(cfmpInfo, result)
                     context.logMultiple {
                         +expression.dump()
-                        +"    result = ${cfmpInfo.predicate.format(leafTerms)}"
+                        +"    current = ${result.predicate.format(leafTerms)}"
+                        +"    aggregated = ${cfmpInfo.predicate.format(leafTerms)}"
                     }
                 }
                 return VisitorResult.Nothing
@@ -972,7 +979,7 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
 
                 context.logMultiple {
                     +"LOOP START ${loop.condition.render()}"
-                    +"    ${data.format(leafTerms)}"
+                    +"    upper level predicate: ${getFullPredicate(Predicate.Empty, false, 0).format(leafTerms)}"
                     variableAliasesAtLoopStart.forEach { (variable, alias) -> +"    ${variable.name} -> ${alias.name}" }
                 }
 
@@ -1050,6 +1057,11 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                         val result = finishControlFlowMerging(loop, breaksCFMPInfo).predicate
                         --loopsDepth
                         breaksCFMPInfos.remove(loop)
+
+                        context.logMultiple {
+                            +"LOOP END ${loop.condition.render()}"
+                            +"    ${Predicates.and(data, result).format(leafTerms)}"
+                        }
 
                         return@usingUpperLevelPredicate Predicates.and(data, result)
                     } else {
@@ -1186,11 +1198,14 @@ internal class CastsOptimization(val context: Context) : BodyLoweringPass {
                     +"    result = ${cfmpInfo.predicate.format(leafTerms)}"
                     +"    predicate = ${predicate.format(leafTerms)}"
                 }
-                if (!expression.branches.last().isUnconditional()) // Non-exhaustive when.
+                val isExhaustive = expression.branches.last().isUnconditional()
+                if (!isExhaustive)
                     controlFlowMergePoint(cfmpInfo, VisitorResult(predicate, null))
                 context.log { "    result = ${cfmpInfo.predicate.format(leafTerms)}" }
 
-                val result = finishControlFlowMerging(expression, cfmpInfo)
+                // It's incorrect to optimize away complex terms for a non-exhaustive when as basically
+                // all the code that goes after it is wrapped with `else { .. }` clause.
+                val result = finishControlFlowMerging(expression, cfmpInfo, optimizeAwayComplexTerms = isExhaustive)
                 context.log { "    result = ${result.predicate.format(leafTerms)}" }
                 val resultPredicate = Predicates.and(data, result.predicate)
                 context.logMultiple {
