@@ -1,15 +1,11 @@
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ValueSource
-import org.gradle.api.provider.ValueSourceParameters
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.process.ExecOperations
-import org.jetbrains.kotlin.systemTest.SystemTestMode
 import org.jetbrains.kotlin.systemTest.TestSystem
-import org.jetbrains.kotlin.systemTest.currentAffectedTestSystems
-import org.jetbrains.kotlin.systemTest.currentSystemTestModeOrNull
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
@@ -19,13 +15,76 @@ import javax.inject.Inject
  */
 
 
-internal val Project.affectedSystemBuildService: Provider<AffectedSystemBuildService>
-    get() = gradle.sharedServices.registerIfAbsent("affectedSystemBuildService", AffectedSystemBuildService::class.java)
+internal val Project.featureBranchDiffService: Provider<FeatureBranchDiffService>
+    get() = gradle.sharedServices.registerIfAbsent("featureBranchDiffService", FeatureBranchDiffService::class.java) {
+        parameters.diffFile.set(project.diffFile)
+    }
 
+internal val Project.affectedTestSystemsService: Provider<AffectedTestSystemsService>
+    get() = gradle.sharedServices.registerIfAbsent("affectedSystemBuildService", AffectedTestSystemsService::class.java) {
+        parameters.diffService.set(featureBranchDiffService)
+        parameters.affectedSystemsFile.set(affectedSystemsFile)
+    }
 
-abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.None>, AutoCloseable {
+internal val Project.diffFile
+    get() = isolated.rootProject.projectDirectory.file(".test-system.diff.txt")
+
+internal val Project.affectedSystemsFile
+    get() = isolated.rootProject.projectDirectory.file(".test-system.affected.txt")
+
+abstract class FeatureBranchDiffService : BuildService<FeatureBranchDiffService.Params>, AutoCloseable {
+    interface Params : BuildServiceParameters {
+        val diffFile: RegularFileProperty
+    }
+
     @get:Inject
-    abstract val exec: ExecOperations
+    internal abstract val exec: ExecOperations
+
+    private var _diff: List<String>? = null
+
+    fun diff(): List<String> {
+        _diff?.let { return it }
+        _diff = calculateFeatureBranchChangedFiles()
+        return _diff.orEmpty()
+    }
+
+    private fun calculateFeatureBranchChangedFiles(): List<String> {
+        /*
+        A diff file might be provided by CI environments
+         */
+        if (parameters.diffFile.get().asFile.exists()) {
+            return parameters.diffFile.get().asFile.readLines()
+        }
+
+        val out = ByteArrayOutputStream()
+        val err = ByteArrayOutputStream()
+        val result = exec.exec {
+            commandLine("git", "diff", "--name-only", "origin/master...HEAD")
+            isIgnoreExitValue = true
+            standardOutput = out
+            errorOutput = err
+        }
+
+        if (result.exitValue != 0) throw Exception(
+            "Inferring changed fails (git diff) failed with exit code ${result.exitValue}\n" + err.toByteArray().decodeToString()
+        )
+
+        return out.toByteArray().decodeToString().lines()
+    }
+
+    @Synchronized
+    override fun close() {
+        _diff = null
+    }
+}
+
+
+abstract class AffectedTestSystemsService : BuildService<AffectedTestSystemsService.Params>, AutoCloseable {
+
+    interface Params : BuildServiceParameters {
+        val diffService: Property<FeatureBranchDiffService>
+        val affectedSystemsFile: RegularFileProperty
+    }
 
     private var cachedValue: Set<TestSystem>? = null
 
@@ -33,24 +92,15 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
     val affectedTestSystems: Set<TestSystem>
         get() {
             cachedValue?.let { return it }
-            /* Precedence goes to currentAffectedTestSystems, which is provided by the current environment (e.g. by command line) */
-            currentAffectedTestSystems?.let { return it }
 
-            val out = ByteArrayOutputStream()
-            val err = ByteArrayOutputStream()
-            val result = exec.exec {
-                commandLine("git", "diff", "--name-only", "master...HEAD")
-                isIgnoreExitValue = true
-                standardOutput = out
-                errorOutput = err
+            /*
+            A .affected-systems.txt file might be provided by CI environments
+            */
+            if (parameters.affectedSystemsFile.get().asFile.exists()) {
+                return parameters.affectedSystemsFile.get().asFile.readLines().map { TestSystem.valueOf(it) }.toSet()
             }
 
-            if (result.exitValue != 0) throw Exception(
-                "Inferring changed fails (git diff) failed with exit code ${result.exitValue}\n" + err.toByteArray().decodeToString()
-            )
-
-            val changedFiles = out.toByteArray().decodeToString().lines()
-            val value = affectedTestSystems(changedFiles).toSet()
+            val value = affectedTestSystems(parameters.diffService.get().diff())
             cachedValue = value
             return value
         }
@@ -59,42 +109,5 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
     @Synchronized
     override fun close() {
         cachedValue = null
-    }
-
-    init {
-        println("Init")
-    }
-
-}
-
-
-abstract class SystemTestModeValueSource : ValueSource<SystemTestMode, SystemTestModeValueSource.Params> {
-    interface Params : ValueSourceParameters {
-        val testSystem: Property<TestSystem>
-        val service: Property<AffectedSystemBuildService>
-    }
-
-    override fun obtain(): SystemTestMode? {
-        /* Precedence goes to currentSystemTestModeOrNull, which is provided by the current environment (e.g. by command line) */
-        currentSystemTestModeOrNull?.let { return it }
-
-        val testSystem = parameters.testSystem.get()
-        if (testSystem == TestSystem.Unknown) return SystemTestMode.Full
-
-        return if (parameters.testSystem.get() in parameters.service.get().affectedTestSystems) {
-            SystemTestMode.Full
-        } else {
-            SystemTestMode.Smoke
-        }
-    }
-}
-
-abstract class AffectedTestSystemValueSource : ValueSource<Set<TestSystem>, AffectedTestSystemValueSource.Params> {
-    interface Params : ValueSourceParameters {
-        val service: Property<AffectedSystemBuildService>
-    }
-
-    override fun obtain(): Set<TestSystem> {
-        return parameters.service.get().affectedTestSystems
     }
 }

@@ -2,6 +2,7 @@
  * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
+@file:Suppress("unused")
 
 package org.jetbrains.kotlin.systemTest
 
@@ -22,6 +23,7 @@ const val SYSTEM_TEST_AFFECTED_ENV_KEY = "SYSTEM_TEST_AFFECTED_SYSTEMS"
 
 val currentAffectedTestSystems: Set<TestSystem>? = run {
     val raw = System.getenv(SYSTEM_TEST_AFFECTED_ENV_KEY) ?: System.getProperty(SYSTEM_TEST_AFFECTED_KEY) ?: return@run null
+    if (raw.isEmpty()) return@run emptySet()
     return@run raw.split(";").map { TestSystem.valueOf(it) }.toSet()
 }
 
@@ -34,3 +36,5 @@ val currentSmokeTestPattern: Regex? = run {
     ?: return@run null
     return@run Regex(raw)
 }
+
+const val SYSTEM_TEST_DIFF_FILE_ENV_KEY = "TEST_SYSTEMS_DIFF_FILE"

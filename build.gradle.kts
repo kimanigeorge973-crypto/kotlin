@@ -1285,3 +1285,5 @@ afterEvaluate {
 tasks.withType<org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask>().configureEach {
     notCompatibleWithConfigurationCache("KotlinNpmInstallTask is not compatible with Configuration Cache")
 }
+
+tasks.register<WriteAffectedSystemsTask>("writeAffectedSystems")
