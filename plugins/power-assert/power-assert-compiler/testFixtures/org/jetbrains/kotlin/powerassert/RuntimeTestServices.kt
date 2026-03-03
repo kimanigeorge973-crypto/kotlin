@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.platform.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
+import org.jetbrains.kotlin.powerassert.PowerAssertConfigurationDirectives.DISABLE_RUNTIME
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
@@ -25,6 +26,8 @@ fun TestConfigurationBuilder.enableRuntime() {
 
 class RuntimeEnvironmentConfigurator(testServices: TestServices) : EnvironmentConfigurator(testServices) {
     override fun configureCompilerConfiguration(configuration: CompilerConfiguration, module: TestModule) {
+        if (DISABLE_RUNTIME in module.directives) return
+
         val platform = module.targetPlatform(testServices)
         when {
             platform.isJvm() -> {
@@ -40,6 +43,8 @@ class RuntimeEnvironmentConfigurator(testServices: TestServices) : EnvironmentCo
 
 class RuntimeRuntimeClassPathProvider(testServices: TestServices) : RuntimeClasspathProvider(testServices) {
     override fun runtimeClassPaths(module: TestModule): List<File> {
+        if (DISABLE_RUNTIME in module.directives) return emptyList()
+
         val targetPlatform = module.targetPlatform(testServices)
         return when {
             targetPlatform.isJvm() -> findJvmLib()

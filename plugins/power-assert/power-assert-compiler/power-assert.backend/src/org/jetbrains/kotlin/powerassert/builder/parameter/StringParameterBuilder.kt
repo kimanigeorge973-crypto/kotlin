@@ -87,7 +87,7 @@ class StringParameterBuilder(
 
         val valuesByRow = variables
             .filterIsInstance<IrDiagramVariable.Displayable>()
-            .map { it.toValueDisplay(callInfo) }
+            .mapNotNull { it.toValueDisplay(callInfo) }
             .sortedBy { it.indent }
             .groupBy { it.row }
 
@@ -156,7 +156,9 @@ class StringParameterBuilder(
 
     private fun IrDiagramVariable.Displayable.toValueDisplay(
         originalInfo: SourceRangeInfo,
-    ): ValueDisplay {
+    ): ValueDisplay? {
+        if (constant) return null
+
         var indent = sourceRangeInfo.startColumnNumber
         var row = sourceRangeInfo.startLineNumber - originalInfo.startLineNumber
 

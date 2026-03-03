@@ -5,6 +5,7 @@
 
 package kotlinx.powerassert
 
+// TODO LiteralExpression?
 @ExperimentalPowerAssert
 public class ConstantExpression(
     startOffset: Int,

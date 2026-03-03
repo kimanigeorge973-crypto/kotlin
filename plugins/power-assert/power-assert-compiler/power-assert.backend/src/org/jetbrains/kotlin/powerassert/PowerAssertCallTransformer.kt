@@ -27,9 +27,6 @@ import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.jvm.ir.parentClassId
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -41,6 +38,10 @@ import org.jetbrains.kotlin.ir.util.isSubtypeOfClass
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.powerassert.PowerAssertDiagnostics.POWER_ASSERT_CAPABLE_OVERLOAD_MISSING
+import org.jetbrains.kotlin.powerassert.PowerAssertDiagnostics.POWER_ASSERT_CONSTANT
+import org.jetbrains.kotlin.powerassert.PowerAssertDiagnostics.POWER_ASSERT_FUNCTION_NOT_TRANSFORMED
+import org.jetbrains.kotlin.powerassert.PowerAssertDiagnostics.POWER_ASSERT_RUNTIME_UNAVAILABLE
 import org.jetbrains.kotlin.powerassert.builder.call.CallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.LambdaCallBuilder
 import org.jetbrains.kotlin.powerassert.builder.call.SamConversionLambdaCallBuilder
@@ -80,19 +81,18 @@ class PowerAssertCallTransformer(
         function: IrSimpleFunction,
     ): IrExpression {
         if (explanationFactory == null || factory == null) {
-            configuration.messageCollector.warn(
-                expression = originalCall,
-                message = "Power-Assert runtime library not available.",
-            )
+            // An IrAnnotation is never created for an unknown annotation.
+            // This means this check is entirely pointless as we cannot have an annotated function
+            // if the runtime library is missing.
+            context.diagnosticReporter.at(originalCall, currentFile)
+                .report(POWER_ASSERT_RUNTIME_UNAVAILABLE)
             return originalCall
         }
 
         val synthetic = factory.find(function)
         if (synthetic == null) {
-            configuration.messageCollector.warn(
-                expression = originalCall,
-                message = "Called function '${function.kotlinFqName}' was not compiled with the power-assert compiler-plugin.",
-            )
+            context.diagnosticReporter.at(originalCall, currentFile)
+                .report(POWER_ASSERT_FUNCTION_NOT_TRANSFORMED, function.kotlinFqName)
             return originalCall
         }
 
@@ -110,21 +110,12 @@ class PowerAssertCallTransformer(
             delegate.function.parameters.count { it.kind == IrParameterKind.Regular }
         }
         if (callBuilder == null) {
-            val fqName = function.kotlinFqName
             val regularParameters = function.parameters.filter { it.kind == IrParameterKind.Regular }
             val valueTypesTruncated = regularParameters.subList(0, regularParameters.size - 1)
                 .joinToString("") { it.type.render() + ", " }
             val valueTypesAll = regularParameters.joinToString("") { it.type.render() + ", " }
-            configuration.messageCollector.warn(
-                expression = originalCall,
-                message = """
-                      |Unable to find overload of function $fqName for power-assert transformation callable as:
-                      | - $fqName(${valueTypesTruncated}String)
-                      | - $fqName($valueTypesTruncated() -> String)
-                      | - $fqName(${valueTypesAll}String)
-                      | - $fqName($valueTypesAll() -> String)
-                    """.trimMargin(),
-            )
+            context.diagnosticReporter.at(originalCall, currentFile)
+                .report(POWER_ASSERT_CAPABLE_OVERLOAD_MISSING, function.kotlinFqName, valueTypesTruncated, valueTypesAll)
             return super.visitCall(originalCall)
         }
 
@@ -142,12 +133,12 @@ class PowerAssertCallTransformer(
 
         // If all roots are null or non-visible, there are no transformable parameters
         if (roots.all { it.child == null }) {
-            configuration.messageCollector.info(originalCall, "Expression is constant and will not be power-assert transformed")
+            context.diagnosticReporter.at(originalCall, currentFile)
+                .report(POWER_ASSERT_CONSTANT)
             return super.visitCall(originalCall)
         }
 
-        val call = buildPowerAssertCall(originalCall, callBuilder, parameterBuilder, roots)
-        return call
+        return buildPowerAssertCall(originalCall, callBuilder, parameterBuilder, roots)
     }
 
     private fun buildPowerAssertCall(
@@ -314,18 +305,6 @@ class PowerAssertCallTransformer(
         } else {
             return this == null && type == null
         }
-    }
-
-    private fun MessageCollector.info(expression: IrElement, message: String) {
-        report(expression, CompilerMessageSeverity.INFO, message)
-    }
-
-    private fun MessageCollector.warn(expression: IrElement, message: String) {
-        report(expression, CompilerMessageSeverity.WARNING, message)
-    }
-
-    private fun MessageCollector.report(expression: IrElement, severity: CompilerMessageSeverity, message: String) {
-        report(severity, message, sourceFile.getCompilerMessageLocation(expression))
     }
 }
 

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.powerassert.builder.parameter
 
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
+import org.jetbrains.kotlin.ir.builders.irNull
 import org.jetbrains.kotlin.ir.builders.irString
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -49,15 +50,23 @@ private fun IrBuilderWithScope.irCallExplanation(
         irCallExplanation(
             offset = startOffset,
             source = irString(source),
-            arguments = argumentVariables.entries
-                .map { (parameter, variables) ->
-                    val sourceRange = originalCall.arguments[parameter]!!.sourceRange
-                    irArgument(
-                        startOffset = sourceRange.start - startOffset,
-                        endOffset = sourceRange.endInclusive - startOffset,
-                        kind = parameter.kind,
-                        expressions = variables.filterIsInstance<IrDiagramVariable.Displayable>().map { irExpression(it, startOffset) },
-                    )
+            arguments = originalCall.symbol.owner.parameters
+                .map { parameter ->
+                    val variables = argumentVariables[parameter]
+                        ?.filterIsInstance<IrDiagramVariable.Displayable>()
+                        ?.takeIf { it.isNotEmpty() }
+
+                    if (variables == null) {
+                        irNull()
+                    } else {
+                        val sourceRange = originalCall.arguments[parameter]!!.sourceRange
+                        irArgument(
+                            startOffset = sourceRange.start - startOffset,
+                            endOffset = sourceRange.endInclusive - startOffset,
+                            kind = parameter.kind,
+                            expressions = variables.map { irExpression(it, startOffset) },
+                        )
+                    }
                 },
         )
     }

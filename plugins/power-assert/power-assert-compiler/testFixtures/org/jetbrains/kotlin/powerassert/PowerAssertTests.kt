@@ -10,12 +10,16 @@ import org.jetbrains.kotlin.codegen.forTestCompile.ForTestCompileRuntime
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.powerassert.PowerAssertConfigurationDirectives.DISABLE_PLUGIN
 import org.jetbrains.kotlin.test.backend.handlers.IrPrettyKotlinDumpHandler
+import org.jetbrains.kotlin.test.backend.ir.IrDiagnosticsHandler
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.builders.irHandlersStep
 import org.jetbrains.kotlin.test.directives.AdditionalFilesDirectives
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives.WITH_STDLIB
+import org.jetbrains.kotlin.test.directives.DiagnosticsDirectives.DIAGNOSTICS
 import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.FULL_JDK
+import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives.OPT_IN
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.RegisteredDirectives
 import org.jetbrains.kotlin.test.model.TestFile
@@ -49,6 +53,9 @@ fun TestConfigurationBuilder.configurePlugin() {
     defaultDirectives {
         +FULL_JDK
         +WITH_STDLIB
+
+        DIAGNOSTICS + "-POWER_ASSERT_CONSTANT"
+        OPT_IN + "kotlinx.powerassert.ExperimentalPowerAssert"
     }
     useDirectives(PowerAssertConfigurationDirectives)
 
@@ -63,6 +70,7 @@ fun TestConfigurationBuilder.configurePlugin() {
 
     irHandlersStep {
         useHandlers(::IrPrettyKotlinDumpHandler)
+        useHandlers(::IrDiagnosticsHandler)
     }
 }
 
@@ -71,6 +79,8 @@ class PowerAssertEnvironmentConfigurator(testServices: TestServices) : Environme
         module: TestModule,
         configuration: CompilerConfiguration,
     ) {
+        if (DISABLE_PLUGIN in module.directives) return
+
         val functions = moduleStructure.allDirectives[PowerAssertConfigurationDirectives.FUNCTION]
             .ifEmpty { listOf("kotlin.assert") }
             .mapTo(mutableSetOf()) { FqName(it) }

@@ -9,23 +9,23 @@ abstract class TypeB : TypeA {
   }
 
   @JvmSynthetic
-  override fun describe$explained(value: Any, $explanation: CallExplanation): String? {
+  override fun describe$powerassert(value: Any, $explanation: CallExplanation): String? {
     return { // BLOCK
       val tmp_0: CallExplanation? = $explanation
       when {
         EQEQ(arg0 = tmp_0, arg1 = null) -> null
-        else -> tmp_0.toDefaultMessage()
+        else -> toDefaultMessage(/* <this> = tmp_0 */)
       }
     }
   }
 
-  @ExplainCall
+  @PowerAssert
   override fun describe(value: Any): String? {
     return { // BLOCK
       val tmp_1: CallExplanation? = null
       when {
         EQEQ(arg0 = tmp_1, arg1 = null) -> null
-        else -> tmp_1.toDefaultMessage()
+        else -> toDefaultMessage(/* <this> = tmp_1 */)
       }
     }
   }
@@ -40,8 +40,8 @@ abstract class TypeC : TypeB {
   }
 
   @JvmSynthetic
-  override fun describe$explained(value: Any, $explanation: CallExplanation): String? {
-    return super<TypeB>.describe$explained(value = value, $explanation = $explanation)
+  override fun describe$powerassert(value: Any, $explanation: CallExplanation): String? {
+    return super<TypeB>.describe$powerassert(value = value, $explanation = $explanation)
   }
 
   override fun describe(value: Any): String? {
@@ -69,7 +69,7 @@ data object TypeD : TypeC {
     when {
       other !is TypeD -> return false
     }
-    val tmp_2: TypeD = other as TypeD
+    val tmp_2: TypeD = other /*as TypeD */
     return true
   }
 
@@ -87,7 +87,7 @@ data object TypeD : TypeC {
 // FILE: B.kt
 
 fun box(): String {
-  return runAllOutput(tests = ["callTypeA".to<String, KFunction0<String>>(that = ::callTypeA), "callTypeB".to<String, KFunction0<String>>(that = ::callTypeB), "callTypeC".to<String, KFunction0<String>>(that = ::callTypeC), "callTypeD".to<String, KFunction0<String>>(that = ::callTypeD)])
+  return runAllOutput(tests = [to<String, KFunction0<String>>(/* <this> = "callTypeA", */ that = ::callTypeA), to<String, KFunction0<String>>(/* <this> = "callTypeB", */ that = ::callTypeB), to<String, KFunction0<String>>(/* <this> = "callTypeC", */ that = ::callTypeC), to<String, KFunction0<String>>(/* <this> = "callTypeD", */ that = ::callTypeD)])
 }
 
 fun callTypeA(): String {

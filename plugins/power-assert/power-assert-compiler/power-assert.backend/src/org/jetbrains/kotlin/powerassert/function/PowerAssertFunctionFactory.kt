@@ -35,9 +35,11 @@ class PowerAssertFunctionFactory(
         function.powerAssertDispatchSymbol?.let { return it }
 
         // Metadata indicates the function was transformed but is not in the current compilation unit.
-        // Generate a stub-function so a symbol exists which can be called.
+        // If there is no metadata, the function was never compiled with power-assert.
         val parentClass = function.parent as? IrClass
         getPowerAssertMetadata(parentClass ?: function) ?: return null
+
+        // Generate a stub-function so a symbol exists which can be called.
         return generate(function).symbol
     }
 
