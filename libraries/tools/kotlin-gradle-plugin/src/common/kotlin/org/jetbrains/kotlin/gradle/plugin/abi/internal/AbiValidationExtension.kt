@@ -15,6 +15,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiFiltersSpec
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.BinariesSource
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.tasks.abi.KotlinAbiCheckTaskImpl
 import org.jetbrains.kotlin.gradle.tasks.abi.KotlinAbiUpdateTask
@@ -46,6 +47,8 @@ internal abstract class AbiValidationExtensionImpl @Inject constructor(
     override val referenceDumpDir: DirectoryProperty = objects.directoryProperty()
 
     override val keepLocallyUnsupportedTargets: Property<Boolean> = objects.property<Boolean>()
+
+    override val binariesSource: Property<BinariesSource> = objects.property<BinariesSource>().convention(BinariesSource.MAIN_COMPILATION)
 
     @Suppress("DEPRECATION")
     @Deprecated(

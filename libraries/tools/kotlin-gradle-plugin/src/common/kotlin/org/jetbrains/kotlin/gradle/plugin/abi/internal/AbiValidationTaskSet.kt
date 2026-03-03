@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskDependency
 import org.jetbrains.kotlin.gradle.tasks.abi.KotlinAbiCheckTaskImpl
 import org.jetbrains.kotlin.gradle.tasks.abi.KotlinAbiDumpTaskImpl
 import org.jetbrains.kotlin.abi.tools.KlibTarget
@@ -65,6 +66,15 @@ internal class AbiValidationTaskSet(project: Project) {
     fun keepLocallyUnsupportedTargets(keep: Provider<Boolean>) {
         legacyDumpTaskProvider.configure {
             it.keepLocallyUnsupportedTargets.set(keep)
+        }
+    }
+
+    /**
+     * Add dependencies of the actual dump generation task.
+     */
+    fun addDependencies(dependencies: TaskDependency) {
+        legacyDumpTaskProvider.configure {
+            it.dependsOn(dependencies)
         }
     }
 

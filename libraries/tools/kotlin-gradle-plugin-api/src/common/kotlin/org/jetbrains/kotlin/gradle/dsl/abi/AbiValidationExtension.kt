@@ -147,6 +147,17 @@ interface AbiValidationExtension {
     val keepLocallyUnsupportedTargets: Property<Boolean>
 
     /**
+     * Specifies the source of the binaries to extract ABI declarations from.
+     *
+     * Refer to the [BinariesSource] for more information.
+     *
+     * The default value is [BinariesSource.MAIN_COMPILATION].
+     *
+     * @since 2.4.0
+     */
+    val binariesSource: Property<BinariesSource>
+
+    /**
      * Provides configuration for dumps stored in the old format that are used separately in the [Binary Compatibility validator plugin](https://github.com/Kotlin/binary-compatibility-validator).
      *
      * Use this property for a smooth migration from the old to the new dump format.
@@ -277,4 +288,27 @@ interface AbiValidationVariantSpec {
         @Deprecated("Variants DSL was removed and is no longer supported.", level = DeprecationLevel.ERROR)
         const val MAIN_VARIANT_NAME = "main"
     }
+}
+
+/**
+ * Type of the source of the binaries to extract ABI declarations from.
+ */
+enum class BinariesSource {
+    /**
+     * The binaries are taken from the Maven publications of the project.
+     * To do this, the `maven-publish` plugin must be applied, the Maven publications must be created and configured correctly.
+     *
+     * Only publishable artifacts for which no classifier is specified (is null) are taken into account.
+     */
+    MAVEN_PUBLICATIONS,
+
+    /**
+     * The binaries are taken from the output of the Kotlin compilation task for main and commonMain source sets.
+     */
+    MAIN_COMPILATION,
+
+    /**
+     * The binaries are taken from the output of the Kotlin compilation tasks which do not contain the word `test` in the name in any case.
+     */
+    NON_TEST_COMPILATIONS
 }

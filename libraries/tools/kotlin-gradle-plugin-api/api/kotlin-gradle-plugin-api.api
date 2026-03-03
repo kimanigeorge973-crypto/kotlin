@@ -723,6 +723,7 @@ public final class org/jetbrains/kotlin/gradle/dsl/abi/AbiFiltersSpec$DefaultImp
 
 public abstract interface class org/jetbrains/kotlin/gradle/dsl/abi/AbiValidationExtension {
 	public abstract fun filters (Lorg/gradle/api/Action;)V
+	public abstract fun getBinariesSource ()Lorg/gradle/api/provider/Property;
 	public abstract fun getCheckTaskProvider ()Lorg/gradle/api/tasks/TaskProvider;
 	public abstract fun getEnabled ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFilters ()Lorg/jetbrains/kotlin/gradle/dsl/abi/AbiFiltersSpec;
@@ -802,6 +803,14 @@ public final class org/jetbrains/kotlin/gradle/dsl/abi/AbiValidationVariantSpec$
 public final class org/jetbrains/kotlin/gradle/dsl/abi/AbiValidationVariantSpec$DefaultImpls {
 	public static fun filters (Lorg/jetbrains/kotlin/gradle/dsl/abi/AbiValidationVariantSpec;Lorg/gradle/api/Action;)V
 	public static fun legacyDump (Lorg/jetbrains/kotlin/gradle/dsl/abi/AbiValidationVariantSpec;Lorg/gradle/api/Action;)V
+}
+
+public final class org/jetbrains/kotlin/gradle/dsl/abi/BinariesSource : java/lang/Enum {
+	public static final field MAIN_COMPILATION Lorg/jetbrains/kotlin/gradle/dsl/abi/BinariesSource;
+	public static final field MAVEN_PUBLICATIONS Lorg/jetbrains/kotlin/gradle/dsl/abi/BinariesSource;
+	public static final field NON_TEST_COMPILATIONS Lorg/jetbrains/kotlin/gradle/dsl/abi/BinariesSource;
+	public static fun valueOf (Ljava/lang/String;)Lorg/jetbrains/kotlin/gradle/dsl/abi/BinariesSource;
+	public static fun values ()[Lorg/jetbrains/kotlin/gradle/dsl/abi/BinariesSource;
 }
 
 public abstract interface annotation class org/jetbrains/kotlin/gradle/dsl/abi/ExperimentalAbiValidation : java/lang/annotation/Annotation {
