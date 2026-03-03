@@ -1,9 +1,9 @@
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_AFFECTED_KEY
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.name
@@ -22,11 +22,11 @@ open class WriteAffectedSystemsTask : DefaultTask() {
     internal val diffService = project.featureBranchDiffService
 
     @get:Internal
-    internal val affectedSystemsService = project.affectedTestSystemsService
+    internal val affectedTestSystemsService = project.affectedTestSystemsService
 
     init {
         usesService(diffService)
-        usesService(affectedSystemsService)
+        usesService(affectedTestSystemsService)
         outputs.upToDateWhen { false }
     }
 
@@ -51,7 +51,11 @@ open class WriteAffectedSystemsTask : DefaultTask() {
         if (affectedSystemsFile.exists()) {
             throw IllegalStateException("${affectedSystemsFile.name} already exists")
         }
+
+        val affectedTestSystems = affectedTestSystemsService.get().affectedTestSystems
         affectedSystemsFile.parent.createDirectories()
-        affectedSystemsFile.writeText(affectedSystemsService.get().affectedTestSystems.joinToString(System.lineSeparator()))
+        affectedSystemsFile.writeText(affectedTestSystems.joinToString(System.lineSeparator()))
+
+        println("##teamcity[setParameter name='$SYSTEM_TEST_AFFECTED_KEY' value='${affectedTestSystems.joinToString(";")}']")
     }
 }
