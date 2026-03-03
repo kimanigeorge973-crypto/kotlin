@@ -1010,7 +1010,7 @@ fun test46(o: Any): Int {
 // CHECK-DEBUG: {{call|call zeroext}} i1 @IsSubtype
 // CHECK-OPT: {{call|call zeroext}} i1 @IsSubclassFast
 // CHECK-DEBUG: call i32 @"kfun:A#<get-x>(){}kotlin.Int
-// CHECK-OPT: getelementptr inbounds %"kclassbody:A#internal
+// CHECK-OPT: getelementptr inbounds nuw %"kclassbody:A#internal
         if (o is A && o.x > 0)
             return@run 0
         return@run 42
@@ -1018,7 +1018,7 @@ fun test46(o: Any): Int {
 // CHECK-DEBUG: {{call|call zeroext}} i1 @IsSubtype
 // CHECK-OPT: {{call|call zeroext}} i1 @IsSubclassFast
 // CHECK-DEBUG: call i32 @"kfun:A#<get-x>(){}kotlin.Int
-// CHECK-OPT: getelementptr inbounds %"kclassbody:A#internal
+// CHECK-OPT: getelementptr inbounds nuw %"kclassbody:A#internal
     return x + ((o as? A)?.x ?: -1)
 // CHECK-LABEL: epilogue:
 }
