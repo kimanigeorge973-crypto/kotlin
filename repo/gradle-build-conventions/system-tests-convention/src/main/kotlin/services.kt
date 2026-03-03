@@ -27,26 +27,27 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
     @get:Inject
     abstract val exec: ExecOperations
 
-    val affectedTestSystems: Set<TestSystem> get() {
-        /* Precedence goes to currentAffectedTestSystems, which is provided by the current environment (e.g. by command line) */
-        currentAffectedTestSystems?.let { return it }
+    val affectedTestSystems: Set<TestSystem>
+        get() {
+            /* Precedence goes to currentAffectedTestSystems, which is provided by the current environment (e.g. by command line) */
+            currentAffectedTestSystems?.let { return it }
 
-        val out = ByteArrayOutputStream()
-        val err = ByteArrayOutputStream()
-        val result = exec.exec {
-            commandLine("git", "diff", "--name-only", "origin/master...HEAD")
-            isIgnoreExitValue = true
-            standardOutput = out
-            errorOutput = err
+            val out = ByteArrayOutputStream()
+            val err = ByteArrayOutputStream()
+            val result = exec.exec {
+                commandLine("git", "diff", "--name-only", "origin/master...HEAD")
+                isIgnoreExitValue = true
+                standardOutput = out
+                errorOutput = err
+            }
+
+            if (result.exitValue != 0) throw Exception(
+                "Inferring changed fails (git diff) failed with exit code ${result.exitValue}\n" + err.toByteArray().decodeToString()
+            )
+
+            val changedFiles = out.toByteArray().decodeToString().lines().map { changeEntry -> Path(changeEntry) }
+            return affectedTestSystems(changedFiles).toSet()
         }
-
-        if (result.exitValue != 0) throw Exception(
-            "Inferring changed fails (git diff) failed with exit code ${result.exitValue}\n" + err.toByteArray().decodeToString()
-        )
-
-        val changedFiles = out.toByteArray().decodeToString().lines().map { changeEntry -> Path(changeEntry) }
-        affectedTestSystems(changedFiles).toSet()
-    }
 }
 
 
