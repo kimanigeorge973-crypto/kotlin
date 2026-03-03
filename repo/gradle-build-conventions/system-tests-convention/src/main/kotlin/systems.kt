@@ -1,6 +1,5 @@
 import org.gradle.api.Project
 import org.jetbrains.kotlin.systemTest.TestSystem
-import java.nio.file.Path
 
 /*
  * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
@@ -18,16 +17,18 @@ internal val Project.testSystem: TestSystem
     }
 
 
-internal fun affectedTestSystems(changedFiles: List<Path>): Set<TestSystem> {
-    val affected = mutableSetOf<TestSystem>()
+internal fun affectedTestSystems(changedFilePaths: List<String>): Set<TestSystem> {
+    val affected = changedFilePaths.map { file ->
+        if (file.contains("compiler/")) {
+            return@map TestSystem.Compiler
+        }
 
-    if (changedFiles.any { it.toString().contains("compiler") }) {
-        affected.add(TestSystem.Compiler)
-    }
+        if (file.contains("gradle")) {
+            return@map TestSystem.Gradle
+        }
 
-    if (changedFiles.any { it.toString().contains("gradle") }) {
-        affected.add(TestSystem.Gradle)
-    }
+        TestSystem.Unknown
+    }.toMutableSet()
 
     if (TestSystem.Compiler in affected) {
         affected.add(TestSystem.Unknown)

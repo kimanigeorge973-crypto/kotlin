@@ -27,7 +27,7 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
     @get:Inject
     abstract val exec: ExecOperations
 
-    var cachedValue: Set<TestSystem>? = null
+    private var cachedValue: Set<TestSystem>? = null
 
     @get:Synchronized
     val affectedTestSystems: Set<TestSystem>
@@ -59,6 +59,10 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
     @Synchronized
     override fun close() {
         cachedValue = null
+    }
+
+    init {
+        println("Init")
     }
 
 }
