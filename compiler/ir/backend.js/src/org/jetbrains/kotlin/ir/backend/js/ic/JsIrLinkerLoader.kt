@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDe
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
+import org.jetbrains.kotlin.config.perfManager
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.LookupTracker
@@ -41,6 +42,8 @@ import org.jetbrains.kotlin.library.uniqueName
 import org.jetbrains.kotlin.psi2ir.descriptors.IrBuiltInsOverDescriptors
 import org.jetbrains.kotlin.psi2ir.generators.TypeTranslatorImpl
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.util.PhaseType
+import org.jetbrains.kotlin.util.tryMeasurePhaseTime
 
 internal class LoadedJsIr(
     loadedFragments: Map<KotlinLibraryFile, IrModuleFragment>,
@@ -212,7 +215,7 @@ internal class JsIrLinkerLoader(
     fun loadIr(
         modifiedFiles: KotlinSourceFileMap<KotlinSourceFileExports>,
         loadAllIr: Boolean = false,
-    ): LoadedJsIr {
+    ): LoadedJsIr = compilerConfiguration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) {
         val loadedModules = loadModules()
         val linkerContext = createLinker(loadedModules)
 

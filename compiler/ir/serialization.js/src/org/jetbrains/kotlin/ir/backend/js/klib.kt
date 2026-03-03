@@ -125,7 +125,7 @@ fun loadIr(
     irFactory: IrFactory,
     filesToLoad: Set<String>? = null,
     loadFunctionInterfacesIntoStdlib: Boolean = false,
-): IrModuleInfo {
+): IrModuleInfo = modulesStructure.compilerConfiguration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) {
     val project = modulesStructure.project
     val mainModule = modulesStructure.mainModule
     val configuration = modulesStructure.compilerConfiguration
@@ -178,7 +178,7 @@ fun loadIr(
 fun loadIrForSingleModule(
     modulesStructure: ModulesStructure,
     irFactory: IrFactory,
-): IrModuleInfo {
+): IrModuleInfo = modulesStructure.compilerConfiguration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) {
     val mainModule = modulesStructure.mainModule
     val configuration = modulesStructure.compilerConfiguration
     val messageLogger = configuration.messageCollector
