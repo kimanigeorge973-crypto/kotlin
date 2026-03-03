@@ -22,9 +22,9 @@
       <option name="vmOptions" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <ExternalSystemReattachDebugProcess>false</ExternalSystemReattachDebugProcess>
     <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
-    <DebugAllEnabled>false</DebugAllEnabled>
+    <DebugAllEnabled>true</DebugAllEnabled>
     <RunAsTest>true</RunAsTest>
     <GradleProfilingDisabled>false</GradleProfilingDisabled>
     <GradleCoverageDisabled>false</GradleCoverageDisabled>

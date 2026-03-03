@@ -23,12 +23,16 @@ import kotlin.io.path.Path
 internal val Project.affectedSystemBuildService: Provider<AffectedSystemBuildService>
     get() = gradle.sharedServices.registerIfAbsent("affectedSystemBuildService", AffectedSystemBuildService::class.java)
 
-abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.None> {
+abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.None>, AutoCloseable {
     @get:Inject
     abstract val exec: ExecOperations
 
+    var cachedValue: Set<TestSystem>? = null
+
+    @get:Synchronized
     val affectedTestSystems: Set<TestSystem>
         get() {
+            cachedValue?.let { return it }
             /* Precedence goes to currentAffectedTestSystems, which is provided by the current environment (e.g. by command line) */
             currentAffectedTestSystems?.let { return it }
 
@@ -46,8 +50,17 @@ abstract class AffectedSystemBuildService : BuildService<BuildServiceParameters.
             )
 
             val changedFiles = out.toByteArray().decodeToString().lines().map { changeEntry -> Path(changeEntry) }
-            return affectedTestSystems(changedFiles).toSet()
+            val value = affectedTestSystems(changedFiles).toSet()
+            cachedValue = value
+            return value
         }
+
+
+    @Synchronized
+    override fun close() {
+        cachedValue = null
+    }
+
 }
 
 
