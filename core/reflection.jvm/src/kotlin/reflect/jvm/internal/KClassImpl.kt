@@ -421,13 +421,18 @@ internal class KClassImpl<T : Any>(
                 }
 
                 for (field in jClass.declaredFields) {
-                    if (Modifier.isStatic(field.modifiers)) {
+                    if (Modifier.isStatic(field.modifiers) && !field.isSynthetic && !field.isEnumConstant) {
                         if (Modifier.isFinal(field.modifiers)) {
                             add(JavaKProperty0<Any>(this@KClassImpl, field, NO_RECEIVER, KCallableOverriddenStorage.EMPTY))
                         } else {
                             add(JavaKMutableProperty0<Any>(this@KClassImpl, field, NO_RECEIVER, KCallableOverriddenStorage.EMPTY))
                         }
                     }
+                }
+
+                if (jClass.isEnum) {
+                    @Suppress("UNCHECKED_CAST")
+                    add(JavaEnumEntriesKProperty(this@KClassImpl as KClassImpl<out Enum<*>>))
                 }
             }
         }

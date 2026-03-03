@@ -121,9 +121,15 @@ public class ReflectionFactoryImpl extends ReflectionFactory {
                     return container.createLocalProperty(Integer.parseInt(values.get(1)), signature);
                 }
                 if (container instanceof KClassImpl && container.getJClass().getAnnotation(Metadata.class) == null) {
-                    Field field = container.findJavaField(p.getName());
-                    if (Modifier.isStatic(field.getModifiers())) {
-                        return new JavaKProperty0(container, field, p.getBoundReceiver(), KCallableOverriddenStorage.EMPTY);
+                    try {
+                        Field field = container.findJavaField(p.getName());
+                        if (Modifier.isStatic(field.getModifiers())) {
+                            return new JavaKProperty0(container, field, p.getBoundReceiver(), KCallableOverriddenStorage.EMPTY);
+                        }
+                    } catch (Exception e) {
+                        if (signature.equals(JavaEnumEntriesKProperty.ENUM_ENTRIES_SIGNATURE)) {
+                            return new JavaEnumEntriesKProperty((KClassImpl<? extends Enum<?>>) container);
+                        }
                     }
                 }
                 if (container instanceof KPackageImpl) {
