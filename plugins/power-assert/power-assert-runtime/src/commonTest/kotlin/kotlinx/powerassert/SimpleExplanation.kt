@@ -5,8 +5,10 @@
 
 package kotlinx.powerassert
 
+// TODO make generally available as part of runtime library?
+//  - common prefix with ValueExpression?
 @ExperimentalPowerAssert
-public class SimpleExplanation(
+class SimpleExplanation(
     override val offset: Int,
     override val source: String,
     override val expressions: List<Expression>,

@@ -8,20 +8,32 @@ package kotlinx.powerassert
 /**
  * Provides information about a section of source code and its evaluation.
  */
+// TODO include a sample source block?
 @ExperimentalPowerAssert
 public abstract class Explanation internal constructor() {
-    // TODO create another class to hold offset and source? CodeBlock?
     // TODO include file name?
+    // TODO create another class to hold offset and source?
+    //  - this would the property to be nullable if source information is unavailable but expression information is.
+    //    - do we even want to support this case?
+    //  - CodeBlock?
+    //  - Explanation.Source?
+
     /**
      * The source text character offset within the containing file.
-     * Offset will always be at column 0 within the containing file, so indent
+     * Offset will always be at column 0 within the containing file,
+     * as all indentation is preserved by [source].
      */
-    public abstract val offset: Int // Always starts at *column* 0 within the file.
+    public abstract val offset: Int
 
     /**
      * The source code text block. Text is provided with all original indentation preserved,
      * but unrelated source code is redacted with whitespace characters.
      */
-    public abstract val source: String // The *block* of source code, redacted with whitespace.
+    public abstract val source: String
+
+    /**
+     * All [Expression]s which were evaluated as part of this explanation.
+     * Expressions are provided in evaluation order.
+     */
     public abstract val expressions: List<Expression>
 }

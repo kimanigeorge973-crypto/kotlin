@@ -5,6 +5,11 @@
 
 package kotlinx.powerassert
 
+/**
+ * An [Expression] for a literal value present in source code.
+ * This is different from a constant, as access of a `const val` will be represented as a [ValueExpression].
+ * Possible literals include numbers, strings, booleans, and null.
+ */
 // TODO LiteralExpression?
 @ExperimentalPowerAssert
 public class ConstantExpression(

@@ -5,20 +5,19 @@
 
 package kotlinx.powerassert
 
+/**
+ * Given an [Explanation], builds the default Power-Assert style diagram.
+ * Used to build the string argument for Power-Assert transformations of
+ * functions provided via fully-qualified domain names.
+ */
+// TODO toDefaultDiagramString?
 @ExperimentalPowerAssert
 public fun Explanation.toDefaultMessage(
     render: (Expression) -> String? = Expression::valueToString,
-): String = toDiagram(render)
-
-@ExperimentalPowerAssert
-public fun Explanation.toDiagram(
-    render: (Expression) -> String? = Expression::valueToString,
-): String {
-    return buildString {
-        appendDiagram(source, expressions, render)
-        appendLine()
-    }.trimIndent()
-}
+): String = buildString {
+    appendDiagram(source, expressions, render)
+    appendLine()
+}.trimIndent()
 
 @ExperimentalPowerAssert
 private fun StringBuilder.appendDiagram(

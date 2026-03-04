@@ -5,6 +5,12 @@
 
 package kotlinx.powerassert
 
+/**
+ * An [Expression] for a value present in source code.
+ * This is the default implementation of an [Expression]
+ * used for all values not representable by other [Expression] implementations.
+ */
+// TODO SimpleExpression?
 @ExperimentalPowerAssert
 public class ValueExpression(
     startOffset: Int,
