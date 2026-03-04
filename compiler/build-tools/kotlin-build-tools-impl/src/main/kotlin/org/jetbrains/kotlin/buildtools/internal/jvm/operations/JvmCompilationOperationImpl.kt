@@ -21,6 +21,9 @@ import org.jetbrains.kotlin.buildtools.api.trackers.CompilerLookupTracker
 import org.jetbrains.kotlin.buildtools.internal.*
 import org.jetbrains.kotlin.buildtools.internal.DaemonExecutionPolicyImpl.Companion.DAEMON_RUN_DIR_PATH
 import org.jetbrains.kotlin.buildtools.internal.DaemonExecutionPolicyImpl.Companion.JVM_ARGUMENTS
+import org.jetbrains.kotlin.buildtools.internal.DaemonExecutionPolicyImpl.Companion.LOGS_FILE_COUNT_LIMIT
+import org.jetbrains.kotlin.buildtools.internal.DaemonExecutionPolicyImpl.Companion.LOGS_FILE_SIZE_LIMIT
+import org.jetbrains.kotlin.buildtools.internal.DaemonExecutionPolicyImpl.Companion.LOGS_PATH
 import org.jetbrains.kotlin.buildtools.internal.DaemonExecutionPolicyImpl.Companion.SHUTDOWN_DELAY_MILLIS
 import org.jetbrains.kotlin.buildtools.internal.arguments.CommonCompilerArgumentsImpl.Companion.LANGUAGE_VERSION
 import org.jetbrains.kotlin.buildtools.internal.arguments.CommonCompilerArgumentsImpl.Companion.X_USE_FIR_IC
@@ -59,6 +62,7 @@ import java.io.File
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.URLClassLoader
+import java.nio.file.Files
 import java.nio.file.Path
 import java.rmi.RemoteException
 
@@ -258,6 +262,14 @@ internal class JvmCompilationOperationImpl private constructor(
         }
 
         val additionalJvmArguments = mutableListOf<String>()
+
+        val daemonLogOptions = DaemonLogOptions(
+            logsPath = executionPolicy[LOGS_PATH].absolutePathStringOrThrow(),
+            logsFileSizeLimit = executionPolicy[LOGS_FILE_SIZE_LIMIT] ?: 0,
+            logsFileCountLimit = executionPolicy[LOGS_FILE_COUNT_LIMIT] ?: 1,
+        )
+        Files.createDirectories(executionPolicy[LOGS_PATH])
+
         val daemonOptions = configureDaemonOptions(
             DaemonOptions().apply {
                 executionPolicy[SHUTDOWN_DELAY_MILLIS]?.let { shutdownDelay ->
@@ -286,7 +298,8 @@ internal class JvmCompilationOperationImpl private constructor(
             loggerAdapter,
             loggerAdapter.kotlinLogger.isDebugEnabled || System.getProperty("kotlin.daemon.debug.log")?.toBooleanStrictOrNull() ?: true,
             daemonJVMOptions = jvmOptions,
-            daemonOptions = daemonOptions
+            daemonOptions = daemonOptions,
+            daemonLogOptions = daemonLogOptions,
         ) ?: return ExitCode.INTERNAL_ERROR.asCompilationResult
         onCancel {
             daemon.cancelCompilation(sessionId, compilationId)

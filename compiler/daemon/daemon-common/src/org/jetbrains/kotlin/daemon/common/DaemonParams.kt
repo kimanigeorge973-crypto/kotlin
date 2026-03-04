@@ -40,6 +40,9 @@ const val COMPILE_DAEMON_MEMORY_THRESHOLD_INFINITE: Long = 0L
 const val COMPILE_DAEMON_FORCE_SHUTDOWN_DEFAULT_TIMEOUT_MS: Long = 10000L // 10 secs
 const val COMPILE_DAEMON_TIMEOUT_INFINITE_MS: Long = 0L
 const val COMPILE_DAEMON_IS_READY_MESSAGE = "Kotlin compile daemon is ready"
+val DEFAULT_LOG_FILE_DIRECTORY = CompilerSystemProperties.TMP_DIR.safeValue
+const val DEFAULT_LOG_FILE_SIZE_LIMIT = 1 * MEGABYTE
+const val DEFAULT_LOG_FILE_COUNT_LIMIT = 3
 
 val COMPILE_DAEMON_DEFAULT_RUN_DIR_PATH: String
     get() = CompilerSystemProperties.COMPILE_DAEMON_CUSTOM_RUN_FILES_PATH_FOR_TESTS.value ?: FileSystem.getRuntimeStateFilesPath(
@@ -212,6 +215,31 @@ data class DaemonJVMOptions(
         get() = RestPropMapper(this, DaemonJVMOptions::jvmParams)
 }
 
+data class DaemonLogOptions(
+    var logsPath: String = DEFAULT_LOG_FILE_DIRECTORY,
+    var logsFileSizeLimit: Long = DEFAULT_LOG_FILE_SIZE_LIMIT,
+    var logsFileCountLimit: Int = DEFAULT_LOG_FILE_COUNT_LIMIT,
+) : OptionsGroup {
+
+    override val mappers: List<PropMapper<*, *, *>>
+        get() = listOf(
+            PropMapper(this, DaemonLogOptions::logsPath, fromString = String::trimQuotes),
+            PropMapper(
+                this,
+                DaemonLogOptions::logsFileSizeLimit,
+                fromString = String::toLong,
+                skipIf = { it == 0L },
+                mergeDelimiter = "="
+            ),
+            PropMapper(
+                this,
+                DaemonLogOptions::logsFileCountLimit,
+                fromString = String::toInt,
+                skipIf = { it == 0 },
+                mergeDelimiter = "="
+            ),
+        )
+}
 
 data class DaemonOptions(
     var runFilesPath: String = COMPILE_DAEMON_DEFAULT_RUN_DIR_PATH,

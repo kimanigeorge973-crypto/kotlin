@@ -46,24 +46,6 @@ class LogStream(name: String) : OutputStream() {
 }
 
 abstract class KotlinCompileDaemonBase {
-    init {
-        val logTime: String = SimpleDateFormat("yyyy-MM-dd.HH-mm-ss-SSS").format(Date())
-        val (logPath: String, fileIsGiven: Boolean) =
-            CompilerSystemProperties.COMPILE_DAEMON_LOG_PATH_PROPERTY.value?.trimQuotes()?.let { Pair(it, File(it).isFile) } ?: Pair("%t", false)
-        val cfg: String =
-            "handlers = java.util.logging.FileHandler\n" +
-                    "java.util.logging.FileHandler.level     = ALL\n" +
-                    "java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter\n" +
-                    "java.util.logging.FileHandler.encoding  = UTF-8\n" +
-                    "java.util.logging.FileHandler.limit     = ${if (fileIsGiven) 0 else (1 shl 20)}\n" + // if file is provided - disabled, else - 1Mb
-                    "java.util.logging.FileHandler.count     = ${if (fileIsGiven) 1 else 3}\n" +
-                    "java.util.logging.FileHandler.append    = $fileIsGiven\n" +
-                    "java.util.logging.FileHandler.pattern   = ${if (fileIsGiven) logPath else (logPath + File.separator + "$COMPILE_DAEMON_DEFAULT_FILES_PREFIX.$logTime.%u%g.log")}\n" +
-                    "java.util.logging.SimpleFormatter.format = %1\$tF %1\$tT.%1\$tL [%3\$s] %4\$s: %5\$s%n\n"
-
-        LogManager.getLogManager().readConfiguration(cfg.byteInputStream())
-    }
-
     val log by lazy { Logger.getLogger("daemon") }
 
     private fun loadVersionFromResource(): String? {
@@ -90,7 +72,44 @@ abstract class KotlinCompileDaemonBase {
 
     protected open fun awaitServerRun(serverRun: Any?) {}
 
+    private fun setupLogging(options: DaemonLogOptions) {
+        val logTime: String = SimpleDateFormat("yyyy-MM-dd.HH-mm-ss-SSS").format(Date())
+        val (logPath: String, fileIsGiven: Boolean) =
+            CompilerSystemProperties.COMPILE_DAEMON_LOG_PATH_PROPERTY.value?.trimQuotes()?.let { Pair(it, File(it).isFile) } ?: Pair(
+                options.logsPath,
+                false
+            )
+        val cfg: String =
+            "handlers = java.util.logging.FileHandler\n" +
+                    "java.util.logging.FileHandler.level     = ALL\n" +
+                    "java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter\n" +
+                    "java.util.logging.FileHandler.encoding  = UTF-8\n" +
+                    "java.util.logging.FileHandler.limit     = ${if (fileIsGiven) 0 else options.logsFileSizeLimit}\n" + // if the file path for testing is provided - disabled, else - the value configured
+                    "java.util.logging.FileHandler.count     = ${if (fileIsGiven) 1 else options.logsFileCountLimit}\n" +
+                    "java.util.logging.FileHandler.append    = $fileIsGiven\n" +
+                    "java.util.logging.FileHandler.pattern   = ${if (fileIsGiven) logPath else (logPath + File.separator + "$COMPILE_DAEMON_DEFAULT_FILES_PREFIX.$logTime.%u%g.log")}\n" +
+                    "java.util.logging.SimpleFormatter.format = %1\$tF %1\$tT.%1\$tL [%3\$s] %4\$s: %5\$s%n\n"
+
+        LogManager.getLogManager().readConfiguration(cfg.byteInputStream())
+    }
+
+    private fun reportUnknownArgs(unknownArgs: Iterable<String>) {
+        if (unknownArgs.any()) {
+            val helpLine = "usage: <daemon> <compilerId options> <daemon options>"
+            log.info(helpLine)
+            println(helpLine)
+            throw IllegalArgumentException("Unknown arguments: " + unknownArgs.joinToString(" "))
+        }
+    }
+
     protected fun mainImpl(args: Array<String>) {
+        val compilerId = CompilerId()
+        val daemonOptions = DaemonOptions()
+        DaemonLogOptions().run {
+            val unknownArgs = args.asIterable().filterExtractProps(compilerId, daemonOptions, this, prefix = COMPILE_DAEMON_CMDLINE_OPTIONS_PREFIX)
+            setupLogging(this)
+            reportUnknownArgs(unknownArgs)
+        }
         ensureServerHostnameIsSetUp()
 
         val jvmArguments = ManagementFactory.getRuntimeMXBean().inputArguments
@@ -102,8 +121,6 @@ abstract class KotlinCompileDaemonBase {
         setIdeaIoUseFallback()
         setupIdeaStandaloneExecution()
 
-        val compilerId = CompilerId()
-        val daemonOptions = DaemonOptions()
         val initialClientInfo = InitialClientInformation(CompilerSystemProperties.COMPILE_DAEMON_INITIATOR_MARKER_FILE.value?.let { File(it) })
         runSynchronized {
             var serverRun: Any?
@@ -113,15 +130,6 @@ abstract class KotlinCompileDaemonBase {
                     inheritOtherJvmOptions = true,
                     inheritAdditionalProperties = true
                 )
-
-                val filteredArgs = args.asIterable().filterExtractProps(compilerId, daemonOptions, prefix = COMPILE_DAEMON_CMDLINE_OPTIONS_PREFIX)
-
-                if (filteredArgs.any()) {
-                    val helpLine = "usage: <daemon> <compilerId options> <daemon options>"
-                    log.info(helpLine)
-                    println(helpLine)
-                    throw IllegalArgumentException("Unknown arguments: " + filteredArgs.joinToString(" "))
-                }
 
                 log.info("starting daemon")
 

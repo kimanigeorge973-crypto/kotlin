@@ -27,8 +27,6 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.nio.file.NoSuchFileException
-import java.nio.file.Path
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.thread
@@ -62,74 +60,45 @@ class CancellationCompatibilitySmokeTest : BaseCompilationTest() {
     fun nonIncrementalDaemonWithCancellation() {
         val kotlinToolchains = KotlinToolchains.loadImplementation(btaClassloader)
         val hasCancellationSupport = hasCancellationSupport(kotlinToolchains.getCompilerVersion())
-        val daemonRunPath: Path = createTempDirectory("test-daemon-files")
         assumeTrue(hasCancellationSupport)
-        val daemonPolicy = kotlinToolchains.daemonExecutionPolicyBuilder().apply {
+        runSingleShotDaemonTest(kotlinToolchains, additionalDaemonConfiguration = {
             this[ExecutionPolicy.WithDaemon.JVM_ARGUMENTS] = listOf(
                 "Dkotlin.daemon.wait.before.compilation.for.tests=true"
             )
-            @OptIn(DelicateBuildToolsApi::class)
-            this[ExecutionPolicy.WithDaemon.DAEMON_RUN_DIR_PATH] = daemonRunPath
-            this[ExecutionPolicy.WithDaemon.SHUTDOWN_DELAY_MILLIS] = 0
-        }.build()
-
-        project(kotlinToolchains, daemonPolicy) {
-            val module1 = module("jvm-module-1") as JvmModule
-            val operationWasCancelled = AtomicBoolean(false)
-            with(module1) {
-                val allowedExtensions = setOf("kt", "kts", "java")
-                val compilationOperation = kotlinToolchain.jvm.jvmCompilationOperationBuilder(
-                    sourcesDirectory.walk().filter { path -> path.pathString.run { allowedExtensions.any { endsWith(".$it") } } }.toList(),
-                    outputDirectory
-                )
-                moduleCompilationConfigAction(compilationOperation)
-                compilationOperation.compilerArguments[NO_REFLECT] = true
-                compilationOperation.compilerArguments[NO_STDLIB] = true
-                compilationOperation.compilerArguments[CLASSPATH] = compileClasspath
-                compilationOperation.compilerArguments[MODULE_NAME] = moduleName
-                val logger = TestKotlinLogger()
-                val operation = compilationOperation.build()
-                val thread = thread {
-                    try {
-                        buildSession.executeOperation(operation, daemonPolicy, logger)
-                    } catch (_: OperationCancelledException) {
-                        operationWasCancelled.store(true)
+        }, additionalCleanupActions = { daemonRunPath ->
+            daemonRunPath.resolve("daemon-test-start").deleteIfExists()
+        }) { daemonPolicy, daemonRunPath ->
+            project(kotlinToolchains, daemonPolicy) {
+                val module1 = module("jvm-module-1") as JvmModule
+                val operationWasCancelled = AtomicBoolean(false)
+                with(module1) {
+                    val allowedExtensions = setOf("kt", "kts", "java")
+                    val compilationOperation = kotlinToolchain.jvm.jvmCompilationOperationBuilder(
+                        sourcesDirectory.walk().filter { path -> path.pathString.run { allowedExtensions.any { endsWith(".$it") } } }
+                            .toList(),
+                        outputDirectory
+                    )
+                    moduleCompilationConfigAction(compilationOperation)
+                    compilationOperation.compilerArguments[NO_REFLECT] = true
+                    compilationOperation.compilerArguments[NO_STDLIB] = true
+                    compilationOperation.compilerArguments[CLASSPATH] = compileClasspath
+                    compilationOperation.compilerArguments[MODULE_NAME] = moduleName
+                    val logger = TestKotlinLogger()
+                    val operation = compilationOperation.build()
+                    val thread = thread {
+                        try {
+                            buildSession.executeOperation(operation, daemonPolicy, logger)
+                        } catch (_: OperationCancelledException) {
+                            operationWasCancelled.store(true)
+                        }
                     }
+                    operation.cancel()
+                    daemonRunPath.resolve("daemon-test-start").createFile().toFile().deleteOnExit()
+                    thread.join()
+                    assertTrue { operationWasCancelled.load() }
                 }
-                operation.cancel()
-                daemonRunPath.resolve("daemon-test-start").createFile().toFile().deleteOnExit()
-                thread.join()
-                assertTrue { operationWasCancelled.load() }
             }
         }
-        attemptCleanupDaemon(daemonRunPath)
-    }
-
-    /**
-     * It's essential that we wait for the daemon to shut down before attempting to delete the test directory, otherwise (on Windows)
-     * an Exception will be thrown saying that the directory is in use and cannot be deleted.
-     *
-     * One way for telling a daemon to shut down is to delete its ".run" file, then wait for it to notice that the file is gone, in which
-     * case the daemon will eventually finish its process.
-     */
-    private fun attemptCleanupDaemon(daemonRunPath: Path) {
-        daemonRunPath.resolve("daemon-test-start").deleteIfExists()
-        var tries = 10
-        do {
-            val deleted = try {
-                daemonRunPath.listDirectoryEntries("*.run").forEach { it.deleteIfExists() }
-                daemonRunPath.deleteExisting()
-                true // run file AND daemon directory deletion was successful, which means daemon is gone now
-            } catch (_: NoSuchFileException) {
-                true // the daemon directory was already deleted, which means daemon is gone now
-            } catch (_: Exception) {
-                false // we weren't able to delete the daemon directory, so the daemon might still be running
-            }
-            if (deleted) {
-                break
-            }
-            Thread.sleep(150)
-        } while (tries-- > 0)
     }
 
     @DisplayName("Incremental in-process compilation test with cancellation")
@@ -154,55 +123,53 @@ class CancellationCompatibilitySmokeTest : BaseCompilationTest() {
     fun incrementalDaemonWithCancellation() {
         val kotlinToolchains = KotlinToolchains.loadImplementation(btaClassloader)
         val hasCancellationSupport = hasCancellationSupport(kotlinToolchains.getCompilerVersion())
-        val daemonRunPath: Path = createTempDirectory("test-daemon-files-incremental")
         assumeTrue(hasCancellationSupport)
-        val daemonPolicy = kotlinToolchains.daemonExecutionPolicyBuilder().apply {
+        runSingleShotDaemonTest(kotlinToolchains, additionalDaemonConfiguration = {
             this[ExecutionPolicy.WithDaemon.JVM_ARGUMENTS] = listOf(
                 "-Dkotlin.daemon.wait.before.compilation.for.tests=true"
             )
-            @OptIn(DelicateBuildToolsApi::class)
-            this[ExecutionPolicy.WithDaemon.DAEMON_RUN_DIR_PATH] = daemonRunPath
-            this[ExecutionPolicy.WithDaemon.SHUTDOWN_DELAY_MILLIS] = 0
-        }.build()
+        }, additionalCleanupActions = { daemonRunPath ->
+            daemonRunPath.resolve("daemon-test-start").deleteIfExists()
+        }) { daemonPolicy, daemonRunPath ->
+            project(kotlinToolchains, daemonPolicy) {
+                val module1 = module("jvm-module-1") as JvmModule
+                val operationWasCancelled = AtomicBoolean(false)
+                with(module1) {
+                    val allowedExtensions = setOf("kt", "kts", "java")
+                    val compilationOperation = kotlinToolchain.jvm.jvmCompilationOperationBuilder(
+                        sourcesDirectory.walk().filter { path -> path.pathString.run { allowedExtensions.any { endsWith(".$it") } } }
+                            .toList(),
+                        outputDirectory
+                    )
+                    moduleCompilationConfigAction(compilationOperation)
+                    compilationOperation.compilerArguments[NO_REFLECT] = true
+                    compilationOperation.compilerArguments[NO_STDLIB] = true
+                    compilationOperation.compilerArguments[CLASSPATH] = compileClasspath
+                    compilationOperation.compilerArguments[MODULE_NAME] = moduleName
 
-        project(kotlinToolchains, daemonPolicy) {
-            val module1 = module("jvm-module-1") as JvmModule
-            val operationWasCancelled = AtomicBoolean(false)
-            with(module1) {
-                val allowedExtensions = setOf("kt", "kts", "java")
-                val compilationOperation = kotlinToolchain.jvm.jvmCompilationOperationBuilder(
-                    sourcesDirectory.walk().filter { path -> path.pathString.run { allowedExtensions.any { endsWith(".$it") } } }.toList(),
-                    outputDirectory
-                )
-                moduleCompilationConfigAction(compilationOperation)
-                compilationOperation.compilerArguments[NO_REFLECT] = true
-                compilationOperation.compilerArguments[NO_STDLIB] = true
-                compilationOperation.compilerArguments[CLASSPATH] = compileClasspath
-                compilationOperation.compilerArguments[MODULE_NAME] = moduleName
+                    val snapshotIcConfig = compilationOperation.snapshotBasedIcConfigurationBuilder(
+                        icCachesDir,
+                        SourcesChanges.Unknown,
+                        emptyList(),
+                    )
+                    compilationOperation[JvmCompilationOperation.INCREMENTAL_COMPILATION] = snapshotIcConfig.build()
 
-                val snapshotIcConfig = compilationOperation.snapshotBasedIcConfigurationBuilder(
-                    icCachesDir,
-                    SourcesChanges.Unknown,
-                    emptyList(),
-                )
-                compilationOperation[JvmCompilationOperation.INCREMENTAL_COMPILATION] = snapshotIcConfig.build()
-
-                val logger = TestKotlinLogger()
-                val operation = compilationOperation.build()
-                val thread = thread {
-                    try {
-                        buildSession.executeOperation(operation, daemonPolicy, logger)
-                    } catch (_: OperationCancelledException) {
-                        operationWasCancelled.store(true)
+                    val logger = TestKotlinLogger()
+                    val operation = compilationOperation.build()
+                    val thread = thread {
+                        try {
+                            buildSession.executeOperation(operation, daemonPolicy, logger)
+                        } catch (_: OperationCancelledException) {
+                            operationWasCancelled.store(true)
+                        }
                     }
+                    operation.cancel()
+                    daemonRunPath.resolve("daemon-test-start").createFile().toFile().deleteOnExit()
+                    thread.join()
+                    assertTrue { operationWasCancelled.load() }
                 }
-                operation.cancel()
-                daemonRunPath.resolve("daemon-test-start").createFile().toFile().deleteOnExit()
-                thread.join()
-                assertTrue { operationWasCancelled.load() }
             }
         }
-        attemptCleanupDaemon(daemonRunPath)
     }
 
     @DisplayName("Sample non-incremental compilation test without cancellation support")

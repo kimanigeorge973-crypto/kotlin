@@ -10,6 +10,9 @@ import org.jetbrains.kotlin.buildtools.api.ExecutionPolicy
 import org.jetbrains.kotlin.buildtools.api.KotlinToolchains
 import org.jetbrains.kotlin.buildtools.tests.compilation.util.btaClassloader
 import org.jetbrains.kotlin.daemon.common.COMPILE_DAEMON_DEFAULT_RUN_DIR_PATH
+import org.jetbrains.kotlin.daemon.common.DEFAULT_LOG_FILE_COUNT_LIMIT
+import org.jetbrains.kotlin.daemon.common.DEFAULT_LOG_FILE_DIRECTORY
+import org.jetbrains.kotlin.daemon.common.DEFAULT_LOG_FILE_SIZE_LIMIT
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.io.path.Path
@@ -23,5 +26,8 @@ class DaemonExecutionPolicyDefaultsTest {
         assertEquals(null, daemonPolicy[ExecutionPolicy.WithDaemon.SHUTDOWN_DELAY_MILLIS])
         @OptIn(DelicateBuildToolsApi::class)
         assertEquals(Path(COMPILE_DAEMON_DEFAULT_RUN_DIR_PATH), daemonPolicy[ExecutionPolicy.WithDaemon.DAEMON_RUN_DIR_PATH])
+        assertEquals(Path(DEFAULT_LOG_FILE_DIRECTORY), daemonPolicy[ExecutionPolicy.WithDaemon.LOGS_PATH])
+        assertEquals(DEFAULT_LOG_FILE_SIZE_LIMIT, daemonPolicy[ExecutionPolicy.WithDaemon.LOGS_FILE_SIZE_LIMIT])
+        assertEquals(DEFAULT_LOG_FILE_COUNT_LIMIT, daemonPolicy[ExecutionPolicy.WithDaemon.LOGS_FILE_COUNT_LIMIT])
     }
 }

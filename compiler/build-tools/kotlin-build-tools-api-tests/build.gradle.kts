@@ -136,6 +136,7 @@ val businessLogicTestSuits = setOf(
     "testBuildMetrics",
     "testKotlinLogger",
     "testDefaultOptions",
+    "testDaemonOptions",
 )
 
 fun JvmTestSuite.addSnapshotBuildToolsImpl() {
@@ -250,6 +251,12 @@ testing {
                         }
                     }
                 }
+            }
+        }
+
+        named<JvmTestSuite>("testDaemonOptions") {
+            dependencies {
+                implementation(project(":daemon-common"))
             }
         }
 

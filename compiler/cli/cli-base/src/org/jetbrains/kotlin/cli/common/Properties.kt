@@ -25,6 +25,11 @@ enum class CompilerSystemProperties(val property: String, val alwaysDirectAccess
     COMPILE_DAEMON_OPTIONS_PROPERTY("kotlin.daemon.options"),
     COMPILE_DAEMON_CLIENT_OPTIONS_PROPERTY("kotlin.daemon.client.options"),
     COMPILE_DAEMON_CLIENT_ALIVE_PATH_PROPERTY("kotlin.daemon.client.alive.path"),
+
+    /**
+     * Configures logging to a specific file overriding any other logging configuration.
+     * The main purpose of this property is our internal testing.
+     */
     COMPILE_DAEMON_LOG_PATH_PROPERTY("kotlin.daemon.log.path"),
     COMPILE_DAEMON_REPORT_PERF_PROPERTY("kotlin.daemon.perf"),
     COMPILE_DAEMON_VERBOSE_REPORT_PROPERTY("kotlin.daemon.verbose"),
