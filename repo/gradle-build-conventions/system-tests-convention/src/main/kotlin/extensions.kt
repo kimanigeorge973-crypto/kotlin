@@ -22,6 +22,5 @@ val Project.systemTestMode: Provider<SystemTestMode>
         })
     }
 
-
 val Project.affectedTestSystems: Provider<Set<TestSystem>>
-    get() = project.affectedTestSystemsService.map { it.affectedTestSystems }
+    get() = provider { currentAffectedTestSystems }.orElse(project.affectedTestSystemsService.map { it.affectedTestSystems })
