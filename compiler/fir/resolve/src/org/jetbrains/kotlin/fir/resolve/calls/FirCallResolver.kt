@@ -268,6 +268,8 @@ class FirCallResolver(
         resolutionMode: ResolutionMode,
         collectionLiteralContext: CollectionLiteralOuterCandidateContext? = null,
     ): ResolutionResult {
+        assert(collectionLiteralContext == null || forceCallKind == null)
+
         val explicitReceiver = qualifiedAccess.explicitReceiver
         val argumentList = (qualifiedAccess as? FirFunctionCall)?.argumentList ?: FirEmptyArgumentList
         val typeArguments = if (qualifiedAccess is FirFunctionCall || forceCallKind == CallKind.Function) {
