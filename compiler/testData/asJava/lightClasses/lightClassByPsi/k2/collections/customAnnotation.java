@@ -5,6 +5,10 @@ public abstract @interface Ann /* test.Ann*/ {
 
 public abstract class CCollection /* test.CCollection*/<Elem>  implements java.util.Collection<Elem>, kotlin.jvm.internal.markers.KMappedMarker {
   @java.lang.Override()
+  @test.Ann(x = 1)
+  public boolean containsAll(java.util.Collection<?>);//  containsAll(java.util.Collection<?>)
+
+  @java.lang.Override()
   public <T> T[] toArray(T[]);// <T>  toArray(T[])
 
   @java.lang.Override()
@@ -15,9 +19,6 @@ public abstract class CCollection /* test.CCollection*/<Elem>  implements java.u
 
   @java.lang.Override()
   public boolean addAll(java.util.Collection<? extends Elem>);//  addAll(java.util.Collection<? extends Elem>)
-
-  @java.lang.Override()
-  public boolean containsAll(java.util.Collection<?>);//  containsAll(java.util.Collection<?>)
 
   @java.lang.Override()
   public boolean remove(java.lang.Object);//  remove(java.lang.Object)

@@ -20,14 +20,27 @@ public abstract class CMutableCollection2 /* test.CMutableCollection2*/<Elem>  i
   public boolean add(Elem);//  add(Elem)
 
   @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean addAll(java.util.Collection<? extends Elem>);//  addAll(java.util.Collection<? extends Elem>)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean remove(java.lang.Object);//  remove(java.lang.Object)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean removeAll(java.util.Collection<?>);//  removeAll(java.util.Collection<?>)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean retainAll(java.util.Collection<?>);//  retainAll(java.util.Collection<?>)
+
+  @java.lang.Override()
   @org.jetbrains.annotations.NotNull()
   public @org.jetbrains.annotations.NotNull() java.util.Iterator<Elem> iterator();//  iterator()
 
   @java.lang.Override()
   public <T> T[] toArray(T[]);// <T>  toArray(T[])
-
-  @java.lang.Override()
-  public boolean addAll(java.util.Collection<? extends Elem>);//  addAll(java.util.Collection<? extends Elem>)
 
   @java.lang.Override()
   public boolean contains(java.lang.Object);//  contains(java.lang.Object)
@@ -37,15 +50,6 @@ public abstract class CMutableCollection2 /* test.CMutableCollection2*/<Elem>  i
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public boolean remove(java.lang.Object);//  remove(java.lang.Object)
-
-  @java.lang.Override()
-  public boolean removeAll(java.util.Collection<?>);//  removeAll(java.util.Collection<?>)
-
-  @java.lang.Override()
-  public boolean retainAll(java.util.Collection<?>);//  retainAll(java.util.Collection<?>)
 
   @java.lang.Override()
   public final int size();//  size()

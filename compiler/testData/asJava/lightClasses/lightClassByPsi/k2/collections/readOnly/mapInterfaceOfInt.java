@@ -74,6 +74,10 @@ public abstract class CMap2 /* test.CMap2*/ implements test.IMap {
   public @org.jetbrains.annotations.Nullable() java.lang.Integer get(int);//  get(int)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final @org.jetbrains.annotations.NotNull() java.lang.Integer get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() java.lang.Integer put(int, int);//  put(int, int)
 
   @java.lang.Override()
@@ -87,9 +91,6 @@ public abstract class CMap2 /* test.CMap2*/ implements test.IMap {
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() java.lang.Integer get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
@@ -139,8 +140,16 @@ public class CMap3 /* test.CMap3*/ implements test.IMap {
   public @org.jetbrains.annotations.NotNull() java.util.Set<@org.jetbrains.annotations.NotNull() java.util.Map.Entry<@org.jetbrains.annotations.NotNull() java.lang.Integer, @org.jetbrains.annotations.NotNull() java.lang.Integer>> getEntries();//  getEntries()
 
   @java.lang.Override()
+  @org.jetbrains.annotations.NotNull()
+  public final @org.jetbrains.annotations.NotNull() java.lang.Integer getOrDefault(java.lang.Object, int);//  getOrDefault(java.lang.Object, int)
+
+  @java.lang.Override()
   @org.jetbrains.annotations.Nullable()
   public @org.jetbrains.annotations.Nullable() java.lang.Integer get(int);//  get(int)
+
+  @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final @org.jetbrains.annotations.NotNull() java.lang.Integer get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() java.lang.Integer put(int, int);//  put(int, int)
@@ -156,12 +165,6 @@ public class CMap3 /* test.CMap3*/ implements test.IMap {
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() java.lang.Integer get(java.lang.Object);//  get(java.lang.Object)
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() java.lang.Integer getOrDefault(java.lang.Object, int);//  getOrDefault(java.lang.Object, int)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)

@@ -78,6 +78,10 @@ public abstract class ABMap2 /* test.ABMap2*/ implements java.util.Map<@org.jetb
   public @org.jetbrains.annotations.Nullable() test.B get(@org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.A);//  get(@org.jetbrains.annotations.NotNull() test.A)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final @org.jetbrains.annotations.NotNull() test.B get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() test.B put(@org.jetbrains.annotations.NotNull() test.A, @org.jetbrains.annotations.NotNull() test.B);//  put(@org.jetbrains.annotations.NotNull() test.A, @org.jetbrains.annotations.NotNull() test.B)
 
   @java.lang.Override()
@@ -91,9 +95,6 @@ public abstract class ABMap2 /* test.ABMap2*/ implements java.util.Map<@org.jetb
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() test.B get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
@@ -143,8 +144,16 @@ public class ABMap3 /* test.ABMap3*/ implements java.util.Map<@org.jetbrains.ann
   public @org.jetbrains.annotations.NotNull() test.B getOrDefault(@org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.A, @org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.B);//  getOrDefault(@org.jetbrains.annotations.NotNull() test.A, @org.jetbrains.annotations.NotNull() test.B)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.NotNull()
+  public final @org.jetbrains.annotations.NotNull() test.B getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B)
+
+  @java.lang.Override()
   @org.jetbrains.annotations.Nullable()
   public @org.jetbrains.annotations.Nullable() test.B get(@org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.A);//  get(@org.jetbrains.annotations.NotNull() test.A)
+
+  @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final @org.jetbrains.annotations.NotNull() test.B get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() test.B put(@org.jetbrains.annotations.NotNull() test.A, @org.jetbrains.annotations.NotNull() test.B);//  put(@org.jetbrains.annotations.NotNull() test.A, @org.jetbrains.annotations.NotNull() test.B)
@@ -160,12 +169,6 @@ public class ABMap3 /* test.ABMap3*/ implements java.util.Map<@org.jetbrains.ann
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() test.B get(java.lang.Object);//  get(java.lang.Object)
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() test.B getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.B)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)

@@ -12,21 +12,36 @@ import com.intellij.psi.impl.light.LightModifierList
 import com.intellij.psi.impl.light.LightParameter
 import com.intellij.psi.impl.light.LightParameterListBuilder
 import com.intellij.psi.javadoc.PsiDocComment
-import org.jetbrains.kotlin.asJava.builder.LightMemberOrigin
 import org.jetbrains.kotlin.asJava.classes.METHOD_INDEX_BASE
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.light.classes.symbol.annotations.SymbolLightSimpleAnnotation
 import org.jetbrains.kotlin.light.classes.symbol.cachedValue
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolLightClassForClassOrObject
-import org.jetbrains.kotlin.light.classes.symbol.annotations.SymbolLightSimpleAnnotation
 import org.jetbrains.kotlin.light.classes.symbol.classes.isTypeParameter
-import org.jetbrains.kotlin.psi.KtDeclaration
 import javax.swing.Icon
 
 internal data class MethodSignature(val parameterTypes: List<PsiType>, val returnType: PsiType)
 
+/**
+ * Represents a stub method generated for a mapped Java collection in Kotlin's custom collection type.
+ *
+ * #### Example
+ *
+ * ```
+ * abstract class CCollection : Collection<String>
+ * ```
+ *
+ * In Kotlin, `CCollection` is a read-only collection. However, from the Java (and JVM) point of view, it is a subclass of
+ * `java.util.Collection`. So, it needs to override all methods that are in (mutable) `java.util.Collection` but not in Kotlin's
+ * (read-only) Collection. For example, we generate two stubs for the method `add`:
+ *
+ * * add(Ljava/lang/String;)Z
+ * * synthetic bridge add(Ljava/lang/Object;)Z
+ *
+ * These stubs are represented by the current class.
+ */
 internal class SymbolLightMethodForMappedCollectionClass(
-    lightMemberOrigin: LightMemberOrigin?,
     containingClass: SymbolLightClassForClassOrObject,
     private val javaMethod: PsiMethod,
     private val substitutor: PsiSubstitutor,
@@ -35,7 +50,8 @@ internal class SymbolLightMethodForMappedCollectionClass(
     private val hasImplementation: Boolean,
     private val substituteObjectWith: PsiType?,
     private val providedSignature: MethodSignature?,
-) : SymbolLightMethodBase(lightMemberOrigin, containingClass, methodIndex = METHOD_INDEX_BASE, isJvmExposedBoxed = false) {
+) : SymbolLightMethodBase(lightMemberOrigin = null, containingClass, methodIndex = METHOD_INDEX_BASE, isJvmExposedBoxed = false),
+    SyntheticElement {
 
     init {
         if (!hasImplementation && isFinal) {
@@ -43,16 +59,9 @@ internal class SymbolLightMethodForMappedCollectionClass(
         }
     }
 
-    override fun getPresentation(): ItemPresentation? =
-        kotlinOrigin?.presentation ?: javaMethod.presentation
-
-    override fun getNavigationElement(): PsiElement =
-        kotlinOrigin?.navigationElement ?: javaMethod.navigationElement
-
-    override fun getIcon(flags: Int): Icon? =
-        kotlinOrigin?.getIcon(flags) ?: javaMethod.getIcon(flags)
-
-    override val kotlinOrigin: KtDeclaration? get() = lightMemberOrigin?.originalElement
+    override fun getPresentation(): ItemPresentation? = javaMethod.presentation
+    override fun getNavigationElement(): PsiElement = javaMethod.navigationElement
+    override fun getIcon(flags: Int): Icon? = javaMethod.getIcon(flags)
 
     override fun hasModifierProperty(name: String): Boolean = when (name) {
         PsiModifier.ABSTRACT -> !hasImplementation

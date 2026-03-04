@@ -11,12 +11,12 @@ import org.jetbrains.kotlin.analysis.api.symbols.*
 import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.analysis.api.types.KaTypeMappingMode
 import org.jetbrains.kotlin.analysis.api.types.KaTypeParameterType
-import org.jetbrains.kotlin.asJava.builder.LightMemberOrigin
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.light.classes.symbol.methods.MethodSignature
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightMethodForMappedCollectionClass
+import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightMethodForMappedKotlinCollectionMethod
 import org.jetbrains.kotlin.load.java.BuiltinSpecialProperties
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.load.java.SpecialGenericSignatures
@@ -167,15 +167,17 @@ internal fun KaSession.processPossiblyMappedCollectionMethod(
     val lightMemberOrigin = (ownFunction.psi as? KtDeclaration)?.let { originalElement ->
         LightMemberOriginForDeclaration(originalElement, originKind)
     }
-    val wrappedMethod = javaMethod.wrap(
-        containingClass,
-        substitutor,
-        lightMemberOrigin,
-        hasImplementation = true,
-        makeFinal = !isErasedSignature
+
+    val mappedMethod = SymbolLightMethodForMappedKotlinCollectionMethod(
+        functionSymbol = ownFunction,
+        lightMemberOrigin = lightMemberOrigin,
+        containingClass = containingClass,
+        javaMethod = javaMethod,
+        substitutor = substitutor,
+        isFinal = !isErasedSignature,
     )
 
-    lightMethodConsumer.add(wrappedMethod)
+    lightMethodConsumer.add(mappedMethod)
     return !isErasedSignature
 }
 
@@ -445,14 +447,12 @@ private fun PsiMethod.openBridge(
 private fun PsiMethod.wrap(
     containingClass: SymbolLightClassForClassOrObject,
     substitutor: PsiSubstitutor,
-    lightMemberOrigin: LightMemberOrigin? = null,
     makeFinal: Boolean = false,
     hasImplementation: Boolean = false,
     name: String = this.name,
     substituteObjectWith: PsiType? = null,
     signature: MethodSignature? = null,
 ) = SymbolLightMethodForMappedCollectionClass(
-    lightMemberOrigin = lightMemberOrigin,
     containingClass = containingClass,
     javaMethod = this,
     substitutor = substitutor,

@@ -56,6 +56,11 @@ public abstract class SMutableMap2 /* test.SMutableMap2*/<VElem>  implements jav
   public @org.jetbrains.annotations.Nullable() VElem remove(int);//  remove(int)
 
   @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  @org.jetbrains.annotations.Nullable()
+  public final VElem remove(java.lang.Object);//  remove(java.lang.Object)
+
+  @java.lang.Override()
   @org.jetbrains.annotations.NotNull()
   public @org.jetbrains.annotations.NotNull() java.util.Collection<VElem> getValues();//  getValues()
 
@@ -72,6 +77,10 @@ public abstract class SMutableMap2 /* test.SMutableMap2*/<VElem>  implements jav
   public @org.jetbrains.annotations.Nullable() VElem get(int);//  get(int)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final VElem get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public boolean containsKey(int);//  containsKey(int)
 
   @java.lang.Override()
@@ -79,12 +88,6 @@ public abstract class SMutableMap2 /* test.SMutableMap2*/<VElem>  implements jav
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final VElem get(java.lang.Object);//  get(java.lang.Object)
-
-  @java.lang.Override()
-  public final VElem remove(java.lang.Object);//  remove(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
@@ -139,6 +142,14 @@ public class SMutableMap3 /* test.SMutableMap3*/<VElem>  implements java.util.Ma
   public @org.jetbrains.annotations.Nullable() VElem remove(int);//  remove(int)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final VElem get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final VElem remove(java.lang.Object);//  remove(java.lang.Object)
+
+  @java.lang.Override()
   public VElem getOrDefault(java.lang.Object, VElem);//  getOrDefault(java.lang.Object, VElem)
 
   @java.lang.Override()
@@ -149,12 +160,6 @@ public class SMutableMap3 /* test.SMutableMap3*/<VElem>  implements java.util.Ma
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final VElem get(java.lang.Object);//  get(java.lang.Object)
-
-  @java.lang.Override()
-  public final VElem remove(java.lang.Object);//  remove(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
