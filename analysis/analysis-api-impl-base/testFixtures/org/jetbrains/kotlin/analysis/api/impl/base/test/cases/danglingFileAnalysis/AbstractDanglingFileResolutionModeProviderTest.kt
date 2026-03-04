@@ -19,6 +19,7 @@ abstract class AbstractDanglingFileResolutionModeProviderTest : AbstractAnalysis
         val copyFile = testModules.singleOrNull { it.name == "copy" }?.ktFiles?.single()
             ?: error("No 'copy' module was found. Expected `copy` module with a single file.")
         copyFile.originalFile = originalFile
+        copyFile.name = originalFile.name
         val resolutionMode = KaDanglingFileResolutionModeProvider.calculateMode(copyFile)
         val result = buildString {
             appendLine("RESOLUTION_MODE: $resolutionMode")

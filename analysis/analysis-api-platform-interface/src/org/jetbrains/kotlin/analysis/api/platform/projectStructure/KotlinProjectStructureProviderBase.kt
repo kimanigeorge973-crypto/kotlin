@@ -56,10 +56,6 @@ public abstract class KotlinProjectStructureProviderBase : KotlinProjectStructur
         return KaDanglingFileResolutionMode.PREFER_SELF
     }
 
-    private val autoDanglingResolutionMode by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        Registry.`is`("kotlin.analysis.autoDanglingResolutionMode", false)
-    }
-
     @OptIn(KaImplementationDetail::class, KaExperimentalApi::class)
     private fun computeContextModule(file: KtFile): KaModule {
         val originalFile = file.copyOrigin
@@ -99,3 +95,11 @@ public var KtCodeFragment.forcedSpecialModule: KaDanglingFileModule?
     set(value) {
         explicitModule = value
     }
+
+/**
+ * Whether [KaDanglingFileResolutionMode] for dangling files should be automatically calculated by [KaDanglingFileResolutionModeProvider]
+ * in cases when [KtFile.danglingFileResolutionMode] is not set.
+ */
+private val autoDanglingResolutionMode by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    Registry.`is`("kotlin.analysis.autoDanglingResolutionMode", true)
+}

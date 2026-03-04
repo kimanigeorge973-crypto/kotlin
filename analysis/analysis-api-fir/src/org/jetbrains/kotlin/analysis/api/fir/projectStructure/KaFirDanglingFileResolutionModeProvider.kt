@@ -81,7 +81,7 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
             return KaDanglingFileResolutionMode.PREFER_SELF
         }
         val originalToCopyStubs = originalStubList.zip(copyStubList)
-        if (originalToCopyStubs.any { !it.first.equalsTo(it.second) }) {
+        if (originalToCopyStubs.any { !it.first.isEquivalentTo(it.second) }) {
             return KaDanglingFileResolutionMode.PREFER_SELF
         }
 
@@ -98,29 +98,16 @@ internal class KaFirDanglingFileResolutionModeProvider : KaDanglingFileResolutio
          * That's why we need to run the PSI-based diff in some specific cases.
          */
         val foundOutOfBlockByPsiCheck = originalToCopyStubs.any { (originalStub, copyStub) ->
-            if (!originalStub.shouldRunPsiCheck()) {
-                return@any false
+            if (originalStub.shouldRunPsiCheck()) {
+                calculateModePsiBased(originalStub.psi, copyStub.psi) == KaDanglingFileResolutionMode.PREFER_SELF
+            } else {
+                false
             }
-
-            calculateModePsiBased(originalStub.psi, copyStub.psi) == KaDanglingFileResolutionMode.PREFER_SELF
         }
 
         return when {
             foundOutOfBlockByPsiCheck -> KaDanglingFileResolutionMode.PREFER_SELF
             else -> KaDanglingFileResolutionMode.IGNORE_SELF
-        }
-    }
-
-    @OptIn(KtImplementationDetail::class)
-    private fun KotlinStubElement<*>.equalsTo(other: KotlinStubElement<*>): Boolean {
-        if (this.elementType != other.elementType) {
-            return false
-        }
-        return when (this) {
-            // File stubs contain module / file names as well (in `facadeFqName`).
-            // That's why we only compare package names to ignore non-relevant information.
-            is KotlinFileStub -> other is KotlinFileStub && this.getPackageFqName() == other.getPackageFqName()
-            else -> this.isEquivalentTo(other)
         }
     }
 

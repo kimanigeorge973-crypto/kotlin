@@ -140,7 +140,7 @@ fun AnalysisApiTestGroup.generateAnalysisApiTests() {
             model("danglingFileReferenceResolve", pattern = TestGeneratorUtil.KT_WITHOUT_DOTS_IN_NAME)
         }
 
-        test<AbstractDanglingFileResolutionModeProviderTest> {
+        test<AbstractDanglingFileResolutionModeProviderTest>(filter = testModuleKindIs(TestModuleKind.Source)) {
             model("danglingFileResolutionModeProvider", pattern = TestGeneratorUtil.KT_WITHOUT_DOTS_IN_NAME)
         }
     }
