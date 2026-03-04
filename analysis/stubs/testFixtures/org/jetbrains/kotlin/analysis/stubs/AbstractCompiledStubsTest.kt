@@ -9,11 +9,11 @@ import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators.AnalysisApiFirBinaryTestConfigurator
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtLibraryBinaryDecompiledTestModuleFactory
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtTestModuleFactory
+import org.jetbrains.kotlin.analysis.test.framework.services.MultiplatformTestOutputPrefixProvider
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiTestConfigurator
 import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.platform.TargetPlatform
-import org.jetbrains.kotlin.platform.jvm.JvmPlatform
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives
 
@@ -36,26 +36,7 @@ abstract class AbstractCompiledStubsTest(defaultTargetPlatform: TargetPlatform) 
             get() = KtLibraryBinaryDecompiledTestModuleFactory
 
         override val testPrefixes: List<String>
-            get() {
-                val simplePlatform = defaultTargetPlatform.singleOrNull()
-                val variantChain = if (simplePlatform is JvmPlatform) {
-                    // JVM is golden output
-                    emptyList()
-                } else {
-                    buildList {
-                        // All supported platforms except for the JVM might be compiled as .knm files,
-                        // so their output should be the same in most cases
-                        // knm is also a default for the Common platform
-                        add("knm")
-
-                        if (simplePlatform != null) {
-                            add(simplePlatform.platformName)
-                        }
-                    }
-                }
-
-                return variantChain
-            }
+            get() = MultiplatformTestOutputPrefixProvider.getPrefixes(listOf(), defaultTargetPlatform)
 
         override fun configureTest(builder: TestConfigurationBuilder, disposable: Disposable) {
             super.configureTest(builder, disposable)
