@@ -12,6 +12,9 @@ internal val Project.testSystem: TestSystem
         return when {
             this.path.contains("gradle") -> TestSystem.Gradle
             this.path.contains("compiler") -> TestSystem.Compiler
+            this.path.contains("wasm") -> TestSystem.Compiler
+            this.path.contains("js") -> TestSystem.Compiler
+            this.path.contains("native") -> TestSystem.Compiler
             else -> TestSystem.Unknown
         }
     }
