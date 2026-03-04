@@ -72,6 +72,10 @@ public abstract class ATMap2 /* test.ATMap2*/<T>  implements java.util.Map<@org.
   public @org.jetbrains.annotations.Nullable() T get(@org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.A);//  get(@org.jetbrains.annotations.NotNull() test.A)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final T get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public T put(@org.jetbrains.annotations.NotNull() test.A, T);//  put(@org.jetbrains.annotations.NotNull() test.A, T)
 
   @java.lang.Override()
@@ -85,9 +89,6 @@ public abstract class ATMap2 /* test.ATMap2*/<T>  implements java.util.Map<@org.
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final T get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
@@ -134,6 +135,10 @@ public class ATMap3 /* test.ATMap3*/<T>  implements java.util.Map<@org.jetbrains
   public @org.jetbrains.annotations.Nullable() T get(@org.jetbrains.annotations.NotNull() @org.jetbrains.annotations.NotNull() test.A);//  get(@org.jetbrains.annotations.NotNull() test.A)
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final T get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public T getOrDefault(java.lang.Object, T);//  getOrDefault(java.lang.Object, T)
 
   @java.lang.Override()
@@ -150,9 +155,6 @@ public class ATMap3 /* test.ATMap3*/<T>  implements java.util.Map<@org.jetbrains
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final T get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)

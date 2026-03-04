@@ -62,6 +62,7 @@ public abstract class TAMap2 /* test.TAMap2*/<T>  implements java.util.Map<T, @o
   public @org.jetbrains.annotations.NotNull() java.util.Set<T> getKeys();//  getKeys()
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
   public @org.jetbrains.annotations.NotNull() test.A get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
@@ -120,10 +121,12 @@ public class TAMap3 /* test.TAMap3*/<T>  implements java.util.Map<T, @org.jetbra
   public @org.jetbrains.annotations.NotNull() java.util.Set<T> getKeys();//  getKeys()
 
   @java.lang.Override()
-  public @org.jetbrains.annotations.NotNull() test.A get(java.lang.Object);//  get(java.lang.Object)
+  @org.jetbrains.annotations.NotNull()
+  public @org.jetbrains.annotations.NotNull() test.A getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.A);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.A)
 
   @java.lang.Override()
-  public @org.jetbrains.annotations.NotNull() test.A getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.A);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() test.A)
+  @org.jetbrains.annotations.Nullable()
+  public @org.jetbrains.annotations.NotNull() test.A get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() test.A put(T, @org.jetbrains.annotations.NotNull() test.A);//  put(T, @org.jetbrains.annotations.NotNull() test.A)

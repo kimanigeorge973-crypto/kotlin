@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.name.JvmStandardClassIds.SYNCHRONIZED_ANNOTATION_CLA
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import java.util.*
 
-internal class SymbolLightSimpleMethod private constructor(
+internal open class SymbolLightSimpleMethod protected constructor(
     functionSymbol: KaNamedFunctionSymbol,
     lightMemberOrigin: LightMemberOrigin?,
     containingClass: SymbolLightClassBase,

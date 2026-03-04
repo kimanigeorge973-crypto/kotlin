@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.light.classes.symbol.methods.MethodSignature
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightMethodForMappedCollectionClass
+import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightMethodForMappedKotlinCollectionMethod
 import org.jetbrains.kotlin.load.java.BuiltinSpecialProperties
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.load.java.SpecialGenericSignatures
@@ -167,13 +168,31 @@ internal fun KaSession.processPossiblyMappedCollectionMethod(
     val lightMemberOrigin = (ownFunction.psi as? KtDeclaration)?.let { originalElement ->
         LightMemberOriginForDeclaration(originalElement, originKind)
     }
-    val wrappedMethod = javaMethod.wrap(
-        containingClass,
-        substitutor,
-        lightMemberOrigin,
-        hasImplementation = true,
-        makeFinal = !isErasedSignature
-    )
+
+    // Use SymbolLightSimpleMethodForMappedCollectionOverride for custom overrides (case 2)
+    // to preserve annotations from the Kotlin source.
+    // Use SymbolLightMethodForMappedCollectionClass for stub methods (case 1) where no Kotlin source exists.
+    val wrappedMethod = if (lightMemberOrigin != null) {
+        SymbolLightMethodForMappedKotlinCollectionMethod(
+            functionSymbol = ownFunction,
+            lightMemberOrigin = lightMemberOrigin,
+            containingClass = containingClass,
+            javaMethod = javaMethod,
+            substitutor = substitutor,
+            mappedName = javaMethod.name,
+            isFinal = !isErasedSignature,
+            substituteObjectWith = null,
+            providedSignature = null,
+        )
+    } else {
+        javaMethod.wrap(
+            containingClass,
+            substitutor,
+            lightMemberOrigin,
+            hasImplementation = true,
+            makeFinal = !isErasedSignature
+        )
+    }
 
     lightMethodConsumer.add(wrappedMethod)
     return !isErasedSignature
