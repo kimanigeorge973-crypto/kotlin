@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.backend.wasm.utils.SourceMapGenerator
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.perfManager
 import org.jetbrains.kotlin.config.phaser.PhaserState
 import org.jetbrains.kotlin.ir.backend.js.MainModule
 import org.jetbrains.kotlin.ir.backend.js.WholeWorldStageController
@@ -33,6 +34,8 @@ import org.jetbrains.kotlin.js.config.sourceMap
 import org.jetbrains.kotlin.js.config.useDebuggerCustomFormatters
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.platform.wasm.WasmTarget
+import org.jetbrains.kotlin.util.PhaseType
+import org.jetbrains.kotlin.util.tryMeasurePhaseTime
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlin.wasm.config.WasmConfigurationKeys
@@ -97,22 +100,24 @@ fun compileToLoweredIr(
         configuration = configuration,
     )
 
-    // Create stubs
-    ExternalDependenciesGenerator(symbolTable, listOf(irLinker)).generateUnboundSymbolsAsDependencies()
+    val allModules = configuration.perfManager.tryMeasurePhaseTime(PhaseType.IrLinking) {
+        // Create stubs
+        ExternalDependenciesGenerator(symbolTable, listOf(irLinker)).generateUnboundSymbolsAsDependencies()
 
-    // Sort dependencies after IR linkage.
-    val sortedModuleDependencies = irLinker.moduleDependencyTracker.reverseTopoOrder(moduleDependencies)
+        // Sort dependencies after IR linkage.
+        val sortedModuleDependencies = irLinker.moduleDependencyTracker.reverseTopoOrder(moduleDependencies)
 
-    val allModules = when (mainModule) {
-        is MainModule.SourceFiles -> sortedModuleDependencies.all + moduleFragment
-        is MainModule.Klib -> sortedModuleDependencies.all
+        when (mainModule) {
+            is MainModule.SourceFiles -> sortedModuleDependencies.all + moduleFragment
+            is MainModule.Klib -> sortedModuleDependencies.all
+        }.also { allModules ->
+            allModules.forEach { it.patchDeclarationParents() }
+
+            irLinker.postProcess(inOrAfterLinkageStep = true)
+            irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
+            irLinker.clear()
+        }
     }
-
-    allModules.forEach { it.patchDeclarationParents() }
-
-    irLinker.postProcess(inOrAfterLinkageStep = true)
-    irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
-    irLinker.clear()
 
     for (module in allModules)
         for (file in module.files)
