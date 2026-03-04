@@ -52,6 +52,7 @@ registerKotlinSourceForVersionRange(
 )
 
 tasks.test {
+    withSmokeTestPattern(".*")
     useJUnitPlatform {
         exclude("**/*LincheckTest.class")
     }
@@ -610,6 +611,7 @@ tasks.register<Test>("functionalTest") {
     systemProperty("kotlinVersion", rootProject.extra["kotlinVersion"] as String)
     systemProperty("konanProperties", rootDir.resolve("kotlin-native/konan/konan.properties"))
     useJUnitPlatform()
+    withSmokeTestPattern(".*/unitTests/.*")
 }
 
 tasks.register<Test>("functionalUnitTest") {

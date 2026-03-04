@@ -1,3 +1,5 @@
+plugins.apply("system-tests-convention")
+
 val extension = extensions.create("projectTests", ProjectTestsExtension::class)
 
 val provider = objects.newInstance<TestCompilerRuntimeArgumentProvider>().apply {
@@ -51,14 +53,4 @@ tasks.withType<Test>().configureEach {
         failOnPassedAfterRetry.set(extension.allowFlaky.convention(true).map { !it })
     }
     ignoreFailures = false
-
-    project.teamcityBuildChangedTestSystems?.let { changedSystems ->
-        if (project.testSystem !in changedSystems) {
-            systemProperty("system.test.mode", "smoke")
-            environment("SYSTEM_TEST_MODE", "smoke")
-            doFirst {
-                logger.quiet("Running in 'smoke' test mode (changed systems: $changedSystems, this system: ${project.testSystem})")
-            }
-        }
-    }
 }

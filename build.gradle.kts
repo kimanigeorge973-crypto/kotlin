@@ -598,6 +598,7 @@ val dependencyOnSnapshotReflectWhitelist = setOf(
 allprojects {
     if (!project.path.startsWith(":kotlin-ide.")) {
         pluginManager.apply("common-configuration")
+        pluginManager.apply("system-tests-convention")
     }
     if (!project.path.startsWith(":compiler:build-tools")) {
         pluginManager.apply("com.autonomousapps.dependency-analysis")

@@ -10,6 +10,7 @@ plugins {
     kotlin("plugin.serialization")
     id("android-sdk-provisioner")
     id("gradle-plugin-published-compiler-dependency-configuration") // the test compilation's output is injected into test project's build classpath for the buildscript injection
+    id("system-tests-convention")
 }
 
 testsJar()
@@ -143,6 +144,7 @@ dependencies {
     testCompileOnly(libs.intellij.asm)
 
     testImplementation(project(":compose-compiler-gradle-plugin"))
+    testImplementation(project(":repo:system-tests"))
 }
 
 tasks.register<Delete>("cleanTestKitCache") {

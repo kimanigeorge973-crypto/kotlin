@@ -122,6 +122,15 @@ internal fun Project.createGeneralTestTask(
     defineJDKEnvVariables: List<JdkMajorVersion> = emptyList(),
     body: Test.() -> Unit = {},
 ): TaskProvider<Test> {
+
+    project.dependencies {
+        "testImplementation"(project(":repo:system-tests"))
+        "testRuntimeOnly"(
+            if (jUnitMode == JUnitMode.JUnit5) project(":compiler:tests-mutes:mutes-junit5")
+            else project(":compiler:tests-mutes:mutes-junit4")
+        )
+    }
+
     if (jUnitMode == JUnitMode.JUnit5) {
         project.dependencies {
             "testRuntimeOnly"(project(":compiler:tests-mutes:mutes-junit5"))
@@ -274,6 +283,7 @@ internal fun Project.createGeneralTestTask(
         jvmArgumentProviders.add(testArgumentProvider)
 
         systemProperty("idea.ignore.disabled.plugins", "true")
+        systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 
         doFirst {
             if (testArgumentProvider.excludesFile.isPresent) {

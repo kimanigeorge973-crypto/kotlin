@@ -10,29 +10,16 @@ import org.gradle.kotlin.dsl.kotlin
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinGradlePluginDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.testbase.GradleTest
-import org.jetbrains.kotlin.gradle.testbase.GradleTestVersions
-import org.jetbrains.kotlin.gradle.testbase.GradleWithJdkTest
-import org.jetbrains.kotlin.gradle.testbase.JdkVersions
-import org.jetbrains.kotlin.gradle.testbase.JvmGradlePluginTests
-import org.jetbrains.kotlin.gradle.testbase.KGPBaseTest
-import org.jetbrains.kotlin.gradle.testbase.TestVersions
-import org.jetbrains.kotlin.gradle.testbase.addKgpToBuildScriptCompilationClasspath
-import org.jetbrains.kotlin.gradle.testbase.assertOutputContains
-import org.jetbrains.kotlin.gradle.testbase.assertOutputDoesNotContain
-import org.jetbrains.kotlin.gradle.testbase.build
-import org.jetbrains.kotlin.gradle.testbase.buildAndFail
-import org.jetbrains.kotlin.gradle.testbase.buildScriptInjection
-import org.jetbrains.kotlin.gradle.testbase.buildScriptReturn
-import org.jetbrains.kotlin.gradle.testbase.plugins
-import org.jetbrains.kotlin.gradle.testbase.project
+import org.jetbrains.kotlin.gradle.testbase.*
 import org.jetbrains.kotlin.gradle.utils.setInvisibleIfSupported
+import org.jetbrains.kotlin.systemTest.SmokeTest
 import org.junit.jupiter.api.DisplayName
 import java.io.File
 import kotlin.io.path.pathString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@SmokeTest
 @DisplayName("Tests on compatibility with various Gradle versions")
 @JvmGradlePluginTests
 class GradleCompatibilityIT : KGPBaseTest() {

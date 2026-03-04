@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.gradle.KaptBaseIT
 import org.jetbrains.kotlin.gradle.testbase.*
 import org.jetbrains.kotlin.gradle.util.checkedReplace
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.extension.ExtendWith
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.relativeTo

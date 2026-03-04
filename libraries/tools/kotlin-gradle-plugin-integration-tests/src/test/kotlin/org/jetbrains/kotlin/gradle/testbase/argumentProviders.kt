@@ -8,7 +8,8 @@ package org.jetbrains.kotlin.gradle.testbase
 import org.gradle.api.JavaVersion
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.testbase.TestVersions.AgpCompatibilityMatrix
-import org.jetbrains.kotlin.gradle.util.isTeamCityRun
+import org.jetbrains.kotlin.systemTest.SystemTestMode
+import org.jetbrains.kotlin.systemTest.currentSystemTestMode
 import org.junit.jupiter.api.extension.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -20,8 +21,6 @@ import org.junit.platform.commons.util.AnnotationUtils
 import org.junit.platform.commons.util.ReflectionUtils
 import java.io.File
 import java.util.stream.Stream
-import kotlin.io.path.Path
-import kotlin.io.path.readLines
 import kotlin.streams.asStream
 
 
@@ -160,6 +159,11 @@ open class GradleArgumentsProvider : ArgumentsProvider {
             println("Using only max gradle version for tests")
             return setOf(maxGradleVersion)
         }
+
+        if (currentSystemTestMode == SystemTestMode.Smoke) {
+            return setOf(maxGradleVersion)
+        }
+
         return setOf(minGradleVersion, *additionalGradleVersions.toTypedArray(), maxGradleVersion)
     }
 
@@ -340,7 +344,7 @@ class GradleAndAgpArgumentsProvider : GradleArgumentsProvider() {
         context: ExtensionContext,
     ): Stream<out Arguments> {
         val agpVersionsAnnotation = findAnnotation<AndroidTestVersions>(context)
-        val agpVersions = setOfNotNull(
+        var agpVersions = setOfNotNull(
             agpVersionsAnnotation.minVersion,
             *agpVersionsAnnotation.additionalVersions,
             if (
@@ -355,6 +359,10 @@ class GradleAndAgpArgumentsProvider : GradleArgumentsProvider() {
                 null
             }
         )
+
+        if (currentSystemTestMode == SystemTestMode.Smoke) {
+            agpVersions = setOf(agpVersions.last())
+        }
 
         val gradleVersions = gradleVersions(context)
         val versionFilter = context.getConfigurationParameter("gradle.integration.tests.gradle.version.filter")

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import org.jetbrains.kotlin.buildtools.api.ExperimentalBuildToolsApi
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
@@ -29,25 +31,30 @@ kotlin {
     }
 }
 
-dependencies {
-    compileOnly(kotlin("stdlib", embeddedKotlinVersion))
-    implementation(project(":system-tests-convention"))
-    implementation(libs.develocity.gradlePlugin)
-    implementation("org.jetbrains.kotlin:kotlin-build-gradle-plugin:${kotlinBuildProperties.buildGradlePluginVersion.get()}")
-    api(project(":utilities"))
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.bootstrapKotlinVersion}")
-    implementation(project(":d8-configuration"))
-    compileOnly(libs.node.gradlePlugin)
-
-    constraints {
-        api(libs.apache.commons.lang)
-    }
-}
-
 project.configurations.named(org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME + "Main") {
     resolutionStrategy {
         eachDependency {
             if (this.requested.group == "org.jetbrains.kotlin") useVersion(libs.versions.kotlin.`for`.gradle.plugins.compilation.get())
         }
     }
+}
+
+
+//region Sync Sources from :system-tests
+val syncSourceFiles = tasks.register<Sync>("syncSrc") {
+    from("../../system-tests/src/main/kotlin/org/jetbrains/kotlin/systemTest") {
+        include("environment.kt")
+        include("SystemTestMode.kt")
+        include("TestSystem.kt")
+    }
+
+    destinationDir = file("build/syncedSrc")
+}
+
+kotlin.sourceSets.main.get().kotlin.srcDir(syncSourceFiles)
+kotlin.sourceSets.main.get().kotlin.srcDir("build/syncedSrc")
+//endregion
+
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-build-gradle-plugin:${kotlinBuildProperties.buildGradlePluginVersion.get()}")
 }

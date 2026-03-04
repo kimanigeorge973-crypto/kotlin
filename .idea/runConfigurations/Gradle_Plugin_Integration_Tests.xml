@@ -1,6 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Test: Kotlin Gradle Plugin / functionalTest" type="GradleRunConfiguration" factoryName="Gradle" folderName="Tests">
+  <configuration default="false" name="Gradle Plugin Integration Tests" type="GradleRunConfiguration" factoryName="Gradle" folderName="Tests">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="SYSTEM_TEST_AFFECTED_SYSTEMS" value="Unknown" />
+          <entry key="SYSTEM_TEST_MODE" value="Smoke" />
+        </map>
+      </option>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
@@ -10,15 +16,18 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":kotlin-gradle-plugin:functionalTest" />
+          <option value=":kotlin-gradle-plugin-integration-tests:kgpAllParallelTests" />
         </list>
       </option>
       <option name="vmOptions" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
     <DebugAllEnabled>false</DebugAllEnabled>
     <RunAsTest>true</RunAsTest>
+    <GradleProfilingDisabled>false</GradleProfilingDisabled>
+    <GradleCoverageDisabled>false</GradleCoverageDisabled>
     <method v="2" />
   </configuration>
 </component>
