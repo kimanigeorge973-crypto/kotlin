@@ -111,7 +111,12 @@ public class KtEnumEntry extends KtClass implements KtDeclarationWithReturnType 
      * <p>
      * This method might move the semicolon from its next sibling if the semicolon was
      * previously a child of the parent {@link KtClassBody}.
-     * </p>
+     * <p>
+     * This can happen if we called {@link KtClassOrObject#addDeclaration(KtDeclaration)}
+     * for a {@link KtFunction} before inserting the {@link KtEnumEntry} into the {@link KtClassBody},
+     * and the semicolon was previously a child of the parent {@link KtClassBody} rather than the last
+     * {@link KtEnumEntry}. Or we deleted the last {@link KtEnumEntry} (reparenting the
+     * semicolon onto the parent {@link KtClassBody}) and inserted a new {@link KtEnumEntry}.
      *
      * @return The added semicolon element.
      */
@@ -147,20 +152,22 @@ public class KtEnumEntry extends KtClass implements KtDeclarationWithReturnType 
 
     @Override
     public void delete() {
-        if (getSemicolon() != null) {
+        // KT-84564
+        PsiElement semicolon = getSemicolon();
+        if (semicolon != null) {
+            // Get previous KtEnumEntry, and move semicolon to it
             PsiElement prevEntry = getPrevSibling();
 
             while (prevEntry != null && !(prevEntry instanceof KtEnumEntry)) {
                 prevEntry = prevEntry.getPrevSibling();
             }
 
-            PsiElement semi = new KtPsiFactory(getProject()).createSemicolon();
             if (prevEntry == null) {
-                PsiElement parent = getParent();
-
-                parent.addAfter(semi, this);
+                // if there's no previous KtEnumEntry, we embed it into the parent (expected to be a KtClassBody)
+                getParent().addAfter(semicolon, this);
             }
             else {
+                // if there is, we move semicolon to it
                 ((KtEnumEntry) prevEntry).addSemicolon();
             }
         }
