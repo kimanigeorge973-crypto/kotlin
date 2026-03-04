@@ -609,6 +609,12 @@ public class SymbolLightClassesEqualityByPsiForLibraryTestGenerated extends Abst
       }
 
       @Test
+      @TestMetadata("customAnnotation.kt")
+      public void testCustomAnnotation() {
+        run("customAnnotation.kt");
+      }
+
+      @Test
       @TestMetadata("explicitOverrides.kt")
       public void testExplicitOverrides() {
         run("explicitOverrides.kt");
