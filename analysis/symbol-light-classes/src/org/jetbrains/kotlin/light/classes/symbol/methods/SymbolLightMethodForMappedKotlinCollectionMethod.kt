@@ -33,10 +33,7 @@ internal class SymbolLightMethodForMappedKotlinCollectionMethod(
     containingClass: SymbolLightClassForClassOrObject,
     private val javaMethod: PsiMethod,
     private val substitutor: PsiSubstitutor,
-    private val mappedName: String,
     private val isFinal: Boolean,
-    private val substituteObjectWith: PsiType?,
-    private val providedSignature: MethodSignature?,
 ) : SymbolLightSimpleMethod(
     functionSymbol = functionSymbol,
     lightMemberOrigin = lightMemberOrigin,
@@ -47,17 +44,12 @@ internal class SymbolLightMethodForMappedKotlinCollectionMethod(
     suppressStatic = false,
     isJvmExposedBoxed = false,
 ) {
-    override fun getName(): String = mappedName
-
     override fun getParameterList(): PsiParameterList = cachedValue {
         LightParameterListBuilder(manager, KotlinLanguage.INSTANCE).apply {
             javaMethod.parameterList.parameters.forEachIndexed { index, paramFromJava ->
                 val typeFromJava = paramFromJava.type
-                val providedType = providedSignature?.parameterTypes?.get(index)
-                val candidateType = providedType ?: substituteType(typeFromJava)
-                val shouldTryToUnbox = providedType != null ||
-                        (typeFromJava.isJavaLangObject() && substituteObjectWith == candidateType) ||
-                        typeFromJava.isTypeParameter()
+                val candidateType = substituteType(typeFromJava)
+                val shouldTryToUnbox = typeFromJava.isTypeParameter()
                 val type = if (shouldTryToUnbox) candidateType.unboxedOrSelf() else candidateType
 
                 addParameter(
@@ -73,36 +65,17 @@ internal class SymbolLightMethodForMappedKotlinCollectionMethod(
         }
     }
 
-    private fun PsiType.isJavaLangObject(): Boolean =
-        this is PsiClassType && this.canonicalText == CommonClassNames.JAVA_LANG_OBJECT
-
     private fun PsiType.unboxedOrSelf(): PsiType =
         PsiPrimitiveType.getUnboxedType(this)?.annotate(TypeAnnotationProvider.EMPTY) ?: this
 
-    private fun substituteType(psiType: PsiType): PsiType {
-        val substituted = substitutor.substitute(psiType) ?: psiType
-        return if (substituted.isJavaLangObject() && substituteObjectWith != null) {
-            substituteObjectWith
-        } else {
-            substituted
-        }
-    }
+    private fun substituteType(psiType: PsiType): PsiType =
+        substitutor.substitute(psiType) ?: psiType
 
     override fun getReturnType(): PsiType =
-        providedSignature?.returnType ?: javaMethod.returnType?.let { substituteType(it) } ?: PsiTypes.voidType()
-
-    override fun getTypeParameters(): Array<PsiTypeParameter> = javaMethod.typeParameters
-
-    override fun getTypeParameterList(): PsiTypeParameterList? = javaMethod.typeParameterList
-
-    override fun hasTypeParameters(): Boolean = javaMethod.hasTypeParameters()
+        javaMethod.returnType?.let { substituteType(it) } ?: PsiTypes.voidType()
 
     override fun hasModifierProperty(name: String): Boolean = when (name) {
-        PsiModifier.ABSTRACT -> false // Always has implementation for overrides
         PsiModifier.FINAL -> isFinal
-        PsiModifier.DEFAULT -> false
-        else -> javaMethod.hasModifierProperty(name)
+        else -> super.hasModifierProperty(name)
     }
-
-    override fun isVarArgs(): Boolean = javaMethod.isVarArgs
 }

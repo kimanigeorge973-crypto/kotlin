@@ -179,10 +179,7 @@ internal fun KaSession.processPossiblyMappedCollectionMethod(
             containingClass = containingClass,
             javaMethod = javaMethod,
             substitutor = substitutor,
-            mappedName = javaMethod.name,
             isFinal = !isErasedSignature,
-            substituteObjectWith = null,
-            providedSignature = null,
         )
     } else {
         javaMethod.wrap(
