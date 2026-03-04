@@ -79,7 +79,7 @@ open class AbstractCustomNativeCompilerSecondStageTest : AbstractNativeCoreTest(
         }
 
         useDirectives(TestDirectives)
-        facadeStep(::NativeCompilerSecondStageFacade.bind(customNativeCompilerSettings))
+        facadeStep(NativeCompilerSecondStageFacade::FirstPhase.bind(customNativeCompilerSettings))
 
         nativeArtifactsHandlersStep {
             useHandlers(::NativeBoxRunner)

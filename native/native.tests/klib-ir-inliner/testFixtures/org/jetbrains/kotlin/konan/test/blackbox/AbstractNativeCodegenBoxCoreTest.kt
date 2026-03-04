@@ -82,7 +82,7 @@ abstract class AbstractNativeCodegenBoxCoreTest : AbstractNativeCoreTest() {
         klibArtifactsHandlersStep()
 
         // 2nd stage (klibs -> executable)
-        facadeStep(::NativeCompilerSecondStageFacade.bind(currentCustomNativeCompilerSettings))
+        facadeStep(NativeCompilerSecondStageFacade::FirstPhase.bind(currentCustomNativeCompilerSettings))
         nativeArtifactsHandlersStep {
             useHandlers(::FileCheckHandler, ::NativeBoxRunner)
         }
