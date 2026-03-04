@@ -85,17 +85,25 @@ class LLFirSessionCache(
 
         checkCanceled()
 
-        val session = storage.unstableDanglingFileSessionCache.compute(module) { _, existingSession ->
-            if (existingSession is LLFirDanglingFileSession && !existingSession.hasFileModifications) {
-                existingSession
+        var session: LLFirSession? = null
+        while (session == null) {
+            // The creation of an unstable dangling file session might require accessing `unstableDanglingFileSessionCache` again to get the
+            // context session, so we have to use `getOrPut` to avoid recursive updates.
+            val candidateSession = storage.unstableDanglingFileSessionCache.getOrPut(module) { createSession(module) }
+
+            require(candidateSession is LLFirDanglingFileSession) {
+                "Expected dangling file session for module: $module"
+            }
+
+            // The cached session might be invalid, so we have to loop until it's valid.
+            if (!candidateSession.hasFileModifications) {
+                session = candidateSession
             } else {
-                createSession(module)
+                checkCanceled()
             }
         }
 
-        requireNotNull(session)
         checkSessionValidity(session)
-
         return session
     }
 
@@ -107,10 +115,7 @@ class LLFirSessionCache(
         } else {
             // Non-isolated session creation may need to access other sessions, so we should create the session outside `computeIfAbsent` to
             // avoid recursive update exceptions.
-            storage[module] ?: run {
-                val newSession = factory(module)
-                storage.computeIfAbsent(module) { newSession }
-            }
+            storage.getOrPut(module) { factory(module) }
         }
 
         checkSessionValidity(session)
