@@ -8,10 +8,14 @@ package org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators
 import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtScriptTestModuleFactory
 import org.jetbrains.kotlin.analysis.test.framework.projectStructure.KtTestModuleFactory
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 
-open class AnalysisApiFirScriptTestConfigurator(analyseInDependentSession: Boolean) :
-    AnalysisApiFirSourceLikeTestConfigurator(analyseInDependentSession) {
+open class AnalysisApiFirScriptTestConfigurator(
+    analyseInDependentSession: Boolean,
+    defaultTargetPlatform: TargetPlatform = defaultTargetPlatformValue
+) :
+    AnalysisApiFirSourceLikeTestConfigurator(analyseInDependentSession, defaultTargetPlatform) {
     override fun configureTest(builder: TestConfigurationBuilder, disposable: Disposable) {
         super.configureTest(builder, disposable)
 

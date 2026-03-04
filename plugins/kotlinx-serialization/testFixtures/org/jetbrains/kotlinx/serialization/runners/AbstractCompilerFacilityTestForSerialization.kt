@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.serialization.runners
 
 import org.jetbrains.kotlin.analysis.api.fir.test.configurators.AnalysisApiFirTestConfiguratorFactory.createConfigurator
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.compilerFacility.AbstractCompilerFacilityTest
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlinx.serialization.configureForKotlinxSerialization
@@ -18,7 +19,8 @@ abstract class AbstractCompilerFacilityTestForSerialization : AbstractCompilerFa
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                TargetPlatformEnum.JVM
             )
         )
 

@@ -31,7 +31,8 @@ object FrontendConfiguratorTestGenerator : MethodGenerator<FrontendConfiguratorT
         println(method.data.frontend.asJavaCode(), ",")
         println(method.data.moduleKind.asJavaCode(), ",")
         println(method.data.analysisSessionMode.asJavaCode(), ",")
-        println(method.data.analysisApiMode.asJavaCode())
+        println(method.data.analysisApiMode.asJavaCode(), ",")
+        println(method.data.targetPlatform.asJavaCode())
         popIndent()
         println(")")
         popIndent()
@@ -64,6 +65,7 @@ class FrontendConfiguratorTestModel(
             add(data.frontend::class.java)
             add(data.analysisSessionMode::class.java)
             add(data.analysisApiMode::class.java)
+            add(data.targetPlatform::class.java)
         }
     }
 }

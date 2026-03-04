@@ -21,13 +21,17 @@ import org.jetbrains.kotlin.analysis.test.framework.services.libraries.configure
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiMode
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiTestConfigurator
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.FrontendKind
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.preprocessors.ExternalAnnotationsSourcePreprocessor
 import org.jetbrains.kotlin.test.services.TestModuleStructure
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.configuration.ExternalAnnotationsEnvironmentConfigurator
 
-abstract class AnalysisApiFirSourceLikeTestConfigurator(override val analyseInDependentSession: Boolean) : AnalysisApiTestConfigurator() {
+abstract class AnalysisApiFirSourceLikeTestConfigurator(
+    override val analyseInDependentSession: Boolean,
+    override val defaultTargetPlatform: TargetPlatform = defaultTargetPlatformValue
+) : AnalysisApiTestConfigurator() {
     override val analysisApiMode: AnalysisApiMode get() = AnalysisApiMode.Ide
     override val frontendKind: FrontendKind get() = FrontendKind.Fir
 

@@ -10,6 +10,7 @@ import androidx.compose.compiler.plugins.kotlin.services.ComposeJsClasspathProvi
 import androidx.compose.compiler.plugins.kotlin.services.ComposeJvmClasspathConfigurator
 import org.jetbrains.kotlin.analysis.api.fir.test.configurators.AnalysisApiFirTestConfiguratorFactory.createConfigurator
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.compilerFacility.AbstractCompilerFacilityTest
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum
 import org.jetbrains.kotlin.analysis.test.framework.services.libraries.TestModuleCompiler.Directives.COMPILER_ARGUMENTS
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 import org.jetbrains.kotlin.js.test.runners.AbstractJsTest
@@ -33,7 +34,8 @@ abstract class AbstractCompilerFacilityTestForComposeCompilerPlugin : AbstractCo
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                TargetPlatformEnum.JVM
             )
         )
 

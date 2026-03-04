@@ -5,13 +5,8 @@
 
 package org.jetbrains.kotlin.generators.tests.analysis.api.dsl
 
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiMode
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiTestConfiguratorFactory
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiTestConfiguratorFactoryData
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisSessionMode
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.FrontendKind
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.TestModuleKind
-import org.jetbrains.kotlin.analysis.test.framework.test.configurators.defaultExtension
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum
+import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 import org.jetbrains.kotlin.generators.dsl.TestGroup
 import org.jetbrains.kotlin.generators.dsl.TestGroupSuite
 import org.jetbrains.kotlin.generators.dsl.getDefaultSuiteTestClassName
@@ -36,9 +31,10 @@ class AnalysisApiTestGroup(
 
     inline fun <reified T : Any> test(
         noinline filter: TestFilter = { true },
+        targetPlatform: TargetPlatformEnum = TargetPlatformEnum.JVM,
         noinline init: TestGroup.TestClass.(data: AnalysisApiTestConfiguratorFactoryData) -> Unit,
     ) {
-        test(T::class.java, filter, init)
+        test(T::class.java, filter and { it.targetPlatform == targetPlatform }, init)
     }
 
     fun test(
@@ -125,6 +121,11 @@ private fun getTestNameSuffix(data: AnalysisApiTestConfiguratorFactoryData): Str
         append(data.analysisApiMode.suffix.capitalizeAsciiOnly());
         append(data.analysisSessionMode.suffix.capitalizeAsciiOnly()); append("Analysis")
         append(data.moduleKind.suffix.capitalizeAsciiOnly()); append("Module")
+        if (data.targetPlatform != TargetPlatformEnum.JVM) {
+            // JVM is considered to be the default target platform,
+            // so we shouldn't use it in the generated name
+            append(data.targetPlatform.toString())
+        }
     }
 }
 
@@ -157,7 +158,17 @@ private val ALL_POSSIBLE_FACTORY_DATA_LIST: List<AnalysisApiTestConfiguratorFact
         TestModuleKind.entries.forEach { moduleKind ->
             AnalysisSessionMode.entries.forEach { analysisSessionMode ->
                 AnalysisApiMode.entries.forEach { analysisApiMode ->
-                    add(AnalysisApiTestConfiguratorFactoryData(frontend, moduleKind, analysisSessionMode, analysisApiMode))
+                    TargetPlatformEnum.entries.forEach { targetPlatform ->
+                        add(
+                            AnalysisApiTestConfiguratorFactoryData(
+                                frontend,
+                                moduleKind,
+                                analysisSessionMode,
+                                analysisApiMode,
+                                targetPlatform
+                            )
+                        )
+                    }
                 }
             }
         }

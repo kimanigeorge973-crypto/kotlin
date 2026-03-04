@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.generators.tests.native.swift.sir
 
 import org.jetbrains.kotlin.analysis.api.fir.test.configurators.AnalysisApiFirTestConfiguratorFactory
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 import org.jetbrains.kotlin.generators.dsl.junit5.generateTestGroupSuiteWithJUnit5
 import org.jetbrains.kotlin.generators.model.annotation
@@ -117,7 +118,8 @@ fun main() {
                     FrontendKind.Fir,
                     TestModuleKind.Source,
                     AnalysisSessionMode.Normal,
-                    AnalysisApiMode.Ide
+                    AnalysisApiMode.Ide,
+                    TargetPlatformEnum.JVM
                 )
                 method(FrontendConfiguratorTestModel(AnalysisApiFirTestConfiguratorFactory::class, data))
             }

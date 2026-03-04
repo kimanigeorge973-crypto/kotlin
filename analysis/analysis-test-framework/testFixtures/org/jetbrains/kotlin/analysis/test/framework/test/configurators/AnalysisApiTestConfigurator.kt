@@ -38,7 +38,7 @@ abstract class AnalysisApiTestConfigurator {
      * The platform used by default, in case if no platform is specified in the test data file.
      */
     open val defaultTargetPlatform: TargetPlatform
-        get() = JvmPlatforms.defaultJvmPlatform
+        get() = defaultTargetPlatformValue
 
     abstract fun configureTest(builder: TestConfigurationBuilder, disposable: Disposable)
 
@@ -59,4 +59,8 @@ abstract class AnalysisApiTestConfigurator {
         testServices: TestServices,
         project: Project,
     ): KtTestModuleStructure
+
+    protected companion object {
+        val defaultTargetPlatformValue: TargetPlatform = JvmPlatforms.defaultJvmPlatform
+    }
 }

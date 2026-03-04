@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.dataframe
 
 import org.jetbrains.kotlin.analysis.api.fir.test.configurators.AnalysisApiFirTestConfiguratorFactory.createConfigurator
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.compilerFacility.AbstractCompilerFacilityTest
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 import org.jetbrains.kotlin.fir.dataframe.services.DataFrameClasspathProvider
 import org.jetbrains.kotlin.fir.dataframe.services.DataFramePluginAnnotationsProvider
@@ -20,7 +21,8 @@ abstract class AbstractCompilerFacilityTestForDataFrame : AbstractCompilerFacili
             FrontendKind.Fir,
             TestModuleKind.Source,
             AnalysisSessionMode.Normal,
-            AnalysisApiMode.Ide
+            AnalysisApiMode.Ide,
+            TargetPlatformEnum.JVM
         )
     )
 

@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.analysis.test.framework.services.libraries.Dispatchi
 import org.jetbrains.kotlin.analysis.test.framework.services.libraries.TestModuleCompiler
 import org.jetbrains.kotlin.analysis.test.framework.services.libraries.TestModuleDecompiler
 import org.jetbrains.kotlin.analysis.test.framework.services.libraries.TestModuleDecompilerJar
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.model.DependencyKind
 import org.jetbrains.kotlin.test.preprocessors.ExternalAnnotationsSourcePreprocessor
@@ -26,7 +27,7 @@ import org.jetbrains.kotlin.test.services.TestModuleStructure
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.configuration.ExternalAnnotationsEnvironmentConfigurator
 
-abstract class StandaloneModeBinaryTestConfigurator : StandaloneModeConfiguratorBase() {
+abstract class StandaloneModeBinaryTestConfigurator(override val defaultTargetPlatform: TargetPlatform = defaultTargetPlatformValue) : StandaloneModeConfiguratorBase() {
     protected abstract val testModuleFactory: KtTestModuleFactory
 
     override fun configureTest(builder: TestConfigurationBuilder, disposable: Disposable) {
@@ -64,10 +65,12 @@ abstract class StandaloneModeBinaryTestConfigurator : StandaloneModeConfigurator
     }
 }
 
-object StandaloneModeLibraryBinaryTestConfigurator : StandaloneModeBinaryTestConfigurator() {
+class StandaloneModeLibraryBinaryTestConfigurator(defaultTargetPlatform: TargetPlatform) :
+    StandaloneModeBinaryTestConfigurator(defaultTargetPlatform) {
     override val testModuleFactory: KtTestModuleFactory get() = KtLibraryBinaryTestModuleFactory
 }
 
-object StandaloneModeLibraryBinaryDecompiledTestConfigurator : StandaloneModeBinaryTestConfigurator() {
+class StandaloneModeLibraryBinaryDecompiledTestConfigurator(defaultTargetPlatform: TargetPlatform) :
+    StandaloneModeBinaryTestConfigurator(defaultTargetPlatform) {
     override val testModuleFactory: KtTestModuleFactory get() = KtLibraryBinaryDecompiledTestModuleFactory
 }
