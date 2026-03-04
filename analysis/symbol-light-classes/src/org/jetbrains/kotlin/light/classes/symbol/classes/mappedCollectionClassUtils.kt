@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.analysis.api.symbols.*
 import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.analysis.api.types.KaTypeMappingMode
 import org.jetbrains.kotlin.analysis.api.types.KaTypeParameterType
-import org.jetbrains.kotlin.asJava.builder.LightMemberOrigin
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
@@ -185,7 +184,6 @@ internal fun KaSession.processPossiblyMappedCollectionMethod(
         javaMethod.wrap(
             containingClass,
             substitutor,
-            lightMemberOrigin,
             hasImplementation = true,
             makeFinal = !isErasedSignature
         )
@@ -461,14 +459,12 @@ private fun PsiMethod.openBridge(
 private fun PsiMethod.wrap(
     containingClass: SymbolLightClassForClassOrObject,
     substitutor: PsiSubstitutor,
-    lightMemberOrigin: LightMemberOrigin? = null,
     makeFinal: Boolean = false,
     hasImplementation: Boolean = false,
     name: String = this.name,
     substituteObjectWith: PsiType? = null,
     signature: MethodSignature? = null,
 ) = SymbolLightMethodForMappedCollectionClass(
-    lightMemberOrigin = lightMemberOrigin,
     containingClass = containingClass,
     javaMethod = this,
     substitutor = substitutor,
