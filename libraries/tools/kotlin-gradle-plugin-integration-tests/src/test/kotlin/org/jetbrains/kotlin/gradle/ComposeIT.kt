@@ -23,6 +23,7 @@ import java.security.MessageDigest
 import kotlin.io.path.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.createFile
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -866,6 +867,138 @@ class ComposeIT : KGPBaseTest() {
         }
     }
 
+    @DisplayName($$"Ensure that older versions of the compiler can access the backing field of a $stable property")
+    @GradleAndroidTest
+    @AndroidTestVersions(minVersion = TestVersions.AGP.MAX_SUPPORTED)
+    @GradleTestVersions(minVersion = GRADLE_VERSION_FOR_STABLE_PROPERTY_TEST, maxVersion = GRADLE_VERSION_FOR_STABLE_PROPERTY_TEST)
+    @OtherGradlePluginTests
+    @TestMetadata("composeMultiModule")
+    fun testOlderCompilerCanAccessBackingFieldOfStableProperty(
+        gradleVersion: GradleVersion,
+        agpVersion: String,
+        providedJdk: JdkVersions.ProvidedJdk,
+    ) {
+        val composeSnapshotId = TestVersions.Compose.composeSnapshotId
+        val composeSnapshotVersion = TestVersions.Compose.composeSnapshotVersion
+        project(
+            projectName = "composeMultiModule/dep",
+            gradleVersion = gradleVersion,
+            buildJdk = providedJdk.location,
+            buildOptions = defaultBuildOptions.copy(androidVersion = agpVersion),
+            dependencyManagement = DependencyManagement.DefaultDependencyManagement(
+                setOf("https://androidx.dev/snapshots/builds/${composeSnapshotId}/artifacts/repository")
+            )
+        ) {
+            buildGradleKts.modify { _ ->
+                """
+                |plugins {
+                |    id("com.android.library")
+                |    id("org.jetbrains.kotlin.android")
+                |    id("maven-publish")
+                |    id("org.jetbrains.kotlin.plugin.compose")
+                |}
+                |
+                |android {
+                |    namespace = "com.example"
+                |    compileSdk = 34
+                |    kotlin {
+                |        jvmToolchain(8)
+                |    }
+                |    defaultConfig {
+                |       minSdk = 24
+                |       targetSdk = 34
+                |    }
+                |    buildFeatures {
+                |       compose = true
+                |    }
+                |    publishing {
+                |        singleVariant("release") {
+                |            withSourcesJar()
+                |        }
+                |    }
+                |}
+                |
+                |publishing {
+                |    repositories {
+                |        maven("<localRepo>")
+                |    }
+                |    publications {
+                |        register<MavenPublication>("release") {
+                |            groupId = "com.example"
+                |            artifactId = "dep"
+                |            version = "1.0"
+                |            afterEvaluate {
+                |                from(components["release"])
+                |            }
+                |        }
+                |    }
+                |}
+                |
+                |dependencies {
+                |    implementation("androidx.compose.runtime:runtime:$composeSnapshotVersion")
+                |}
+                """.trimMargin()
+            }
+
+            val depFile = projectPath.resolve("src/main/kotlin/com/example/dep/A.kt").createParentDirectories().createFile()
+            depFile.writeText(
+                //language=kotlin
+                """
+                |package com.example.dep
+                |
+                |class A(val value: Int)
+                """.trimMargin()
+            )
+            build("publishToMavenLocal") {
+                assertTasksExecuted(":compileReleaseKotlin")
+            }
+        }
+
+        project(
+            projectName = "composeMultiModule",
+            gradleVersion = gradleVersion,
+            buildJdk = providedJdk.location,
+            buildOptions = defaultBuildOptions.copy(androidVersion = agpVersion, kotlinVersion = "2.3.10"),
+            dependencyManagement = DependencyManagement.DefaultDependencyManagement(
+                additionalRepos = setOf("https://androidx.dev/snapshots/builds/${composeSnapshotId}/artifacts/repository")
+            )
+        ) {
+            buildGradleKts.appendComposePlugin()
+            buildGradleKts.appendText(
+                """
+                |
+                |dependencies {
+                |    implementation("com.example:dep:1.0")
+                |}
+                """.trimMargin()
+            )
+
+            val testFile = projectPath.resolve("src/test/kotlin/com/example/ComposeTest.kt")
+            testFile.writeText(
+                //language=kotlin
+                """
+                |package com.example
+                |
+                |import org.junit.Test
+                |import com.example.dep.A
+                |
+                |class B(val a: A)
+                |
+                |class ComposeTest {
+                |    @Test
+                |    fun test() {
+                |       println(B(A(1)).a.value)
+                |    }
+                |}
+                """.trimMargin()
+            )
+
+            build("testReleaseUnitTest") {
+                assertTasksExecuted(":compileReleaseUnitTestKotlin")
+            }
+        }
+    }
+
     private fun Path.appendComposePlugin() {
         modify { originalBuildScript ->
             """
@@ -886,5 +1019,8 @@ class ComposeIT : KGPBaseTest() {
         private const val LEGACY_OPEN_FUNCTION_WARNING =
             "Detected a @Composable function that overrides an open function compiled with older compiler that is known to crash " +
                     "at runtime."
+
+        // Gradle version known to be compatible with Kotlin 2.3.20
+        private const val GRADLE_VERSION_FOR_STABLE_PROPERTY_TEST = TestVersions.Gradle.G_9_3
     }
 }

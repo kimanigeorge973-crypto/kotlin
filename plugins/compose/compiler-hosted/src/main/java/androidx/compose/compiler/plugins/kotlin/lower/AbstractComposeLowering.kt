@@ -878,8 +878,9 @@ abstract class AbstractComposeLowering(
             visibility = if (context.platform.isJvm()) DescriptorVisibilities.PUBLIC else DescriptorVisibilities.PRIVATE
         }.also {
             if (context.platform.isJvm()) {
-                // This tells the Kotlin compiler to replace invocations of this field's getter with
-                // direct field accesses.
+                // This tells the Kotlin compiler to avoid generating JVM bytecode for this field's
+                // getter and to replace invocations of this field's getter with direct field
+                // accesses. The relevant Kotlin compiler logic is in `JvmPropertiesLowering`.
                 it.annotations = listOf(jvmField()!!)
             }
         }
