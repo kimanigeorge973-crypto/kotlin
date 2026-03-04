@@ -224,6 +224,9 @@ class PhasedPipelineChecker(
                 is WrappedException.WrappedExceptionWithoutModule -> nonSuppressibleFailures
                 is WrappedException.FromHandler ->
                     processFailure(exception.failedModule, exception.handler.toPhase(), exception)
+                is WrappedException.FromSecondPhaseFacade,
+                is WrappedException.FromSecondPhaseHandler ->
+                    processFailure(module = null, TestPhase.BACKEND, exception)
             }
             targetStorage += exception
         }

@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlin.test.builders
 
-import org.jetbrains.kotlin.test.TestRunner
+import org.jetbrains.kotlin.test.FirstPhaseTestRunner
 
-inline fun testRunner(testDataPath: String, crossinline init: TestConfigurationBuilder.() -> Unit): TestRunner {
-    return TestRunner(testConfiguration(testDataPath, init))
+inline fun firstPhaseTestRunner(testDataPath: String, crossinline init: TestConfigurationBuilder.() -> Unit): FirstPhaseTestRunner {
+    return FirstPhaseTestRunner(testConfiguration(testDataPath, init))
 }
