@@ -70,6 +70,10 @@ public abstract class CMap2 /* test.CMap2*/ implements java.util.Map<@org.jetbra
   public @org.jetbrains.annotations.NotNull() java.util.Set<@org.jetbrains.annotations.NotNull() kotlin.UInt> getKeys();//  getKeys()
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final @org.jetbrains.annotations.NotNull() kotlin.UInt get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() kotlin.UInt put(@org.jetbrains.annotations.NotNull() kotlin.UInt, @org.jetbrains.annotations.NotNull() kotlin.UInt);//  put(@org.jetbrains.annotations.NotNull() kotlin.UInt, @org.jetbrains.annotations.NotNull() kotlin.UInt)
 
   @java.lang.Override()
@@ -86,9 +90,6 @@ public abstract class CMap2 /* test.CMap2*/ implements java.util.Map<@org.jetbra
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() kotlin.UInt get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)
@@ -134,6 +135,14 @@ public class CMap3 /* test.CMap3*/ implements java.util.Map<@org.jetbrains.annot
   public @org.jetbrains.annotations.NotNull() java.util.Set<@org.jetbrains.annotations.NotNull() kotlin.UInt> getKeys();//  getKeys()
 
   @java.lang.Override()
+  @org.jetbrains.annotations.NotNull()
+  public final @org.jetbrains.annotations.NotNull() kotlin.UInt getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() kotlin.UInt);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() kotlin.UInt)
+
+  @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
+  public final @org.jetbrains.annotations.NotNull() kotlin.UInt get(java.lang.Object);//  get(java.lang.Object)
+
+  @java.lang.Override()
   public @org.jetbrains.annotations.NotNull() kotlin.UInt put(@org.jetbrains.annotations.NotNull() kotlin.UInt, @org.jetbrains.annotations.NotNull() kotlin.UInt);//  put(@org.jetbrains.annotations.NotNull() kotlin.UInt, @org.jetbrains.annotations.NotNull() kotlin.UInt)
 
   @java.lang.Override()
@@ -150,12 +159,6 @@ public class CMap3 /* test.CMap3*/ implements java.util.Map<@org.jetbrains.annot
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() kotlin.UInt get(java.lang.Object);//  get(java.lang.Object)
-
-  @java.lang.Override()
-  public final @org.jetbrains.annotations.NotNull() kotlin.UInt getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() kotlin.UInt);//  getOrDefault(java.lang.Object, @org.jetbrains.annotations.NotNull() kotlin.UInt)
 
   @java.lang.Override()
   public final boolean containsKey(java.lang.Object);//  containsKey(java.lang.Object)

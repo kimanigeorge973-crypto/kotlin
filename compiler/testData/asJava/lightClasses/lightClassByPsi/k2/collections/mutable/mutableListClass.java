@@ -34,6 +34,26 @@ public abstract class CMutableList2 /* test.CMutableList2*/<Elem>  implements ja
   public boolean add(Elem);//  add(Elem)
 
   @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean addAll(int, java.util.Collection<? extends Elem>);//  addAll(int, java.util.Collection<? extends Elem>)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean addAll(java.util.Collection<? extends Elem>);//  addAll(java.util.Collection<? extends Elem>)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean remove(java.lang.Object);//  remove(java.lang.Object)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean removeAll(java.util.Collection<?>);//  removeAll(java.util.Collection<?>)
+
+  @java.lang.Override()
+  @kotlin.IgnorableReturnValue()
+  public boolean retainAll(java.util.Collection<?>);//  retainAll(java.util.Collection<?>)
+
+  @java.lang.Override()
   @org.jetbrains.annotations.NotNull()
   public @org.jetbrains.annotations.NotNull() java.util.Iterator<Elem> iterator();//  iterator()
 
@@ -56,12 +76,6 @@ public abstract class CMutableList2 /* test.CMutableList2*/<Elem>  implements ja
   public Elem get(int);//  get(int)
 
   @java.lang.Override()
-  public boolean addAll(int, java.util.Collection<? extends Elem>);//  addAll(int, java.util.Collection<? extends Elem>)
-
-  @java.lang.Override()
-  public boolean addAll(java.util.Collection<? extends Elem>);//  addAll(java.util.Collection<? extends Elem>)
-
-  @java.lang.Override()
   public boolean contains(java.lang.Object);//  contains(java.lang.Object)
 
   @java.lang.Override()
@@ -69,15 +83,6 @@ public abstract class CMutableList2 /* test.CMutableList2*/<Elem>  implements ja
 
   @java.lang.Override()
   public boolean isEmpty();//  isEmpty()
-
-  @java.lang.Override()
-  public boolean remove(java.lang.Object);//  remove(java.lang.Object)
-
-  @java.lang.Override()
-  public boolean removeAll(java.util.Collection<?>);//  removeAll(java.util.Collection<?>)
-
-  @java.lang.Override()
-  public boolean retainAll(java.util.Collection<?>);//  retainAll(java.util.Collection<?>)
 
   @java.lang.Override()
   public final Elem remove(int);//  remove(int)

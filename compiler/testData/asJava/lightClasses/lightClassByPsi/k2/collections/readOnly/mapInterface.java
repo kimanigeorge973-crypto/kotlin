@@ -52,6 +52,7 @@ public abstract class CMap2 /* test.CMap2*/<KElem, VElem>  implements test.IMap<
   public @org.jetbrains.annotations.NotNull() java.util.Set<KElem> getKeys();//  getKeys()
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
   public VElem get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
@@ -107,6 +108,7 @@ public class CMap3 /* test.CMap3*/<KElem, VElem>  implements test.IMap<KElem, VE
   public @org.jetbrains.annotations.NotNull() java.util.Set<KElem> getKeys();//  getKeys()
 
   @java.lang.Override()
+  @org.jetbrains.annotations.Nullable()
   public VElem get(java.lang.Object);//  get(java.lang.Object)
 
   @java.lang.Override()
