@@ -30,10 +30,7 @@ import org.junit.Test
 class StaticExpressionDetectionTests(useFir: Boolean) : AbstractIrTransformTest(useFir) {
     @Test
     fun testKnownUnstableTypesAreNeverStatic() = assertUncertain(
-        expression = "Unstable(0)",
-        extraSrc = """
-            class Unstable(var x: Int)
-        """
+        expression = "Any()",
     )
 
     @Test

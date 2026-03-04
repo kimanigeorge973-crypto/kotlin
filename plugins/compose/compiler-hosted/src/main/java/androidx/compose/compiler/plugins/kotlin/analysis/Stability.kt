@@ -443,6 +443,7 @@ class StabilityInferencer(
         fileContainingDependent: IrFile?,
     ): Stability {
         return when {
+            type.isAny() -> Stability.Unstable
             type is IrErrorType -> Stability.Unstable
             type is IrDynamicType -> Stability.Unstable
 

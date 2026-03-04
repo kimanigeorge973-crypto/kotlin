@@ -72,7 +72,7 @@ fun Test(a: Int, b: Foo?, c: Int, %composer: Composer?, %changed: Int, %default:
       sourceInformationMarkerEnd(%composer)
       tmp0_group
     }
-    used(s, %composer, Any.%stable)
+    used(s, %composer, 0)
     if (isTraceInProgress()) {
       traceEventEnd()
     }

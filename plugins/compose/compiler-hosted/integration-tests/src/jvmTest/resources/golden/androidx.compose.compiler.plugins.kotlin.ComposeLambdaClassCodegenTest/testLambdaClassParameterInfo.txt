@@ -28,12 +28,7 @@ fun Test(z: Int, x: Int, y: Result<Int>, %composer: Composer?, %changed: Int) {
     %dirty = %dirty or if (%composer.changed(x)) 0b00100000 else 0b00010000
   }
   if (%changed and 0b000110000000 == 0) {
-    %dirty = %dirty or if (if (%changed and 0b001000000000 == 0) {
-      %composer.changed(<unsafe-coerce>(y))
-    } else {
-      %composer.changedInstance(<unsafe-coerce>(y))
-    }
-    ) 0b000100000000 else 0b10000000
+    %dirty = %dirty or if (%composer.changedInstance(<unsafe-coerce>(y))) 0b000100000000 else 0b10000000
   }
   if (%composer.shouldExecute(%dirty and 0b10010011 != 0b10010010, %dirty and 0b0001)) {
     if (isTraceInProgress()) {
@@ -45,7 +40,7 @@ fun Test(z: Int, x: Int, y: Result<Int>, %composer: Composer?, %changed: Int) {
         if (isTraceInProgress()) {
           traceEventStart(<>, %changed, -1, <>)
         }
-        Test(z, x, y, %composer, Any.%stable shl 0b0110)
+        Test(z, x, y, %composer, 0)
         if (isTraceInProgress()) {
           traceEventEnd()
         }
