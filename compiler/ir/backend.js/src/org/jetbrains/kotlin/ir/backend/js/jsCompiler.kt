@@ -113,11 +113,13 @@ fun compileIr(
 
     // Load declarations referenced during `context` initialization
     val irProviders = listOf(irLinker)
-    ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
+    performanceManager.tryMeasurePhaseTime(PhaseType.IrLinking) {
+        ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
 
-    irLinker.postProcess(inOrAfterLinkageStep = true)
-    irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
-    irLinker.clear()
+        irLinker.postProcess(inOrAfterLinkageStep = true)
+        irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
+        irLinker.clear()
+    }
 
     // Sort dependencies after IR linkage.
     val sortedModuleDependencies = irLinker.moduleDependencyTracker.reverseTopoOrder(moduleDependencies)
