@@ -325,7 +325,6 @@ interface KotlinDependencyHandler : HasProject {
      * ```
      *
      * @param path The project path
-     * @param configuration The optional target configuration in the project
      */
     fun project(path: String) = project(path, null)
 
