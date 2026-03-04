@@ -15,8 +15,7 @@ import kotlin.io.path.writeText
  */
 
 
-
-open class WriteAffectedSystemsTask : DefaultTask() {
+open class WriteAffectedTestSystemsTask : DefaultTask() {
 
     @get:Internal
     internal val diffService = project.featureBranchDiffService
