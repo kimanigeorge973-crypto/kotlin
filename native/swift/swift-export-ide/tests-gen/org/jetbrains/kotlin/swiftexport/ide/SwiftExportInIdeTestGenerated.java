@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.analysis.test.framework.test.configurators.TestModul
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.FrontendKind;
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisSessionMode;
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiMode;
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum;
 import org.jetbrains.kotlin.test.TestMetadata;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,8 @@ public class SwiftExportInIdeTestGenerated extends AbstractSymbolToSirTest {
         FrontendKind.Fir,
         TestModuleKind.Source,
         AnalysisSessionMode.Normal,
-        AnalysisApiMode.Ide
+        AnalysisApiMode.Ide,
+        TargetPlatformEnum.JVM
       )
     );
   }

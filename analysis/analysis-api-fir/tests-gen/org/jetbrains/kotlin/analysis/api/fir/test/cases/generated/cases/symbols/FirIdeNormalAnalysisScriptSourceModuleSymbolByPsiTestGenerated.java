@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.analysis.test.framework.test.configurators.TestModul
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.FrontendKind;
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisSessionMode;
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiMode;
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum;
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.symbols.AbstractSymbolByPsiTest;
 import org.jetbrains.kotlin.test.TestMetadata;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +37,8 @@ public class FirIdeNormalAnalysisScriptSourceModuleSymbolByPsiTestGenerated exte
         FrontendKind.Fir,
         TestModuleKind.ScriptSource,
         AnalysisSessionMode.Normal,
-        AnalysisApiMode.Ide
+        AnalysisApiMode.Ide,
+        TargetPlatformEnum.JVM
       )
     );
   }

@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.analysis.test.framework.test.configurators.TestModul
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.FrontendKind;
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisSessionMode;
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.AnalysisApiMode;
+import org.jetbrains.kotlin.analysis.test.framework.services.TargetPlatformEnum;
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.analysisScopeProvider.AbstractCanBeAnalysedTest;
 import org.jetbrains.kotlin.test.TestMetadata;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,8 @@ public class FirIdeNormalAnalysisScriptSourceModuleCanBeAnalysedTestGenerated ex
         FrontendKind.Fir,
         TestModuleKind.ScriptSource,
         AnalysisSessionMode.Normal,
-        AnalysisApiMode.Ide
+        AnalysisApiMode.Ide,
+        TargetPlatformEnum.JVM
       )
     );
   }
