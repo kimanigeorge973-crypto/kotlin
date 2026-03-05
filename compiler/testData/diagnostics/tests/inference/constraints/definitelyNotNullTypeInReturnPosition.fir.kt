@@ -35,7 +35,7 @@ class Foo13<T>(x: T) {
 fun <K> foo14(x: K?): Bar<K> where K: Comparable<K>, K: CharSequence = materialize()
 fun <K: T?, T> foo15(x: T): Bar<K> = materialize()
 fun <K: T?, T> foo16(x: K): Bar<T> = materialize()
-fun <K: T?, T> foo17(x: K): Bar<T> = null as Bar<T>
+fun <K: T?, T> foo17(x: K): Bar<T> = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Bar<T>
 fun <K> foo19(x: Bar<K>): K = null as K
 fun <K> Bar<K>.foo20(): K = null as K
 
@@ -268,10 +268,10 @@ class Main<L>(x: L?, y: L) {
     val x482 = takeLambda { foo48 { null } }
 }
 
-fun <T : Comparable<T>> nullsLast() = null as Foo<T?>
+fun <T : Comparable<T>> nullsLast() = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Foo<T?>
 fun <K> take(x: Foo<K>, comparator: Foo<K>): Foo<K> {<!NO_RETURN_IN_FUNCTION_WITH_BLOCK_BODY!>}<!>
 fun <L> test() {
-    take(null as Foo<String?>, nullsLast())
+    take(null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Foo<String?>, nullsLast())
 }
 
 class Inv1<T>

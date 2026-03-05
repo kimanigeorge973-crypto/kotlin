@@ -193,8 +193,8 @@ fun <T> case_11(y: T) {
 
 fun case_12() {
     val x1 = Test.getList(10)
-    val x2 = null as MutableList<Int>
-    val x3 = select(null as List<Int>, null)
+    val x2 = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> MutableList<Int>
+    val x3 = select(null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> List<Int>, null)
 
     val result_1 = select(x1, x2)
     val result_2 = select(x2, x1)
@@ -218,8 +218,8 @@ fun case_12() {
 fun case_13() {
     val x1 = Test.getList(10)
     val x2: dynamic = null
-    val x3 = null as MutableList<Int>
-    val x4 = select(null as List<Int>, null)
+    val x3 = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> MutableList<Int>
+    val x4 = select(null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> List<Int>, null)
 
     val result_1 = select(x1, x2, x3, x4)
     val result_2 = select(x2, x1)
@@ -250,8 +250,8 @@ fun case_13() {
 
 fun case_14() {
     val x1 = Test.getRawList()
-    val x2 = null as List<Int>
-    val x3 = select(null as MutableList<Int>, null)
+    val x2 = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> List<Int>
+    val x3 = select(null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> MutableList<Int>, null)
 
     val result_1 = select(x1, x2)
     val result_2 = select(x2, x1)

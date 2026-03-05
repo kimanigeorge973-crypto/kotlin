@@ -38,7 +38,7 @@ fun test() {
 
         // TODO: should we allow somehow to call with passing continuation explicitly?
         severalParams("", 89, <!TOO_MANY_ARGUMENTS!>6.9<!>) checkType { <!UNRESOLVED_REFERENCE_WRONG_RECEIVER!>_<!><Unit>() }
-        severalParams("", 89, <!TOO_MANY_ARGUMENTS!>this <!CAST_NEVER_SUCCEEDS!>as<!> Continuation<Double><!>) checkType { <!UNRESOLVED_REFERENCE_WRONG_RECEIVER!>_<!><Unit>() }
+        severalParams("", 89, <!TOO_MANY_ARGUMENTS!>this <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Continuation<Double><!>) checkType { <!UNRESOLVED_REFERENCE_WRONG_RECEIVER!>_<!><Unit>() }
     }
 }
 

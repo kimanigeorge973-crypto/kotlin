@@ -10,7 +10,7 @@ annotation class Foo
 
 fun foo1(x: @Foo() () -> Unit) = x as Iterable<@Foo() () -> Unit>?
 
-fun foo2() = null as @Foo() () -> Unit
+fun foo2() = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> @Foo() () -> Unit
 
 fun foo3(x: Any?) {
     if (x is (@Foo() () -> Unit)?) {

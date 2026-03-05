@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // DIAGNOSTICS: -UNUSED_VARIABLE, -UNUSED_TYPEALIAS_PARAMETER, -CAST_NEVER_SUCCEEDS
 // LANGUAGE: +TrailingCommas
@@ -23,7 +23,7 @@ fun <T>foo () {
             Float,
             >()
     val x4: Foo4<Comparable<Int,>, Iterable<Comparable<Float,>,>, Double, T,
-            >? = null as Foo4<Comparable<Int,>, Iterable<Comparable<Float,>,>, Double, T,>
+            >? = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Foo4<Comparable<Int,>, Iterable<Comparable<Float,>,>, Double, T,>
     val x5: (Float,) -> Unit = {}
     val x6: Pair<(Float, Comparable<T,>,) -> Unit, (Float,) -> Unit,>? = null
     val x61: Pair<(Float, Comparable<T,/**/>,/**/) -> Unit, (Float,/**/) -> Unit,/**/>? = null

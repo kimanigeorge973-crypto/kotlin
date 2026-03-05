@@ -27,7 +27,7 @@ val <K> FlowCollector<K>.foo5: K get() = null as K
 class Foo6
 
 class Foo7<T>
-fun foo7() = null as Foo7<Int>
+fun foo7() = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Foo7<Int>
 
 interface FlowCollector<in T> {}
 

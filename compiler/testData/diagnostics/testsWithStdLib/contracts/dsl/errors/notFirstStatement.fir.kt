@@ -44,7 +44,7 @@ inline fun case_4(number: Int?): Boolean {
     val cond = number != null
     <!CONTRACT_NOT_ALLOWED!>contract<!> {
         returns(false) implies (cond)
-    } as ContractBuilder
+    } <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> ContractBuilder
     return number == null
 }
 

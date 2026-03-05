@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // DIAGNOSTICS: -UNCHECKED_CAST
 interface Trait1
 interface Trait2
@@ -15,23 +15,23 @@ fun <TP1: OClass1, TP2: OClass2> test(
 ) {
   t1 as Trait2
   t1 as OClass2
-  t1 <!CAST_NEVER_SUCCEEDS!>as<!> FClass2
+  t1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> FClass2
   t1 as TP2
 
   oc1 as Trait2
-  oc1 <!CAST_NEVER_SUCCEEDS!>as<!> OClass2
-  oc1 <!CAST_NEVER_SUCCEEDS!>as<!> FClass2
-  oc1 <!CAST_NEVER_SUCCEEDS!>as<!> TP2
+  oc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> OClass2
+  oc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> FClass2
+  oc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> TP2
 
-  fc1 <!CAST_NEVER_SUCCEEDS!>as<!> Trait2
-  fc1 <!CAST_NEVER_SUCCEEDS!>as<!> OClass2
-  fc1 <!CAST_NEVER_SUCCEEDS!>as<!> FClass2
-  fc1 <!CAST_NEVER_SUCCEEDS!>as<!> TP2
+  fc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Trait2
+  fc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> OClass2
+  fc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> FClass2
+  fc1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> TP2
 
   tp1 as Trait2
-  tp1 <!CAST_NEVER_SUCCEEDS!>as<!> OClass2
-  tp1 <!CAST_NEVER_SUCCEEDS!>as<!> FClass2
-  tp1 <!CAST_NEVER_SUCCEEDS!>as<!> TP2
+  tp1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> OClass2
+  tp1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> FClass2
+  tp1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> TP2
 }
 
 /* GENERATED_FIR_TAGS: asExpression, classDeclaration, functionDeclaration, interfaceDeclaration, intersectionType,

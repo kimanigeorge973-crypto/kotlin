@@ -9,11 +9,11 @@ fun bar(n: String) {}
 
 fun main() {
     val a = ""
-    a <!CAST_NEVER_SUCCEEDS!>as<!> UByte
+    a <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> UByte
     <!OVERLOAD_RESOLUTION_AMBIGUITY!>foo<!>(a)
 
     val b = ""
-    b <!CAST_NEVER_SUCCEEDS!>as<!> Long
+    b <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Long
     <!OVERLOAD_RESOLUTION_AMBIGUITY!>bar<!>(b)
 }
 

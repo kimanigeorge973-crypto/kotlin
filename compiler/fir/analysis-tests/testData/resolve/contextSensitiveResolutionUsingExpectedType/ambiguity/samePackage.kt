@@ -36,12 +36,12 @@ fun topLevelExplicit(s: Sealed): Int = when (s) {
 }
 
 fun cast1wrong(s: Sealed): Int {
-    s <!CAST_NEVER_SUCCEEDS!>as<!> <!CONTEXT_SENSITIVE_RESOLUTION_AMBIGUITY!>A<!>
+    s <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> <!CONTEXT_SENSITIVE_RESOLUTION_AMBIGUITY!>A<!>
     return 1
 }
 
 fun cast2wrong(s: Sealed): Int {
-    s <!CAST_NEVER_SUCCEEDS!>as<!> <!CONTEXT_SENSITIVE_RESOLUTION_AMBIGUITY!>B<!>
+    s <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> <!CONTEXT_SENSITIVE_RESOLUTION_AMBIGUITY!>B<!>
     return 2
 }
 
@@ -56,12 +56,12 @@ fun cast2sealed(s: Sealed): Int {
 }
 
 fun cast1topLevel(s: Sealed): Int {
-    s <!CAST_NEVER_SUCCEEDS!>as<!> foo.A
+    s <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> foo.A
     return 1
 }
 
 fun cast2topLevel(s: Sealed): Int {
-    s <!CAST_NEVER_SUCCEEDS!>as<!> foo.B
+    s <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> foo.B
     return 2
 }
 

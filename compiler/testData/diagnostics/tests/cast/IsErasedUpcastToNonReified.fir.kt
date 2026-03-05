@@ -29,7 +29,7 @@ inline fun <reified T> test(x: T?, a: Any) {
     a is <!CANNOT_CHECK_FOR_ERASED!>Box<T><!>
     a is <!CANNOT_CHECK_FOR_ERASED!>Array<T><!>
     a <!UNCHECKED_CAST!>as Box<T><!>
-    a <!CAST_NEVER_SUCCEEDS!>as<!> Array<T>
+    a <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Array<T>
 
     a is <!CANNOT_CHECK_FOR_ERASED!>Box<List<T>><!>
     a is <!CANNOT_CHECK_FOR_ERASED!>Array<List<T>><!>

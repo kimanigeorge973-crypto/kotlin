@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // DIAGNOSTICS: -CAST_NEVER_SUCCEEDS -UNUSED_PARAMETER
 
 interface AssertionPlant<out T : Any>
@@ -12,7 +12,7 @@ interface CreatorLike<TSubject, T, A : BaseAssertionPlant<T, A>, C : BaseCollect
 interface ParameterObjectOption {
     fun <TSubject : Any, T : Any?> withParameterObjectNullable(
         parameterObject: ParameterObject<TSubject, T>
-    ) = null as CreatorNullable<TSubject, T>
+    ) = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> CreatorNullable<TSubject, T>
 }
 
 class ParameterObject<TSubject, T>
@@ -29,7 +29,7 @@ fun <K, V, M, A : BaseAssertionPlant<V, A>, C : BaseCollectingAssertionPlant<V, 
 private fun <K, V> createGetParameterObject(
     plant: AssertionPlant<Map<out K, V>>,
     key: K
-) = null as ParameterObject<Map<out K, V>, V>
+) = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> ParameterObject<Map<out K, V>, V>
 
 private fun <K, V : Any, M> containsNullable(
     plant: AssertionPlant<Map<out K, V?>>,

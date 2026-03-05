@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // ISSUE: KT-32754
 
 import java.lang.invoke.MethodHandles
@@ -36,7 +36,7 @@ fun test(c: Collection<String>, l: List<String>, s: Set<String>) {
     consumeInt("".formatted())
     consumeInt("".repeat(1))
     consumeInt("".describeConstable())
-    consumeInt("".resolveConstantDesc(null <!CAST_NEVER_SUCCEEDS!>as<!> MethodHandles.Lookup))
+    consumeInt("".resolveConstantDesc(null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> MethodHandles.Lookup))
 
     consumeInt(MyEnum.E.describeConstable())
 }

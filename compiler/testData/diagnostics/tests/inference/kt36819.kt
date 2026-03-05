@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // DIAGNOSTICS: -UNUSED_PARAMETER -UNUSED_VARIABLE -UNUSED_ANONYMOUS_PARAMETER -CAST_NEVER_SUCCEEDS
 // ISSUE: KT-36819
@@ -39,7 +39,7 @@ fun bar() {
         false -> { _ ->
             Unit
         }
-        true -> null as X
+        true -> null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> X
         else -> { x ->
             x()
             Unit

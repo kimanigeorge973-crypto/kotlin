@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // DIAGNOSTICS: -PLATFORM_CLASS_MAPPED_TO_KOTLIN -USELESS_CAST
 import java.lang.String as JString
@@ -30,8 +30,8 @@ fun test(
   jcs as CharSequence
   jcs as String
 
-  jcs <!CAST_NEVER_SUCCEEDS!>as<!> Int
-  s <!CAST_NEVER_SUCCEEDS!>as<!> java.lang.Integer
+  jcs <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Int
+  s <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> java.lang.Integer
 }
 
 /* GENERATED_FIR_TAGS: asExpression, functionDeclaration, intersectionType, smartcast */

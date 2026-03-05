@@ -7,7 +7,7 @@ import kotlin.experimental.ExperimentalTypeInference
 
 class Foo7<T>
 
-fun foo7() = null as Foo7<Int>
+fun foo7() = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Foo7<Int>
 
 fun poll17(flag: Boolean): Any? {
     val inv = if (flag) { foo7() } else { ::<!CANNOT_INFER_PARAMETER_TYPE!>Foo7<!> }

@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // DIAGNOSTICS: -UNUSED_PARAMETER -CAST_NEVER_SUCCEEDS
 
@@ -40,7 +40,7 @@ fun <A, DA : DataType<A>, B, DB : DataType<B>, C, DC : DataType<C>, D, DD : Data
             firstName, firstType, secondName, secondType, thirdName, thirdType, fourthName, fourthType,
             fifthName, fifthType, sixthName, sixthType, seventhName, seventhType, eighthName, eighthType
         )
-    ) as DataType.NotNull.Partial<Either8<A, B, C, D, E, F, G, H>>
+    ) <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> DataType.NotNull.Partial<Either8<A, B, C, D, E, F, G, H>>
 
 class Either8<T, U, V, W, X, Y, Z, T1>
 

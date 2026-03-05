@@ -72,10 +72,10 @@ const val defaultGetter = 19
     <!CONST_VAL_WITH_GETTER!>get<!>
 
 const val nonConstInitializer1 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>foo()<!>
-const val nonConstInitializer2 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1 as String<!>
-const val nonConstInitializer3 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1.0 as String<!>
-const val nonConstInitializer4 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1 as Double<!>
-const val nonConstInitializer5 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>"2" as Int<!>
+const val nonConstInitializer2 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> String<!>
+const val nonConstInitializer3 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1.0 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> String<!>
+const val nonConstInitializer4 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1 <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Double<!>
+const val nonConstInitializer5 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>"2" <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Int<!>
 const val nonConstInitializer6 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1/0<!>
 const val nonConstInitializer7 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>-1/0<!>
 const val nonConstInitializer8 = <!CONST_VAL_WITH_NON_CONST_INITIALIZER!>1/0 - 1/0<!>

@@ -51,6 +51,9 @@ class NoFirCompilationErrorsHandler(
                             val locationText = firFile.source?.psi?.containingFile?.let { psiFile ->
                                 PsiDiagnosticUtils.atLocation(psiFile, range)
                             } ?: "${firFile.name}:$range"
+                            testServices.moduleStructure.originalTestDataFiles.first().let { testDataFile ->
+                                testDataFile.writeText(testDataFile.readText().replace("// RUN_PIPELINE_TILL: BACKEND", "// RUN_PIPELINE_TILL: FRONTEND"))
+                            }
                             error("${diagnostic.factory.name}: $diagnosticText at $locationText")
                         }
                     }

@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // DIAGNOSTICS: -UNUSED_PARAMETER -CAST_NEVER_SUCCEEDS
 // SKIP_TXT
@@ -18,7 +18,7 @@ class Inv<E>
 fun <R> foo(x: R, y: Inv<R>) {}
 
 fun main() {
-    val values: List<Int> = null as List<Int>
+    val values: List<Int> = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> List<Int>
     /*
      * Before the fix, there was type mismatch during checking `Test.bar()` to pass to `foo`:
      *      Required: Inv<List<Int>>

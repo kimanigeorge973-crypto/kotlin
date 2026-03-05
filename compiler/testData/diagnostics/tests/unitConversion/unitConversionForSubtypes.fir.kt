@@ -14,7 +14,7 @@ fun test1(s: SubInt, sWrong: SubIntWrong) {
     val a = "foo"
     foo(<!ARGUMENT_TYPE_MISMATCH!>a<!>)
 
-    a <!CAST_NEVER_SUCCEEDS!>as<!> (Int, String) -> String
+    a <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> (Int, String) -> String
     foo(<!ARGUMENT_TYPE_MISMATCH!>a<!>)
 }
 

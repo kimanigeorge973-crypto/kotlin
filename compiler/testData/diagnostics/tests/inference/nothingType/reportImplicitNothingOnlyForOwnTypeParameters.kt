@@ -1,6 +1,6 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
-fun <R> runCatching(block: () -> R) = null <!CAST_NEVER_SUCCEEDS!>as<!> Result<R>
+fun <R> runCatching(block: () -> R) = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Result<R>
 
 class Result<out T> {
     fun getOrNull(): T? = null

@@ -19,7 +19,7 @@ fun bar(s: String?) {
     s.gav()
     s <!USELESS_CAST!>as? String<!>
     s as String?
-    s <!CAST_NEVER_SUCCEEDS!>as<!> String
+    s <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> String
 }
 
 /* GENERATED_FIR_TAGS: additiveExpression, asExpression, assignment, checkNotNullCall, equalityExpression,

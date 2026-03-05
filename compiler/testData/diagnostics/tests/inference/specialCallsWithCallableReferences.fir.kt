@@ -17,7 +17,7 @@ fun <K> foo4(): K = null as K
 class Foo6
 
 class Foo7<T>
-fun foo7() = null as Foo7<Int>
+fun foo7() = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Foo7<Int>
 
 fun poll0(flag: Boolean) {
     val inv = <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction0<kotlin.Int>")!>if (flag) { ::bar2 } else { ::foo4 }<!>

@@ -1,10 +1,10 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // KT-716 Type inference failed
 
 class TypeInfo<T>
 
-fun <T> typeinfo() : TypeInfo<T> = null <!CAST_NEVER_SUCCEEDS!>as<!> TypeInfo<T>
+fun <T> typeinfo() : TypeInfo<T> = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> TypeInfo<T>
 
 fun <T> TypeInfo<T>.getJavaClass() : java.lang.Class<T> {
     val t : <!PLATFORM_CLASS_MAPPED_TO_KOTLIN!>java.lang.Object<!> = this as <!PLATFORM_CLASS_MAPPED_TO_KOTLIN!>java.lang.Object<!>

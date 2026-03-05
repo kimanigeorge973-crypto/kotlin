@@ -9,10 +9,10 @@ public class Foo<L> extends Bar<L> {
 }
 
 // FILE: main.kt
-fun <T : Any> Bar<T>.foo(): T = null as T
-fun <T : Any> Bar<T?>.bar(): T = null as T
-fun <T : Any> Foo<T>.boo1(): T = null as T
-fun <T : Any> Foo<T?>.boo2(): T = null as T
+fun <T : Any> Bar<T>.foo(): T = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> T
+fun <T : Any> Bar<T?>.bar(): T = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> T
+fun <T : Any> Foo<T>.boo1(): T = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> T
+fun <T : Any> Foo<T?>.boo2(): T = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> T
 
 open class Bar<out K>(val x: K)
 

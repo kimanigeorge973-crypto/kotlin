@@ -5,7 +5,7 @@
 fun <E : Enum<E>> createMap(enumClass: Class<E>) {}
 
 fun reproduce() {
-    val enumClass: Class<Enum<*>> = "any" as Class<Enum<*>>
+    val enumClass: Class<Enum<*>> = "any" <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> Class<Enum<*>>
     createMap(<!ARGUMENT_TYPE_MISMATCH!>enumClass<!>)
 }
 

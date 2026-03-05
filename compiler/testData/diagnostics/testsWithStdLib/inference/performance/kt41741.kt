@@ -1,4 +1,4 @@
-// RUN_PIPELINE_TILL: BACKEND
+// RUN_PIPELINE_TILL: FRONTEND
 // FIR_IDENTICAL
 // FULL_JDK
 // WITH_STDLIB
@@ -25,7 +25,7 @@ public class Simple<K, V, C extends E, E extends Collection<V>> {
 // FILE: main.kt
 import java.util.*
 
-fun <K, V, C : E, E : Collection<V>, B: Simple<K, V, C, E>> Iterable<V>.groupByTo(destination: B, keySelector: (V) -> K) = null as B
+fun <K, V, C : E, E : Collection<V>, B: Simple<K, V, C, E>> Iterable<V>.groupByTo(destination: B, keySelector: (V) -> K) = null <!CAST_NEVER_SUCCEEDS_ERROR!>as<!> B
 
 enum class Format { Foo, Bar }
 
