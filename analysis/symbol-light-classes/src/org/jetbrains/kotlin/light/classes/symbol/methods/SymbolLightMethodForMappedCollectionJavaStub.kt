@@ -23,7 +23,7 @@ import javax.swing.Icon
 
 internal data class MethodSignature(val parameterTypes: List<PsiType>, val returnType: PsiType)
 
-internal class SymbolLightMethodForMappedCollectionClass(
+internal class SymbolLightMethodForMappedCollectionJavaStub(
     containingClass: SymbolLightClassForClassOrObject,
     private val javaMethod: PsiMethod,
     private val substitutor: PsiSubstitutor,
@@ -71,7 +71,7 @@ internal class SymbolLightMethodForMappedCollectionClass(
                     LightParameter(
                         paramFromJava.name,
                         type,
-                        this@SymbolLightMethodForMappedCollectionClass,
+                        this@SymbolLightMethodForMappedCollectionJavaStub,
                         KotlinLanguage.INSTANCE,
                         paramFromJava.isVarArgs
                     )
@@ -122,7 +122,7 @@ internal class SymbolLightMethodForMappedCollectionClass(
 
     private val _modifierList: PsiModifierList by lazyPub {
         object : LightModifierList(manager, language) {
-            override fun getParent(): PsiElement = this@SymbolLightMethodForMappedCollectionClass
+            override fun getParent(): PsiElement = this@SymbolLightMethodForMappedCollectionJavaStub
 
             private val overrideAnnotation by lazy {
                 SymbolLightSimpleAnnotation(fqName = CommonClassNames.JAVA_LANG_OVERRIDE, parent = this)
@@ -131,7 +131,7 @@ internal class SymbolLightMethodForMappedCollectionClass(
             private val allAnnotations: Array<PsiAnnotation> by lazy { arrayOf(overrideAnnotation) }
 
             override fun hasModifierProperty(name: String): Boolean =
-                this@SymbolLightMethodForMappedCollectionClass.hasModifierProperty(name)
+                this@SymbolLightMethodForMappedCollectionJavaStub.hasModifierProperty(name)
 
             override fun hasExplicitModifier(name: String): Boolean = hasModifierProperty(name)
 
@@ -151,7 +151,7 @@ internal class SymbolLightMethodForMappedCollectionClass(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is SymbolLightMethodForMappedCollectionClass) return false
+        if (other !is SymbolLightMethodForMappedCollectionJavaStub) return false
 
         if (name != other.name) return false
         if (isFinal != other.isFinal) return false
