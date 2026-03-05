@@ -1,4 +1,5 @@
 // RUN_PIPELINE_TILL: FRONTEND
+// LANGUAGE: +CompanionBlocksAndExtensions
 open class C {
     companion {
         fun insideCompanionBlock() {
