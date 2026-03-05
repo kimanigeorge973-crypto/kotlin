@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_MODE_ENV_KEY
 import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_MODE_KEY
 import org.jetbrains.kotlin.systemTest.SystemTestMode
 
-if (project.kotlinBuildProperties.isTeamcityBuild.get() && providers.environmentVariable(SYSTEM_TEST_AFFECTED_KEY).isPresent) {
+if (project.isSystemTestFederationEnabled.orNull == true) {
     val systemTestRuntime = configurations.detachedConfiguration(dependencies.project(":repo:system-tests")).apply {
         attributes {
             attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))

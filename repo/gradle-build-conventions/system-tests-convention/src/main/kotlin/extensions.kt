@@ -24,3 +24,7 @@ val Project.systemTestMode: Provider<SystemTestMode>
 
 val Project.affectedTestSystems: Provider<Set<TestSystem>>
     get() = provider { currentAffectedTestSystems }.orElse(project.affectedTestSystemsService.map { it.affectedTestSystems })
+
+val Project.isSystemTestFederationEnabled: Provider<Boolean>
+    get() = provider { currentSystemTestFederationEnabledOrNull }
+        .orElse(project.providers.gradleProperty(SYSTEM_TEST_FEDERATION_ENABLED_KEY).map { it.toBoolean() })
