@@ -56,7 +56,6 @@ open class WriteAffectedTestSystemsTask : DefaultTask() {
         affectedSystemsFile.writeText(affectedTestSystems.joinToString(System.lineSeparator()))
 
         println("##teamcity[setParameter name='$SYSTEM_TEST_AFFECTED_KEY' value='${affectedTestSystems.joinToString(";")}']")
-        println("##teamcity[addBuildTag 'Smoke']")
         affectedTestSystems.forEach { testSystem ->
             println("##teamcity[addBuildTag 'Affected: $testSystem']")
         }
