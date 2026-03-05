@@ -9,9 +9,17 @@ package org.jetbrains.kotlin.systemTest
 const val SYSTEM_TEST_FEDERATION_ENABLED_KEY = "system.test.federation"
 const val SYSTEM_TEST_FEDERATION_ENABLED_ENV_KEY = "SYSTEM_TEST_FEDERATION"
 
-val currentSystemTestFederationEnabled: Boolean = run {
-    val raw = System.getenv(SYSTEM_TEST_FEDERATION_ENABLED_ENV_KEY) ?: System.getProperty(SYSTEM_TEST_FEDERATION_ENABLED_KEY) ?: return@run false
+
+val currentSystemTestFederationEnabledOrNull: Boolean? = run {
+    val raw = System.getenv(SYSTEM_TEST_FEDERATION_ENABLED_ENV_KEY)
+        ?: System.getProperty(SYSTEM_TEST_FEDERATION_ENABLED_KEY)
+        ?: return@run null
+
     return@run raw.toBoolean()
+}
+
+val currentSystemTestFederationEnabled: Boolean = run {
+    currentSystemTestFederationEnabledOrNull ?: false
 }
 
 const val SYSTEM_TEST_MODE_KEY = "system.test.mode"

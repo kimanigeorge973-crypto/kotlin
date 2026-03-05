@@ -1,8 +1,4 @@
-import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_AFFECTED_ENV_KEY
-import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_AFFECTED_KEY
-import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_MODE_ENV_KEY
-import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_MODE_KEY
-import org.jetbrains.kotlin.systemTest.SystemTestMode
+import org.jetbrains.kotlin.systemTest.*
 
 if (project.isSystemTestFederationEnabled.orNull == true) {
     val systemTestRuntime = configurations.detachedConfiguration(dependencies.project(":repo:system-tests")).apply {
@@ -27,6 +23,13 @@ if (project.isSystemTestFederationEnabled.orNull == true) {
             systemProperty(SYSTEM_TEST_AFFECTED_KEY, formattedAffectedTestSystems)
             environment(SYSTEM_TEST_AFFECTED_ENV_KEY, formattedAffectedTestSystems)
             systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+
+            if (systemTestMode.get() == SystemTestMode.Smoke) {
+                println("##teamcity[addBuildTag 'Smoke']")
+                affectedTestSystems.get().forEach { testSystem ->
+                    println("##teamcity[addBuildTag 'Affected: $testSystem']")
+                }
+            }
         }
     }
 
