@@ -2889,14 +2889,12 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrLink :
 	protected fun contributeAdditionalCompilerArguments (Lorg/jetbrains/kotlin/gradle/plugin/KotlinCompilerArgumentsProducer$ContributeCompilerArgumentsContext;)V
 	public final fun getIncrementalJsIr ()Z
 	public final fun getIncrementalWasm ()Z
-	public final fun getMode ()Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsBinaryMode;
 	public final fun getOutputGranularity ()Lorg/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrOutputGranularity;
 	public abstract fun getRootCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public fun getSources ()Lorg/gradle/api/file/FileCollection;
 	protected fun processArgsBeforeCompile (Lorg/jetbrains/kotlin/cli/common/arguments/K2JSCompilerArguments;)V
 	public final fun setIncrementalJsIr (Z)V
 	public final fun setIncrementalWasm (Z)V
-	public final fun setMode (Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsBinaryMode;)V
 	protected fun skipCondition ()Z
 }
 

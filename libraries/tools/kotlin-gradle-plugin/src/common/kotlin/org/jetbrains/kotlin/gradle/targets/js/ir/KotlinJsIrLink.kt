@@ -86,17 +86,6 @@ abstract class KotlinJsIrLink @Inject constructor(
     override val taskBuildCacheableOutputDirectory: DirectoryProperty
         get() = super.taskBuildCacheableOutputDirectory
 
-    @get:Internal
-    @get:Deprecated(
-        "Internal development property. Scheduled for removal in Kotlin 2.4.",
-        level = DeprecationLevel.ERROR
-    )
-    var mode: KotlinJsBinaryMode
-        get() = modeProperty.get()
-        set(value) {
-            modeProperty.set(value)
-        }
-
     @get:Input
     internal abstract val modeProperty: Property<KotlinJsBinaryMode>
 
