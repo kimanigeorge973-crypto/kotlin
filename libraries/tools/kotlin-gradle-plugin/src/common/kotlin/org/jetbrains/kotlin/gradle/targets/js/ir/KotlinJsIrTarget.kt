@@ -70,13 +70,6 @@ constructor(
     override var wasmTargetType: KotlinWasmTargetType? = null
         internal set
 
-    @Deprecated("Use outputModuleName with Provider API instead. Scheduled for removal in Kotlin 2.3.", level = DeprecationLevel.ERROR)
-    override var moduleName: String?
-        get() = outputModuleName.get()
-        set(value) {
-            outputModuleName.set(value)
-        }
-
     override val kotlinComponents: Set<KotlinTargetComponent> by lazy {
         val mainCompilation = compilations.getByName(MAIN_COMPILATION_NAME)
         val usageContexts = createUsageContexts(mainCompilation).toMutableSet()

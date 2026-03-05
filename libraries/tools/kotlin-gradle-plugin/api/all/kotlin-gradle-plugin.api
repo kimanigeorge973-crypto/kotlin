@@ -2080,16 +2080,6 @@ public abstract interface class org/jetbrains/kotlin/gradle/targets/js/AbstractE
 
 public abstract class org/jetbrains/kotlin/gradle/targets/js/AbstractSettings : org/jetbrains/kotlin/gradle/internal/ConfigurationPhaseAware {
 	public fun <init> ()V
-	public final fun getCommand ()Ljava/lang/String;
-	public final fun getDownload ()Z
-	public final fun getDownloadBaseUrl ()Ljava/lang/String;
-	public final fun getInstallationDir ()Ljava/io/File;
-	public final fun getVersion ()Ljava/lang/String;
-	public final fun setCommand (Ljava/lang/String;)V
-	public final fun setDownload (Z)V
-	public final fun setDownloadBaseUrl (Ljava/lang/String;)V
-	public final fun setInstallationDir (Ljava/io/File;)V
-	public final fun setVersion (Ljava/lang/String;)V
 }
 
 public abstract class org/jetbrains/kotlin/gradle/targets/js/AbstractSetupTask : org/gradle/api/DefaultTask, org/jetbrains/kotlin/gradle/plugin/statistics/UsesBuildFusService {
@@ -2102,15 +2092,11 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/AbstractSetupTask :
 	protected abstract fun getArtifactModule ()Ljava/lang/String;
 	protected abstract fun getArtifactName ()Ljava/lang/String;
 	protected abstract fun getArtifactPattern ()Ljava/lang/String;
-	public final fun getDestination ()Ljava/io/File;
-	public final fun getDestinationHashFile ()Ljava/io/File;
 	public final fun getDestinationHashFileProvider ()Lorg/gradle/api/file/RegularFileProperty;
 	public final fun getDestinationProvider ()Lorg/gradle/api/file/RegularFileProperty;
 	public final fun getDist ()Ljava/io/File;
-	public final fun getDownloadBaseUrl ()Ljava/lang/String;
 	public final fun getDownloadBaseUrlProvider ()Lorg/gradle/api/provider/Provider;
 	protected final fun getEnv ()Lorg/gradle/api/provider/Provider;
-	public final fun getIvyDependency ()Ljava/lang/String;
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/AbstractSetupTask$Companion {
@@ -2383,12 +2369,8 @@ public final class org/jetbrains/kotlin/gradle/targets/js/d8/D8RootExtension$Com
 public abstract interface class org/jetbrains/kotlin/gradle/targets/js/dsl/Distribution {
 	public static final field Companion Lorg/jetbrains/kotlin/gradle/targets/js/dsl/Distribution$Companion;
 	public static final field DIST Ljava/lang/String;
-	public abstract fun getDirectory ()Ljava/io/File;
 	public abstract fun getDistributionName ()Lorg/gradle/api/provider/Property;
-	public abstract fun getName ()Ljava/lang/String;
 	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
-	public abstract fun setDirectory (Ljava/io/File;)V
-	public abstract fun setName (Ljava/lang/String;)V
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/dsl/Distribution$Companion {
@@ -2459,12 +2441,10 @@ public abstract interface class org/jetbrains/kotlin/gradle/targets/js/dsl/Kotli
 	public abstract fun generateTypeScriptDefinitions ()V
 	public abstract fun getBinaries ()Lorg/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsBinaryContainer;
 	public abstract fun getCompilations ()Lorg/gradle/api/NamedDomainObjectContainer;
-	public abstract fun getModuleName ()Ljava/lang/String;
 	public abstract fun getOutputModuleName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getTestRuns ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun passAsArgumentToMainFunction (Ljava/lang/String;)V
 	public abstract fun produceExecutable ()V
-	public abstract fun setModuleName (Ljava/lang/String;)V
 	public abstract fun useCommonJs ()V
 	public abstract fun useEsModules ()V
 }
@@ -2964,7 +2944,6 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrTarget
 	public fun getCompilerOptions ()Lorg/jetbrains/kotlin/gradle/dsl/KotlinJsCompilerOptions;
 	public fun getD8 ()Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinWasmD8Dsl;
 	public fun getKotlinComponents ()Ljava/util/Set;
-	public fun getModuleName ()Ljava/lang/String;
 	public fun getNodejs ()Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsNodeDsl;
 	public fun getSubTargets ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public fun getTestRuns ()Lorg/gradle/api/NamedDomainObjectContainer;
@@ -2977,7 +2956,6 @@ public abstract class org/jetbrains/kotlin/gradle/targets/js/ir/KotlinJsIrTarget
 	public fun nodejs (Lorg/gradle/api/Action;)V
 	public fun passAsArgumentToMainFunction (Ljava/lang/String;)V
 	public fun produceExecutable ()V
-	public fun setModuleName (Ljava/lang/String;)V
 	public fun useCommonJs ()V
 	public fun useEsModules ()V
 	public fun whenBrowserConfigured (Lkotlin/jvm/functions/Function1;)V
@@ -4039,12 +4017,8 @@ public final class org/jetbrains/kotlin/gradle/targets/js/npm/tasks/RootPackageJ
 
 public final class org/jetbrains/kotlin/gradle/targets/js/subtargets/DefaultDistribution : org/jetbrains/kotlin/gradle/targets/js/dsl/Distribution {
 	public fun <init> (Lorg/gradle/api/Project;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;)V
-	public fun getDirectory ()Ljava/io/File;
 	public fun getDistributionName ()Lorg/gradle/api/provider/Property;
-	public fun getName ()Ljava/lang/String;
 	public fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
-	public fun setDirectory (Ljava/io/File;)V
-	public fun setName (Ljava/lang/String;)V
 }
 
 public abstract class org/jetbrains/kotlin/gradle/targets/js/subtargets/KotlinBrowserJs : org/jetbrains/kotlin/gradle/targets/js/subtargets/KotlinJsSubTarget, org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsBrowserDsl {
