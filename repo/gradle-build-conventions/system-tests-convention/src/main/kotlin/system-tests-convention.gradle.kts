@@ -26,7 +26,7 @@ if (project.isSystemTestFederationEnabled.orNull == true) {
             systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 
             if (systemTestMode.get() == SystemTestMode.Smoke) {
-                println("##teamcity[addBuildTag 'Smoke']")
+                println("##teamcity[addBuildTag 'System Test Mode: Smoke']")
                 affectedTestSystems.get().forEach { testSystem ->
                     println("##teamcity[addBuildTag 'Affected: $testSystem']")
                 }
