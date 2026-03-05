@@ -9,11 +9,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.GenerateSyntheticLinkageImportProject
+import org.jetbrains.kotlin.gradle.testbase.TestProject
+import org.jetbrains.kotlin.gradle.testbase.build
+import org.jetbrains.kotlin.gradle.uklibs.dumpKlibMetadataSignatures
 import org.jetbrains.kotlin.gradle.util.runProcess
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
+import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.writeText
 
 @Suppress("INVISIBLE_REFERENCE")
@@ -336,6 +341,23 @@ data class XcodebuildPIFFrameworksBuildPhase(
 fun dumpXcodebuildPIF(appPath: Path): List<XcodebuildPIFEntry> {
     val outputFile = File.createTempFile("xcodebuild-pif", ".json")
     return runAppleToolCommand(appPath, listOf("xcodebuild", "-dumpPIF", outputFile.absolutePath), outputFile)
+}
+
+fun TestProject.commonizeAndDumpCinteropSignatures(
+    commonizerBasePath: Path = projectPath,
+    commonizeTask: String = "commonizeCInterop"
+): String {
+    build(commonizeTask)
+
+    val commonizerResult = commonizerBasePath.resolve("build/classes/kotlin/commonizer/swiftPMImport")
+        .listDirectoryEntries()
+        .single { it.isDirectory() }
+        .listDirectoryEntries()
+        .single { it.isDirectory() }
+        .listDirectoryEntries()
+        .single { it.isDirectory() }
+
+    return dumpKlibMetadataSignatures(commonizerResult.toFile())
 }
 
 // region Code snippet generators for test sources
