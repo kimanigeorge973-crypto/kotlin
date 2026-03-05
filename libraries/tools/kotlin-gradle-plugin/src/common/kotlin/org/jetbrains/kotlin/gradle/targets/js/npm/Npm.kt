@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.gradle.internal.execWithProgress
 import org.jetbrains.kotlin.gradle.internal.newBuildOpLogger
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolved.PreparedKotlinCompilationNpmResolution
 import org.jetbrains.kotlin.gradle.utils.getFile
-import org.jetbrains.kotlin.gradle.utils.property
 import java.io.File
 
 class Npm internal constructor(
@@ -91,32 +90,6 @@ class Npm internal constructor(
                 Npm::class.java.getResourceAsStream("/org/jetbrains/kotlin/gradle/targets/js/npm/package-lock.json")
                     ?.copyTo(out)
             }
-    }
-
-    @Deprecated(
-        "Updated to remove ServiceRegistry. Scheduled for removal in Kotlin 2.4.",
-        ReplaceWith("packageManagerExec(logger, nodeJs, environment, dir, description, args)"),
-        level = DeprecationLevel.ERROR
-    )
-    @Suppress("unused")
-    fun npmExec(
-        @Suppress("UNUSED_PARAMETER")
-        services: ServiceRegistry,
-        logger: Logger,
-        nodeJs: NodeJsEnvironment,
-        environment: NpmEnvironment,
-        dir: File,
-        description: String,
-        args: List<String>,
-    ) {
-        packageManagerExec(
-            logger = logger,
-            nodeJs = nodeJs,
-            environment = environment,
-            dir = objects.property<File>().value(dir),
-            description = description,
-            args = args,
-        )
     }
 
     override fun packageManagerExec(
