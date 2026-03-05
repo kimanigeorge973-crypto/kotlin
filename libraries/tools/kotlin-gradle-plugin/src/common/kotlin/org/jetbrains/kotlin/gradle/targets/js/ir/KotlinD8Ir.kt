@@ -22,8 +22,6 @@ abstract class KotlinD8Ir
 @Inject
 internal constructor(
     target: KotlinJsIrTarget,
-    private val objects: ObjectFactory,
-    private val providers: ProviderFactory,
 ) :
     KotlinJsIrSubTarget(target, "d8"),
     KotlinWasmD8Dsl {
@@ -42,7 +40,7 @@ internal constructor(
     }
 
     override fun configureDefaultTestFramework(test: KotlinJsTest) {
-        test.testFramework = KotlinWasmD8(test, objects, providers)
+        test.testFramework = KotlinWasmD8(test)
     }
 
     override fun configureTestDependencies(test: KotlinJsTest, binary: JsIrBinary) {
