@@ -305,9 +305,6 @@ class KotlinCompilationNpmResolver(
             val includedBuild = project.gradle.includedBuild(identifier.identityPath.topRealPath().name!!)
             internalCompositeDependencies.add(
                 CompositeDependency(
-                    dependencyName = "", // deprecated, no longer used
-                    dependencyVersion = "",  // deprecated, no longer used
-                    includedBuildDir = includedBuild.projectDir,
                     includedBuild = includedBuild,
                 )
             )

@@ -3826,18 +3826,12 @@ public final class org/jetbrains/kotlin/gradle/targets/js/npm/resolved/PreparedK
 }
 
 public final class org/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency : java/io/Serializable {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/gradle/api/initialization/IncludedBuild;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/io/File;
-	public final fun component4 ()Lorg/gradle/api/initialization/IncludedBuild;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/gradle/api/initialization/IncludedBuild;)Lorg/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency;
-	public static synthetic fun copy$default (Lorg/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/gradle/api/initialization/IncludedBuild;ILjava/lang/Object;)Lorg/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency;
+	public fun <init> (Lorg/gradle/api/initialization/IncludedBuild;)V
+	public final fun component1 ()Lorg/gradle/api/initialization/IncludedBuild;
+	public final fun copy (Lorg/gradle/api/initialization/IncludedBuild;)Lorg/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency;
+	public static synthetic fun copy$default (Lorg/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency;Lorg/gradle/api/initialization/IncludedBuild;ILjava/lang/Object;)Lorg/jetbrains/kotlin/gradle/targets/js/npm/resolver/CompositeDependency;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getDependencyName ()Ljava/lang/String;
-	public final fun getDependencyVersion ()Ljava/lang/String;
 	public final fun getIncludedBuild ()Lorg/gradle/api/initialization/IncludedBuild;
-	public final fun getIncludedBuildDir ()Ljava/io/File;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -6412,3 +6406,4 @@ public final class org/jetbrains/kotlin/gradle/utils/processes/ProcessLaunchOpti
 	public final fun processLaunchOptions (Lorg/gradle/api/model/ObjectFactory;Lkotlin/jvm/functions/Function1;)Lorg/jetbrains/kotlin/gradle/utils/processes/ProcessLaunchOptions;
 	public static synthetic fun processLaunchOptions$default (Lorg/jetbrains/kotlin/gradle/utils/processes/ProcessLaunchOptions$Companion;Lorg/gradle/api/model/ObjectFactory;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lorg/jetbrains/kotlin/gradle/utils/processes/ProcessLaunchOptions;
 }
+
