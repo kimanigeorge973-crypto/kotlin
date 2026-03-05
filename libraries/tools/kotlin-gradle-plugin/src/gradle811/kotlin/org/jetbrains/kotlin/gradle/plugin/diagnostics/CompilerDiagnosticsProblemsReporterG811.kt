@@ -31,7 +31,7 @@ internal abstract class CompilerDiagnosticsProblemsReporterG811 @Inject construc
         try {
             problems.reporter.reporting {
                 it
-                    .id(severity.problemId, severity.toDisplayName(), diagnosticGroup.toProblemGroup())
+                    .id(severity.problemId, severity.toDisplayName(), KgpProblemGroup(diagnosticGroup))
                     .contextualLabel(message)
                     .details(message)
                     .severity(gradleSeverity)
