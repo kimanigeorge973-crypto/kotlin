@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.compilerRunner.GradleCompilerRunner
 import org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWorkArguments
 import org.jetbrains.kotlin.gradle.internal.ClassLoadersCachingBuildService
 import org.jetbrains.kotlin.gradle.plugin.BuildFinishedListenerService
+import org.jetbrains.kotlin.gradle.plugin.diagnostics.CompilerDiagnosticsProblemsReporter
 import org.jetbrains.kotlin.gradle.plugin.internal.BuildIdService
 import org.jetbrains.kotlin.gradle.tasks.GradleCompileTaskProvider
 import org.jetbrains.kotlin.gradle.tasks.TaskOutputsBackup
@@ -33,6 +34,7 @@ internal class GradleBuildToolsApiCompilerRunner(
     private val buildFinishedListenerService: Provider<BuildFinishedListenerService>,
     private val buildIdService: Provider<BuildIdService>,
     private val buildSessionService: Provider<BuildSessionService>,
+    private val compilerDiagnosticsProblemsReporterFactory: Provider<CompilerDiagnosticsProblemsReporter.Factory>,
     fusMetricsConsumer: Provider<StatisticsValuesConsumer>,
 ) : GradleCompilerRunner(taskProvider, jdkToolsJar, compilerExecutionSettings, buildMetrics, fusMetricsConsumer) {
 
@@ -49,6 +51,7 @@ internal class GradleBuildToolsApiCompilerRunner(
             params.buildFinishedListenerService.set(buildFinishedListenerService)
             params.buildIdService.set(buildIdService)
             params.buildSessionService.set(buildSessionService)
+            params.compilerDiagnosticsProblemsReporterFactory.set(compilerDiagnosticsProblemsReporterFactory)
             if (taskOutputsBackup != null) {
                 params.taskOutputsToRestore.set(taskOutputsBackup.outputsToRestore)
                 params.snapshotsDir.set(taskOutputsBackup.snapshotsDir)

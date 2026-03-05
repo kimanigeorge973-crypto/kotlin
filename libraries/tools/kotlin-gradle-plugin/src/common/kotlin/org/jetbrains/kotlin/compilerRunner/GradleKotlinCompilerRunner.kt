@@ -85,6 +85,7 @@ internal fun createGradleCompilerRunner(
             buildFinishedListenerService,
             buildIdService,
             buildSessionService,
+            taskProvider.compilerDiagnosticsProblemsReporterFactory,
             fusMetricsConsumer
         )
     } else if (compilerExecutionSettings.generateCompilerRefIndex) {

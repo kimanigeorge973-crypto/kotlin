@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.compilerRunner.btapi
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
@@ -29,6 +30,7 @@ import org.jetbrains.kotlin.buildtools.api.jvm.JvmSnapshotBasedIncrementalCompil
 import org.jetbrains.kotlin.buildtools.api.jvm.JvmSnapshotBasedIncrementalCompilationConfiguration.Companion.USE_FIR_RUNNER
 import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation
 import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation.Companion.COMPILER_ARGUMENTS_LOG_LEVEL
+import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation.Companion.COMPILER_MESSAGE_RENDERER
 import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation.Companion.GENERATE_COMPILER_REF_INDEX
 import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation.Companion.INCREMENTAL_COMPILATION
 import org.jetbrains.kotlin.buildtools.api.jvm.operations.JvmCompilationOperation.Companion.KOTLINSCRIPT_EXTENSIONS
@@ -42,6 +44,7 @@ import org.jetbrains.kotlin.gradle.internal.ClassLoadersCachingBuildService
 import org.jetbrains.kotlin.gradle.internal.ParentClassLoaderProvider
 import org.jetbrains.kotlin.gradle.logging.*
 import org.jetbrains.kotlin.gradle.plugin.BuildFinishedListenerService
+import org.jetbrains.kotlin.gradle.plugin.diagnostics.CompilerDiagnosticsProblemsReporter
 import org.jetbrains.kotlin.gradle.plugin.internal.BuildIdService
 import org.jetbrains.kotlin.gradle.plugin.internal.state.TaskExecutionResults
 import org.jetbrains.kotlin.gradle.plugin.internal.state.getTaskLogger
@@ -61,6 +64,7 @@ import javax.inject.Inject
 
 internal abstract class BuildToolsApiCompilationWork @Inject constructor(
     private val fileSystemOperations: FileSystemOperations,
+    private val objects: ObjectFactory,
 ) :
     WorkAction<BuildToolsApiCompilationWork.BuildToolsApiCompilationParameters> {
     internal interface BuildToolsApiCompilationParameters : WorkParameters {
@@ -72,6 +76,7 @@ internal abstract class BuildToolsApiCompilationWork @Inject constructor(
         val taskOutputsToRestore: ListProperty<File>
         val snapshotsDir: DirectoryProperty
         val metricsReporter: Property<BuildMetricsReporter<BuildTimeMetric, BuildPerformanceMetric>>
+        val compilerDiagnosticsProblemsReporterFactory: Property<CompilerDiagnosticsProblemsReporter.Factory>
     }
 
     private val workArguments
@@ -79,6 +84,9 @@ internal abstract class BuildToolsApiCompilationWork @Inject constructor(
 
     private val taskPath
         get() = workArguments.taskPath
+
+    private val compilerDiagnosticsProblemsReporter: CompilerDiagnosticsProblemsReporter
+        get() = parameters.compilerDiagnosticsProblemsReporterFactory.get().getInstance(objects)
 
     private val metrics = if (workArguments.reportingSettings.buildReportOutputs.isNotEmpty()) {
         BuildMetricsReporterImpl()
@@ -110,6 +118,8 @@ internal abstract class BuildToolsApiCompilationWork @Inject constructor(
                 compilationOperationBuilder[KOTLINSCRIPT_EXTENSIONS] = workArguments.kotlinScriptExtensions
                 compilationOperationBuilder[COMPILER_ARGUMENTS_LOG_LEVEL] =
                     workArguments.compilerArgumentsLogLevel.toBtaCompilerArgumentsLogLevel()
+                compilationOperationBuilder[COMPILER_MESSAGE_RENDERER] =
+                    ProblemsApiCompilerMessageRenderer(compilerDiagnosticsProblemsReporter)
                 if (metrics is BuildMetricsReporterImpl) {
                     @Suppress("DEPRECATION_ERROR")
                     compilationOperationBuilder[BuildOperation.createCustomOption("XX_KGP_METRICS_COLLECTOR")] = true
