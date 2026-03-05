@@ -213,6 +213,16 @@ internal class KotlinWrapperPre2_4_0(
                     arrayValue.map { Path(it) } as V
                 }
 
+                JvmCompilerArguments.X_SCRIPT_RESOLVER_ENVIRONMENT -> {
+                    if (delegate[key] == null) return null as V
+
+                    val arrayValue = delegate[key] as Array<String>
+                    arrayValue.associate {
+                        val parts = it.split("=", limit = 2)
+                        Pair(parts[0], parts[1])
+                    } as V
+                }
+
                 else -> delegate[key]
             }
         }
@@ -286,6 +296,16 @@ internal class KotlinWrapperPre2_4_0(
                     @Suppress("UNCHECKED_CAST")
                     val listValue: List<Path>? = (value as? List<*>)?.takeIf { it.all { item -> item is Path } } as List<Path>?
                     val arrayValue = listValue?.map { it.toFile().absolutePath }?.toTypedArray()
+                    val arrayKey = JvmCompilerArguments.JvmCompilerArgument<Array<String>?>(key.id, key.availableSinceVersion)
+
+                    delegate[arrayKey] = arrayValue
+                }
+
+                JvmCompilerArguments.X_SCRIPT_RESOLVER_ENVIRONMENT -> {
+                    @Suppress("UNCHECKED_CAST")
+                    val mapValue: Map<String, String>? =
+                        (value as? Map<*, *>)?.takeIf { it.all { entry -> entry.key is String && entry.value is String } } as Map<String, String>?
+                    val arrayValue = mapValue?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray()
                     val arrayKey = JvmCompilerArguments.JvmCompilerArgument<Array<String>?>(key.id, key.availableSinceVersion)
 
                     delegate[arrayKey] = arrayValue

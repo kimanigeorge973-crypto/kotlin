@@ -12,11 +12,14 @@ import kotlin.Array
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.OptIn
+import kotlin.Pair
 import kotlin.String
 import kotlin.Suppress
 import kotlin.collections.List
+import kotlin.collections.Map
 import kotlin.collections.MutableMap
 import kotlin.collections.MutableSet
+import kotlin.collections.associate
 import kotlin.collections.joinToString
 import kotlin.collections.map
 import kotlin.collections.mutableMapOf
@@ -213,7 +216,7 @@ internal class JvmCompilerArgumentsImpl(
     if (X_PROFILE in this) { arguments.profileCompilerCommand = get(X_PROFILE)?.toArgumentString()}
     if (X_SAM_CONVERSIONS in this) { arguments.samConversions = get(X_SAM_CONVERSIONS)}
     if (X_SANITIZE_PARENTHESES in this) { arguments.sanitizeParentheses = get(X_SANITIZE_PARENTHESES)}
-    if (X_SCRIPT_RESOLVER_ENVIRONMENT in this) { arguments.scriptResolverEnvironment = get(X_SCRIPT_RESOLVER_ENVIRONMENT)}
+    if (X_SCRIPT_RESOLVER_ENVIRONMENT in this) { arguments.scriptResolverEnvironment = get(X_SCRIPT_RESOLVER_ENVIRONMENT)?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray()}
     try { if (X_SERIALIZE_IR in this) { arguments.setUsingReflection("serializeIr", get(X_SERIALIZE_IR))} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: X_SERIALIZE_IR. Current compiler version is: $KC_VERSION, but the argument was removed in 2.4.0""").initCause(e) }
     if (X_STRING_CONCAT in this) { arguments.stringConcat = get(X_STRING_CONCAT)}
     if (X_SUPPORT_COMPATQUAL_CHECKER_FRAMEWORK_ANNOTATIONS in this) { arguments.supportCompatqualCheckerFrameworkAnnotations = get(X_SUPPORT_COMPATQUAL_CHECKER_FRAMEWORK_ANNOTATIONS)}
@@ -298,7 +301,7 @@ internal class JvmCompilerArgumentsImpl(
     try { this[X_PROFILE] = arguments.profileCompilerCommand?.toXprofile() } catch (_: NoSuchMethodError) {  }
     try { this[X_SAM_CONVERSIONS] = arguments.samConversions } catch (_: NoSuchMethodError) {  }
     try { this[X_SANITIZE_PARENTHESES] = arguments.sanitizeParentheses } catch (_: NoSuchMethodError) {  }
-    try { this[X_SCRIPT_RESOLVER_ENVIRONMENT] = arguments.scriptResolverEnvironment } catch (_: NoSuchMethodError) {  }
+    try { this[X_SCRIPT_RESOLVER_ENVIRONMENT] = arguments.scriptResolverEnvironment?.associate { val parts = it.split("=", limit = 2); Pair(parts[0], parts[1]) } } catch (_: NoSuchMethodError) {  }
     try { this[X_SERIALIZE_IR] = arguments.getUsingReflection("serializeIr") } catch (_: NoSuchMethodError) {  }
     try { this[X_STRING_CONCAT] = arguments.stringConcat } catch (_: NoSuchMethodError) {  }
     try { this[X_SUPPORT_COMPATQUAL_CHECKER_FRAMEWORK_ANNOTATIONS] = arguments.supportCompatqualCheckerFrameworkAnnotations } catch (_: NoSuchMethodError) {  }
@@ -486,7 +489,7 @@ internal class JvmCompilerArgumentsImpl(
     public val X_SANITIZE_PARENTHESES: JvmCompilerArgument<Boolean> =
         JvmCompilerArgument("X_SANITIZE_PARENTHESES")
 
-    public val X_SCRIPT_RESOLVER_ENVIRONMENT: JvmCompilerArgument<Array<String>?> =
+    public val X_SCRIPT_RESOLVER_ENVIRONMENT: JvmCompilerArgument<Map<String, String>?> =
         JvmCompilerArgument("X_SCRIPT_RESOLVER_ENVIRONMENT")
 
     public val X_SERIALIZE_IR: JvmCompilerArgument<String> = JvmCompilerArgument("X_SERIALIZE_IR")

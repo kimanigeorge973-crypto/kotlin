@@ -100,6 +100,12 @@ private object JvmCompilerArgumentPre2_4_0ValueAdapter : CompilerArgumentValueAd
                 listValue.map { it.absolutePathStringOrThrow() }.toTypedArray() as T
             }
 
+            JvmCompilerArguments.X_SCRIPT_RESOLVER_ENVIRONMENT -> {
+                val mapValue: Map<String, String>? =
+                    (value as? Map<*, *>)?.takeIf { it.all { entry -> entry.key is String && entry.value is String } } as Map<String, String>?
+                mapValue?.entries?.map { "${it.key}=${it.value}" }?.toTypedArray() as T
+            }
+
             else -> value as T
         }
     }
@@ -153,6 +159,14 @@ private object JvmCompilerArgumentPre2_4_0ValueAdapter : CompilerArgumentValueAd
             JvmCompilerArguments.X_JAVA_SOURCE_ROOTS -> {
                 val arrayValue = value as Array<String>
                 arrayValue.map { Path(it) } as T
+            }
+
+            JvmCompilerArguments.X_SCRIPT_RESOLVER_ENVIRONMENT -> {
+                val arrayValue = value as Array<String>
+                arrayValue.associate {
+                    val parts = it.split("=", limit = 2)
+                    Pair(parts[0], parts[1])
+                } as T
             }
 
             else -> value as T

@@ -46,6 +46,8 @@ val StringListType.Companion.defaultNull: StringListType
 val PathListType.Companion.defaultSystemPath: PathListType
     get() = SystemPathType()
 
-
 val PathListType.Companion.defaultLiteralPath: PathListType
     get() = LiteralPathType()
+
+val StringMapType.Companion.defaultNull: StringMapType
+    get() = StringMapType()

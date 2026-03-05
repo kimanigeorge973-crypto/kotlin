@@ -7340,7 +7340,7 @@
                                     "removedVersion": null
                                 },
                                 "argumentType": {
-                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringArrayType",
+                                    "type": "org.jetbrains.kotlin.arguments.dsl.types.StringMapType",
                                     "defaultValue": {
                                         "current": null,
                                         "valueInVersions": []

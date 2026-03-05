@@ -10,6 +10,7 @@ import kotlin.Deprecated
 import kotlin.Int
 import kotlin.String
 import kotlin.collections.List
+import kotlin.collections.Map
 import kotlin.jvm.JvmField
 import org.jetbrains.kotlin.buildtools.api.DeprecatedCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.KotlinReleaseVersion
@@ -617,7 +618,7 @@ public interface JvmCompilerArguments : CommonCompilerArguments {
      */
     @JvmField
     @ExperimentalCompilerArgument
-    public val X_SCRIPT_RESOLVER_ENVIRONMENT: JvmCompilerArgument<Array<String>?> =
+    public val X_SCRIPT_RESOLVER_ENVIRONMENT: JvmCompilerArgument<Map<String, String>?> =
         JvmCompilerArgument("X_SCRIPT_RESOLVER_ENVIRONMENT", KotlinReleaseVersion(1, 1, 2))
 
     /**

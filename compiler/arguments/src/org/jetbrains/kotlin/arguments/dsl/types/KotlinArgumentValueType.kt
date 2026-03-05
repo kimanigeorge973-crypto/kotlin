@@ -257,6 +257,22 @@ class LiteralPathType(
     }
 }
 
+/**
+ * A value type that accepts a map of [String] to [String] key-value pairs.
+ */
+@Serializable
+class StringMapType(
+    // TODO(KT-84609) Change to be non-nullable with default of emptyMap()
+    override val defaultValue: ReleaseDependent<Map<String, String>?> = ReleaseDependent(null),
+    override val isNullable: ReleaseDependent<Boolean> = ReleaseDependent(true),
+) : KotlinArgumentValueType<Map<String, String>> {
+
+    override fun stringRepresentation(value: Map<String, String>?): String? {
+        if (value == null) return null
+        return value.entries.joinToString { "${it.key.valueOrNullStringLiteral}=${it.value.valueOrNullStringLiteral}" }
+    }
+}
+
 private val String?.valueOrNullStringLiteral: String
     get() = "\"${this}\""
 

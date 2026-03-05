@@ -394,6 +394,7 @@ private fun SmartPrinter.generateProperty(argument: KotlinCompilerArgument) {
         is StringArrayType -> "Array<String>?"
         is SystemPathType -> "String?"
         is LiteralPathType -> "Array<String>?"
+        is StringMapType -> "Array<String>?"
         else -> when (type.isNullable.current) {
             true -> "String?"
             false -> "String"
@@ -486,6 +487,8 @@ private val KotlinCompilerArgument.defaultValueInArgs: String
             is StringListType -> "arrayOf(${valueType.stringRepresentation(valueType.defaultValue.current)})"
             is PathListType if valueType.defaultValue.current == null -> "null"
             is LiteralPathType -> "arrayOf(${valueType.stringRepresentation(valueType.defaultValue.current)})"
+            is StringMapType if valueType.defaultValue.current == null -> "null"
+            is StringMapType -> "arrayOf(${valueType.stringRepresentation(valueType.defaultValue.current)})"
             else -> valueType.stringRepresentation(valueType.defaultValue.current) ?: "null"
         }
     }

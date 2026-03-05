@@ -374,6 +374,15 @@ internal class BtaImplGenerator(
                     MemberName(KOTLIN_COLLECTIONS, "toTypedArray")
                 )
             }
+            argument.valueType.origin is StringMapType -> {
+                add(
+                    maybeGetNullabilitySign(argument) + ".entries" +
+                            maybeGetNullabilitySign(argument) + $$".%M { \"${it.key}=${it.value}\" }" +
+                            maybeGetNullabilitySign(argument) + ".%M()",
+                    MemberName(KOTLIN_COLLECTIONS, "map"),
+                    MemberName(KOTLIN_COLLECTIONS, "toTypedArray")
+                )
+            }
             else -> add("")
         }
     }.build()
@@ -450,7 +459,6 @@ internal class BtaImplGenerator(
                 )
             }
             argument.valueType.origin is LiteralPathType -> {
-
                 add(
                     maybeGetNullabilitySign(argument) + ".%M { %M(it) }",
                     MemberName(KOTLIN_COLLECTIONS, "map"),
@@ -464,6 +472,13 @@ internal class BtaImplGenerator(
                     ClassName(JAVA_IO, "File"),
                     MemberName(KOTLIN_COLLECTIONS, "map"),
                     MemberName(KOTLIN_IO_PATH, "Path")
+                )
+            }
+            argument.valueType.origin is StringMapType -> {
+                add(
+                    maybeGetNullabilitySign(argument) + ".%M { val parts = it.split(\"=\", limit = 2); %T(parts[0], parts[1]) }",
+                    MemberName(KOTLIN_COLLECTIONS, "associate"),
+                    Pair::class.asTypeName()
                 )
             }
             else -> add("")
