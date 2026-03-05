@@ -1,3 +1,4 @@
+import org.gradle.api.internal.tasks.testing.junit.JUnitTestFramework
 import org.jetbrains.kotlin.systemTest.*
 
 if (project.isSystemTestFederationEnabled.orNull == true) {
@@ -41,6 +42,11 @@ if (project.isSystemTestFederationEnabled.orNull == true) {
             When running in smoke test mode, a given test task might actually not provide any smoke test
             */
             failOnNoDiscoveredTests.value(systemTestMode.map { it != SystemTestMode.Smoke })
+
+            val testFramework = testFramework
+            if(testFramework is JUnitTestFramework) {
+                testFramework.options.includeCategories("org.jetbrains.kotlin.systemTest.SmokeTest")
+            }
         }
     }
 }
