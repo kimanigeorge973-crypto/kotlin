@@ -212,7 +212,7 @@ object FirCastOperatorsChecker : FirTypeOperatorCallChecker(MppCheckerKind.Commo
             FirOperation.SAFE_AS -> FirErrors.SAFE_CAST_RELYING_ON_NULL
             else -> FirErrors.UNSAFE_CAST_RELYING_ON_NULL
         }
-        else -> FirErrors.CAST_NEVER_SUCCEEDS
+        else -> FirErrors.CAST_NEVER_SUCCEEDS.chooseFactory(context)
     }
 
     context(context: CheckerContext)
