@@ -1020,8 +1020,16 @@ public fun <T : Comparable<T>> Iterable<T>.isSorted(): Boolean {
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (T) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(selector: (T) -> R?): Boolean {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return true
+    var currentValue = selector(iterator.next())
+    while (iterator.hasNext()) {
+        val nextValue = selector(iterator.next())
+        if (compareValues(currentValue, nextValue) > 0) return false
+        currentValue = nextValue
+    }
+    return true
 }
 
 /**
@@ -1043,8 +1051,16 @@ public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline sele
  * @sample samples.generated.issorted.IsSortedIterablesSamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedByDescending(crossinline selector: (T) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedByDescending(selector: (T) -> R?): Boolean {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return true
+    var currentValue = selector(iterator.next())
+    while (iterator.hasNext()) {
+        val nextValue = selector(iterator.next())
+        if (compareValues(currentValue, nextValue) < 0) return false
+        currentValue = nextValue
+    }
+    return true
 }
 
 /**

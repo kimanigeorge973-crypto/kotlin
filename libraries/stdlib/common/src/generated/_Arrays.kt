@@ -5731,8 +5731,11 @@ public fun CharArray.isSorted(): Boolean {
  * @sample samples.generated.issorted.IsSortedArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <T, R : Comparable<R>> Array<out T>.isSortedBy(crossinline selector: (T) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <T, R : Comparable<R>> Array<out T>.isSortedBy(selector: (T) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5748,8 +5751,11 @@ public inline fun <T, R : Comparable<R>> Array<out T>.isSortedBy(crossinline sel
  * @sample samples.generated.issorted.IsSortedByteArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> ByteArray.isSortedBy(crossinline selector: (Byte) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> ByteArray.isSortedBy(selector: (Byte) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5765,8 +5771,11 @@ public inline fun <R : Comparable<R>> ByteArray.isSortedBy(crossinline selector:
  * @sample samples.generated.issorted.IsSortedShortArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> ShortArray.isSortedBy(crossinline selector: (Short) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> ShortArray.isSortedBy(selector: (Short) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5782,8 +5791,11 @@ public inline fun <R : Comparable<R>> ShortArray.isSortedBy(crossinline selector
  * @sample samples.generated.issorted.IsSortedIntArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> IntArray.isSortedBy(crossinline selector: (Int) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> IntArray.isSortedBy(selector: (Int) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5799,8 +5811,11 @@ public inline fun <R : Comparable<R>> IntArray.isSortedBy(crossinline selector: 
  * @sample samples.generated.issorted.IsSortedLongArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> LongArray.isSortedBy(crossinline selector: (Long) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> LongArray.isSortedBy(selector: (Long) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5816,8 +5831,11 @@ public inline fun <R : Comparable<R>> LongArray.isSortedBy(crossinline selector:
  * @sample samples.generated.issorted.IsSortedFloatArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> FloatArray.isSortedBy(crossinline selector: (Float) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> FloatArray.isSortedBy(selector: (Float) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5833,8 +5851,11 @@ public inline fun <R : Comparable<R>> FloatArray.isSortedBy(crossinline selector
  * @sample samples.generated.issorted.IsSortedDoubleArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> DoubleArray.isSortedBy(crossinline selector: (Double) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> DoubleArray.isSortedBy(selector: (Double) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5850,8 +5871,11 @@ public inline fun <R : Comparable<R>> DoubleArray.isSortedBy(crossinline selecto
  * @sample samples.generated.issorted.IsSortedBooleanArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> BooleanArray.isSortedBy(crossinline selector: (Boolean) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> BooleanArray.isSortedBy(selector: (Boolean) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5867,8 +5891,11 @@ public inline fun <R : Comparable<R>> BooleanArray.isSortedBy(crossinline select
  * @sample samples.generated.issorted.IsSortedCharArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> CharArray.isSortedBy(crossinline selector: (Char) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> CharArray.isSortedBy(selector: (Char) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -5885,8 +5912,11 @@ public inline fun <R : Comparable<R>> CharArray.isSortedBy(crossinline selector:
  * @sample samples.generated.issorted.IsSortedArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <T, R : Comparable<R>> Array<out T>.isSortedByDescending(crossinline selector: (T) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <T, R : Comparable<R>> Array<out T>.isSortedByDescending(selector: (T) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -5903,8 +5933,11 @@ public inline fun <T, R : Comparable<R>> Array<out T>.isSortedByDescending(cross
  * @sample samples.generated.issorted.IsSortedByteArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> ByteArray.isSortedByDescending(crossinline selector: (Byte) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> ByteArray.isSortedByDescending(selector: (Byte) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -5921,8 +5954,11 @@ public inline fun <R : Comparable<R>> ByteArray.isSortedByDescending(crossinline
  * @sample samples.generated.issorted.IsSortedShortArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> ShortArray.isSortedByDescending(crossinline selector: (Short) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> ShortArray.isSortedByDescending(selector: (Short) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -5939,8 +5975,11 @@ public inline fun <R : Comparable<R>> ShortArray.isSortedByDescending(crossinlin
  * @sample samples.generated.issorted.IsSortedIntArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> IntArray.isSortedByDescending(crossinline selector: (Int) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> IntArray.isSortedByDescending(selector: (Int) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -5957,8 +5996,11 @@ public inline fun <R : Comparable<R>> IntArray.isSortedByDescending(crossinline 
  * @sample samples.generated.issorted.IsSortedLongArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> LongArray.isSortedByDescending(crossinline selector: (Long) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> LongArray.isSortedByDescending(selector: (Long) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -5975,8 +6017,11 @@ public inline fun <R : Comparable<R>> LongArray.isSortedByDescending(crossinline
  * @sample samples.generated.issorted.IsSortedFloatArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> FloatArray.isSortedByDescending(crossinline selector: (Float) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> FloatArray.isSortedByDescending(selector: (Float) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -5993,8 +6038,11 @@ public inline fun <R : Comparable<R>> FloatArray.isSortedByDescending(crossinlin
  * @sample samples.generated.issorted.IsSortedDoubleArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> DoubleArray.isSortedByDescending(crossinline selector: (Double) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> DoubleArray.isSortedByDescending(selector: (Double) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -6011,8 +6059,11 @@ public inline fun <R : Comparable<R>> DoubleArray.isSortedByDescending(crossinli
  * @sample samples.generated.issorted.IsSortedBooleanArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> BooleanArray.isSortedByDescending(crossinline selector: (Boolean) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> BooleanArray.isSortedByDescending(selector: (Boolean) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -6029,8 +6080,11 @@ public inline fun <R : Comparable<R>> BooleanArray.isSortedByDescending(crossinl
  * @sample samples.generated.issorted.IsSortedCharArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
-public inline fun <R : Comparable<R>> CharArray.isSortedByDescending(crossinline selector: (Char) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> CharArray.isSortedByDescending(selector: (Char) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**

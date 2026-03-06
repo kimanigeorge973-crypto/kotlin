@@ -2846,8 +2846,11 @@ public fun UShortArray.isSorted(): Boolean {
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> UIntArray.isSortedBy(crossinline selector: (UInt) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> UIntArray.isSortedBy(selector: (UInt) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -2864,8 +2867,11 @@ public inline fun <R : Comparable<R>> UIntArray.isSortedBy(crossinline selector:
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> ULongArray.isSortedBy(crossinline selector: (ULong) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> ULongArray.isSortedBy(selector: (ULong) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -2882,8 +2888,11 @@ public inline fun <R : Comparable<R>> ULongArray.isSortedBy(crossinline selector
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> UByteArray.isSortedBy(crossinline selector: (UByte) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> UByteArray.isSortedBy(selector: (UByte) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -2900,8 +2909,11 @@ public inline fun <R : Comparable<R>> UByteArray.isSortedBy(crossinline selector
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> UShortArray.isSortedBy(crossinline selector: (UShort) -> R?): Boolean {
-    return isSortedWith(compareBy(selector))
+public inline fun <R : Comparable<R>> UShortArray.isSortedBy(selector: (UShort) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+    }
+    return true
 }
 
 /**
@@ -2919,8 +2931,11 @@ public inline fun <R : Comparable<R>> UShortArray.isSortedBy(crossinline selecto
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> UIntArray.isSortedByDescending(crossinline selector: (UInt) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> UIntArray.isSortedByDescending(selector: (UInt) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -2938,8 +2953,11 @@ public inline fun <R : Comparable<R>> UIntArray.isSortedByDescending(crossinline
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> ULongArray.isSortedByDescending(crossinline selector: (ULong) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> ULongArray.isSortedByDescending(selector: (ULong) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -2957,8 +2975,11 @@ public inline fun <R : Comparable<R>> ULongArray.isSortedByDescending(crossinlin
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> UByteArray.isSortedByDescending(crossinline selector: (UByte) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> UByteArray.isSortedByDescending(selector: (UByte) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**
@@ -2976,8 +2997,11 @@ public inline fun <R : Comparable<R>> UByteArray.isSortedByDescending(crossinlin
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
-public inline fun <R : Comparable<R>> UShortArray.isSortedByDescending(crossinline selector: (UShort) -> R?): Boolean {
-    return isSortedWith(compareByDescending(selector))
+public inline fun <R : Comparable<R>> UShortArray.isSortedByDescending(selector: (UShort) -> R?): Boolean {
+    for (i in 1..lastIndex) {
+        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+    }
+    return true
 }
 
 /**

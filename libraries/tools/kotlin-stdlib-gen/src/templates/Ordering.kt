@@ -718,7 +718,7 @@ object Ordering : TemplateGroupBase() {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    val f_isSortedBy = fn("isSortedBy(crossinline selector: (T) -> R?)") {
+    val f_isSortedBy = fn("isSortedBy(selector: (T) -> R?)") {
         includeDefault()
         include(ArraysOfUnsigned)
     } builder {
@@ -741,11 +741,31 @@ object Ordering : TemplateGroupBase() {
         }
         appendIterationOrderNote()
         sample(isSortedSampleRef("isSortedBy"))
-        body { "return isSortedWith(compareBy(selector))" }
+        body {
+            """
+            val iterator = iterator()
+            if (!iterator.hasNext()) return true
+            var currentValue = selector(iterator.next())
+            while (iterator.hasNext()) {
+                val nextValue = selector(iterator.next())
+                if (compareValues(currentValue, nextValue) > 0) return false
+                currentValue = nextValue
+            }
+            return true
+            """
+        }
+        body(ArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned) {
+            """
+            for (i in 1..lastIndex) {
+                if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+            }
+            return true
+            """
+        }
     }
 
     @Suppress("UNUSED_PARAMETER")
-    val f_isSortedByDescending = fn("isSortedByDescending(crossinline selector: (T) -> R?)") {
+    val f_isSortedByDescending = fn("isSortedByDescending(selector: (T) -> R?)") {
         includeDefault()
         include(ArraysOfUnsigned)
     } builder {
@@ -769,6 +789,26 @@ object Ordering : TemplateGroupBase() {
         }
         appendIterationOrderNote()
         sample(isSortedSampleRef("isSortedByDescending"))
-        body { "return isSortedWith(compareByDescending(selector))" }
+        body {
+            """
+            val iterator = iterator()
+            if (!iterator.hasNext()) return true
+            var currentValue = selector(iterator.next())
+            while (iterator.hasNext()) {
+                val nextValue = selector(iterator.next())
+                if (compareValues(currentValue, nextValue) < 0) return false
+                currentValue = nextValue
+            }
+            return true
+            """
+        }
+        body(ArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned) {
+            """
+            for (i in 1..lastIndex) {
+                if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+            }
+            return true
+            """
+        }
     }
 }
