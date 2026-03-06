@@ -107,16 +107,17 @@ fun compileToLoweredIr(
         // Sort dependencies after IR linkage.
         val sortedModuleDependencies = irLinker.moduleDependencyTracker.reverseTopoOrder(moduleDependencies)
 
-        when (mainModule) {
+        val allModules = when (mainModule) {
             is MainModule.SourceFiles -> sortedModuleDependencies.all + moduleFragment
             is MainModule.Klib -> sortedModuleDependencies.all
-        }.also { allModules ->
-            allModules.forEach { it.patchDeclarationParents() }
-
-            irLinker.postProcess(inOrAfterLinkageStep = true)
-            irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
-            irLinker.clear()
         }
+        allModules.forEach { it.patchDeclarationParents() }
+
+        irLinker.postProcess(inOrAfterLinkageStep = true)
+        irLinker.checkNoUnboundSymbols(symbolTable, "at the end of IR linkage process")
+        irLinker.clear()
+
+        allModules
     }
 
     for (module in allModules)
