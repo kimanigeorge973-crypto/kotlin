@@ -62,7 +62,7 @@ fun <T: Any> TypeCrossfade(state: T, content: @[ExtensionFunctionType] Function4
           traceEventStart(<>, %dirty, -1, <>)
         }
         with(BoxScope) {
-          content(%this%with, it, %composer, BoxScope%stableprop or 0b1000 and %dirty shl 0b0011 or 0b01110000 and %dirty shl 0b0011)
+          content(%this%with, it, %composer, %stable or 0b1000 and %dirty shl 0b0011 or 0b01110000 and %dirty shl 0b0011)
         }
         if (isTraceInProgress()) {
           traceEventEnd()
@@ -89,7 +89,7 @@ fun App(%composer: Composer?, %changed: Int) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %changed, -1, <>)
     }
-    TypeCrossfade(A(), ComposableSingletons%TestKt.lambda%-1203334793, %composer, 0b00110000 or States_A%stableprop)
+    TypeCrossfade(A(), ComposableSingletons%TestKt.lambda%-1203334793, %composer, 0b00110000 or %stable)
     if (isTraceInProgress()) {
       traceEventEnd()
     }

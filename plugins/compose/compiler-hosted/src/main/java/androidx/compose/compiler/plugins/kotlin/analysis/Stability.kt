@@ -195,6 +195,8 @@ private fun IrAnnotationContainer.stabilityParamBitmask(): Int? =
 private data class SymbolForAnalysis(
     val symbol: IrClassifierSymbol,
     val typeParameters: List<IrTypeArgument?>,
+    /* The file containing the element that depends on the stability of [symbol]. */
+    val fileContainingDependent: IrFile?,
 )
 
 class StabilityInferencer(
@@ -204,7 +206,7 @@ class StabilityInferencer(
 ) {
     private val externalTypeMatcherCollection = FqNameMatcherCollection(externalStableTypeMatchers)
 
-    private val cache = mutableMapOf<Pair<SymbolForAnalysis, IrFile?>, Stability>()
+    private val cache = mutableMapOf<SymbolForAnalysis, Stability>()
 
     /**
      * Returns the stability of [irType].
@@ -229,28 +231,20 @@ class StabilityInferencer(
     ): Stability {
         val symbol = declaration.symbol
         val typeArguments = declaration.typeParameters.map { substitutions[it.symbol] }
-        val fullSymbol = SymbolForAnalysis(symbol, typeArguments)
+        val fullSymbol = SymbolForAnalysis(symbol, typeArguments, fileContainingDependent)
 
-        val cacheKey = Pair(fullSymbol, fileContainingDependent)
-        if (cacheKey in cache) return cache[cacheKey]!!
+        if (fullSymbol in cache) return cache[fullSymbol]!!
 
-        val result = stabilityOf(declaration, fullSymbol, substitutions, currentlyAnalyzing, fileContainingDependent)
-        cache[cacheKey] = result
+        val result = stabilityOf(declaration, fullSymbol, substitutions, currentlyAnalyzing)
+        cache[fullSymbol] = result
         return result
     }
 
-    /**
-     * Returns the stability of [declaration].
-     *
-     * @param fileContainingDependent The file containing the element that depends on the returned
-     * result.
-     */
     private fun stabilityOf(
         declaration: IrClass,
         symbol: SymbolForAnalysis,
         substitutions: Map<IrTypeParameterSymbol, IrTypeArgument>,
         currentlyAnalyzing: Set<SymbolForAnalysis>,
-        fileContainingDependent: IrFile?,
     ): Stability {
         if (currentlyAnalyzing.contains(symbol)) return Stability.Unstable
         if (declaration.hasStableMarkedDescendant()) return Stability.Stable
@@ -266,6 +260,7 @@ class StabilityInferencer(
         val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
         val typeParameters = declaration.typeParameters
         val fileContainingDeclaration = declaration.fileOrNull
+        val fileContainingDependent = symbol.fileContainingDependent
         // To support incremental compilation, we are forced to use runtime stability when
         // [declaration] is `public` or `internal`, is contained in a different file than
         // [fileContainingDependent], and has a stability bitmask attached to it.
@@ -458,7 +453,7 @@ class StabilityInferencer(
             type.isTypeParameter() -> {
                 val classifier = type.classifierOrFail
                 val arg = substitutions[classifier]
-                val symbol = SymbolForAnalysis(classifier, emptyList())
+                val symbol = SymbolForAnalysis(classifier, emptyList(), fileContainingDependent)
                 if (arg != null && symbol !in currentlyAnalyzing) {
                     stabilityOf(arg, substitutions, currentlyAnalyzing + symbol, fileContainingDependent)
                 } else {

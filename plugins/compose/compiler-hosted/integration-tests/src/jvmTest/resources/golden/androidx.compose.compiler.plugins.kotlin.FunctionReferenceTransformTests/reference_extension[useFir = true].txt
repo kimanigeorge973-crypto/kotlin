@@ -38,7 +38,7 @@ fun Ref(cls: Cls, content: Function3<Int, Composer, Int, Unit>, %composer: Compo
       }
       sourceInformationMarkerEnd(%composer)
       tmp0_group
-    }, %composer, Cls%stableprop or 0b1110 and %dirty)
+    }, %composer, %stable or 0b1110 and %dirty)
     if (isTraceInProgress()) {
       traceEventEnd()
     }

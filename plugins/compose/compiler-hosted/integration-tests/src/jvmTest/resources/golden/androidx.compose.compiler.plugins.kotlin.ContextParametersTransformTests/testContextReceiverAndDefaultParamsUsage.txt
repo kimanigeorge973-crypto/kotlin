@@ -37,10 +37,10 @@ fun Parent(%composer: Composer?, %changed: Int) {
       traceEventStart(<>, %changed, -1, <>)
     }
     with(Foo()) {
-      Test(%this%with, null, 0, %composer, Foo%stableprop, 0b0011)
-      Test(%this%with, "a", 0, %composer, 0b00110000 or Foo%stableprop, 0b0010)
-      Test(%this%with, null, 101, %composer, 0b000110000000 or Foo%stableprop, 0b0001)
-      Test(%this%with, "Yes", 10, %composer, 0b000110110000 or Foo%stableprop, 0)
+      Test(%this%with, null, 0, %composer, %stable, 0b0011)
+      Test(%this%with, "a", 0, %composer, 0b00110000 or %stable, 0b0010)
+      Test(%this%with, null, 101, %composer, 0b000110000000 or %stable, 0b0001)
+      Test(%this%with, "Yes", 10, %composer, 0b000110110000 or %stable, 0)
     }
     if (isTraceInProgress()) {
       traceEventEnd()

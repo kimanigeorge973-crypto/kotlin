@@ -569,7 +569,7 @@ abstract class AbstractComposeLowering(
     )
 
     protected fun irForLoop(
-        parentFunction: IrFunction,
+        parent: IrDeclarationParent,
         elementType: IrType,
         subject: IrExpression,
         loopBody: (IrValueDeclaration) -> IrExpression,
@@ -626,7 +626,7 @@ abstract class AbstractComposeLowering(
                         name = "value",
                         irType = elementType
                     ).also {
-                        it.parent = parentFunction
+                        it.parent = parent
                     }
                     condition = irCall(
                         symbol = hasNextSymbol.symbol,
@@ -887,7 +887,7 @@ abstract class AbstractComposeLowering(
     }
 
     private fun IrClass.buildStabilityPropJvm(buildGetter: Boolean): IrProperty {
-        val propName = this.uniqueStabilityPropertyName()
+        val propName = ComposeNames.StabilityFlag
         val existingProp = declarations.firstOrNull {
             it is IrProperty && it.name == propName
         } as? IrProperty

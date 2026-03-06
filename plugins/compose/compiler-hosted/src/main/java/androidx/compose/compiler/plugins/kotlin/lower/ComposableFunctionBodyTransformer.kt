@@ -1654,7 +1654,7 @@ class ComposableFunctionBodyTransformer(
                 )
                 statements.add(
                     irForLoop(
-                        parentFunction = scope.function,
+                        parent = scope.function,
                         varargElementType,
                         irGet(param)
                     ) { loopVar ->
