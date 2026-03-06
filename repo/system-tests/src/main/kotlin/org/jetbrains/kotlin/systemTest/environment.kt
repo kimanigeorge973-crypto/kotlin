@@ -38,7 +38,7 @@ const val SYSTEM_TEST_AFFECTED_KEY = "system.test.affectedSystems"
 const val SYSTEM_TEST_AFFECTED_ENV_KEY = "SYSTEM_TEST_AFFECTED_SYSTEMS"
 
 val currentAffectedTestSystems: Set<TestSystem>? = run {
-    val raw = System.getenv(SYSTEM_TEST_AFFECTED_ENV_KEY) ?: System.getProperty(SYSTEM_TEST_AFFECTED_KEY) ?: return@run null
+    val raw = /*System.getenv(SYSTEM_TEST_AFFECTED_ENV_KEY) ?: */ System.getProperty(SYSTEM_TEST_AFFECTED_KEY) ?: return@run null
     if (raw.isEmpty()) return@run emptySet()
     return@run raw.split(";").map { TestSystem.valueOf(it) }.toSet()
 }

@@ -124,7 +124,6 @@ internal fun Project.createGeneralTestTask(
 ): TaskProvider<Test> {
 
     project.dependencies {
-        "testImplementation"(project(":repo:system-tests"))
         "testRuntimeOnly"(
             if (jUnitMode == JUnitMode.JUnit5) project(":compiler:tests-mutes:mutes-junit5")
             else project(":compiler:tests-mutes:mutes-junit4")

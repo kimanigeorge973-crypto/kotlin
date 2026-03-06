@@ -144,7 +144,6 @@ dependencies {
     testCompileOnly(libs.intellij.asm)
 
     testImplementation(project(":compose-compiler-gradle-plugin"))
-    testImplementation(project(":repo:system-tests"))
 }
 
 tasks.register<Delete>("cleanTestKitCache") {

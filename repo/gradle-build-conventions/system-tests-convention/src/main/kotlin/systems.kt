@@ -1,3 +1,5 @@
+package org.jetbrains.kotlin.systemTest.gradle
+
 import org.gradle.api.Project
 import org.jetbrains.kotlin.systemTest.TestSystem
 

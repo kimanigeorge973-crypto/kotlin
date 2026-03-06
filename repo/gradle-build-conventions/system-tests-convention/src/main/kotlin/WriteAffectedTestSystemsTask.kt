@@ -1,9 +1,14 @@
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.systemTest.SYSTEM_TEST_AFFECTED_KEY
+import org.jetbrains.kotlin.systemTest.gradle.affectedSystemsFile
+import org.jetbrains.kotlin.systemTest.gradle.affectedTestSystemsService
+import org.jetbrains.kotlin.systemTest.gradle.diffFile
+import org.jetbrains.kotlin.systemTest.gradle.featureBranchDiffService
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.name

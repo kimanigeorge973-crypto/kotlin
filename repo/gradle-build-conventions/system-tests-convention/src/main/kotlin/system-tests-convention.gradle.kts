@@ -1,5 +1,11 @@
 import org.gradle.api.internal.tasks.testing.junit.JUnitTestFramework
+import org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestFramework
 import org.jetbrains.kotlin.systemTest.*
+import org.jetbrains.kotlin.systemTest.gradle.SystemTestExtension
+import org.jetbrains.kotlin.systemTest.gradle.affectedTestSystemsService
+import org.jetbrains.kotlin.systemTest.gradle.testSystem
+
+val extension = extensions.create<SystemTestExtension>("systemTests")
 
 if (project.isSystemTestFederationEnabled.orNull == true) {
     val systemTestRuntime = configurations.detachedConfiguration(dependencies.project(":repo:system-tests")).apply {
@@ -9,7 +15,7 @@ if (project.isSystemTestFederationEnabled.orNull == true) {
     }
 
     tasks.withType<Test>().configureEach {
-        val currentTestSystem = project.testSystem
+        val currentTestSystem = project.provider { TestSystem.Unknown } // project.testSystem
         val systemTestMode = project.systemTestMode
         val affectedTestSystems = project.affectedTestSystems
 
@@ -26,6 +32,18 @@ if (project.isSystemTestFederationEnabled.orNull == true) {
             systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 
             if (systemTestMode.get() == SystemTestMode.Smoke) {
+                val testFramework = testFramework
+                if (testFramework is JUnitPlatformTestFramework) {
+                    testFramework.options.includeTags("smoke")
+                    affectedTestSystems.get().forEach { testSystem ->
+                        testFramework.options.includeTags("contract:${testSystem.name}")
+                    }
+                }
+
+                if (testFramework is JUnitTestFramework) {
+                    testFramework.options.includeCategories("org.jetbrains.kotlin.systemTest.SmokeTest")
+                }
+
                 println("##teamcity[addBuildTag 'System Test Mode: Smoke']")
                 affectedTestSystems.get().forEach { testSystem ->
                     println("##teamcity[addBuildTag 'Affected: $testSystem']")
@@ -41,12 +59,19 @@ if (project.isSystemTestFederationEnabled.orNull == true) {
             /*
             When running in smoke test mode, a given test task might actually not provide any smoke test
             */
-            failOnNoDiscoveredTests.value(systemTestMode.map { it != SystemTestMode.Smoke })
 
-            val testFramework = testFramework
-            if(testFramework is JUnitTestFramework) {
-                testFramework.options.includeCategories("org.jetbrains.kotlin.systemTest.SmokeTest")
-            }
+            //doFirst {
+            //   failOnNoDiscoveredTests.value(systemTestMode.map { it != SystemTestMode.Smoke })
+            // }
+        }
+    }
+}
+
+afterEvaluate {
+    if (extension.defaultDependencyEnabled.get()) {
+        dependencies {
+            configurations.findByName("testImplementation")?.name(project(":repo:system-tests"))
+            configurations.findByName("jvmTestImplementation")?.name(project(":repo:system-tests"))
         }
     }
 }

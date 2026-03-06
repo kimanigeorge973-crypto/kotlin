@@ -1,8 +1,10 @@
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
+import org.gradle.api.provider.*
 import org.gradle.api.tasks.testing.Test
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.systemTest.*
+import org.jetbrains.kotlin.systemTest.gradle.affectedTestSystemsService
+import org.jetbrains.kotlin.systemTest.gradle.testSystem
 
 /*
  * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
@@ -16,15 +18,40 @@ fun Test.withSmokeTestPattern(@Language("RegExp") pattern: String) {
 
 val Project.systemTestMode: Provider<SystemTestMode>
     get() {
-        val currentTestSystem = project.testSystem
-        return provider { currentSystemTestModeOrNull }.orElse(project.affectedTestSystems.map { affectedTestSystems ->
-            if (currentTestSystem in affectedTestSystems) SystemTestMode.Full else SystemTestMode.Smoke
-        })
+        val myTestSystem = project.testSystem
+        return project.affectedTestSystems.map { affectedTestSystems ->
+            if (myTestSystem in affectedTestSystems) {
+                SystemTestMode.Full
+            } else SystemTestMode.Smoke
+        }
+
     }
 
 val Project.affectedTestSystems: Provider<Set<TestSystem>>
-    get() = provider { currentAffectedTestSystems }.orElse(project.affectedTestSystemsService.map { it.affectedTestSystems })
+    get() {
+        return providers.environmentVariable(SYSTEM_TEST_AFFECTED_ENV_KEY)
+            .map { it.split(";").map { TestSystem.valueOf(it) }.toSet() }
+            .orElse(project.affectedTestSystemsService.map { it.affectedTestSystems })
+
+        /*
+        providers.of(AffectedTestSystemValueSource::class.java) {
+            parameters.service.set(project.affectedTestSystemsService.map { it.affectedTestSystems })
+        }*/
+    }
+
 
 val Project.isSystemTestFederationEnabled: Provider<Boolean>
     get() = provider { currentSystemTestFederationEnabledOrNull }
         .orElse(project.providers.gradleProperty(SYSTEM_TEST_FEDERATION_ENABLED_KEY).map { it.toBoolean() })
+
+
+abstract class AffectedTestSystemValueSource : ValueSource<Set<TestSystem>, AffectedTestSystemValueSource.Params> {
+    interface Params : ValueSourceParameters {
+        val service: SetProperty<TestSystem>
+    }
+
+    override fun obtain(): Set<TestSystem>? {
+        val raw = System.getenv(SYSTEM_TEST_AFFECTED_ENV_KEY)
+        return raw?.split(";")?.map { TestSystem.valueOf(it) }?.toSet() ?: parameters.service.get()
+    }
+}
