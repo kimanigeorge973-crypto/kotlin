@@ -176,7 +176,7 @@ fun TestConfigurationBuilder.commonHandlersForCodegenTest(includeK1Handlers: Boo
 /**
  * Adds a handler which checks that there are no compilation errors reported at the K1 frontend step
  */
-fun TestStepBuilder.HandlersStepBuilder.FirstPhase<ClassicFrontendOutputArtifact, FrontendKinds.ClassicFrontend>.commonClassicFrontendHandlersForCodegenTest() {
+fun TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<ClassicFrontendOutputArtifact, FrontendKinds.ClassicFrontend>.commonClassicFrontendHandlersForCodegenTest() {
     useHandlers(
         ::NoCompilationErrorsHandler,
     )
@@ -185,7 +185,7 @@ fun TestStepBuilder.HandlersStepBuilder.FirstPhase<ClassicFrontendOutputArtifact
 /**
  * Adds a handler which checks that there are no compilation errors reported at the K2 frontend step
  */
-fun TestStepBuilder.HandlersStepBuilder.FirstPhase<FirOutputArtifact, FrontendKinds.FIR>.commonFirHandlersForCodegenTest() {
+fun TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<FirOutputArtifact, FrontendKinds.FIR>.commonFirHandlersForCodegenTest() {
     useHandlers(
         ::NoFirCompilationErrorsHandler,
     )
@@ -194,7 +194,7 @@ fun TestStepBuilder.HandlersStepBuilder.FirstPhase<FirOutputArtifact, FrontendKi
 /**
  * Add JVM artifact handlers usually used in codegen tests
  */
-fun TestStepBuilder.HandlersStepBuilder.FirstPhase<BinaryArtifacts.Jvm, ArtifactKinds.Jvm>.commonBackendHandlersForCodegenTest(includeNoCompilationErrorsHandler: Boolean = true) {
+fun TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<BinaryArtifacts.Jvm, ArtifactKinds.Jvm>.commonBackendHandlersForCodegenTest(includeNoCompilationErrorsHandler: Boolean = true) {
     useHandlers(
         ::JvmBackendDiagnosticsHandler,
         ::DxCheckerHandler,

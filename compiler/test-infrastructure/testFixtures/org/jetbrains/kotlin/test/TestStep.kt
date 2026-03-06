@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.test
 
-import org.jetbrains.kotlin.test.FirstPhaseTestRunner.Companion.shouldRun
+import org.jetbrains.kotlin.test.NonGroupingTestRunner.Companion.shouldRun
 import org.jetbrains.kotlin.test.model.*
 
 sealed class TestStep<InputArtifact, OutputArtifact>
@@ -24,7 +24,7 @@ sealed class TestStep<InputArtifact, OutputArtifact>
         val handlers: List<AnalysisHandlerBase<InputArtifact>>
     }
 
-    sealed class FirstPhaseStep<InputArtifact, OutputArtifact> : TestStep<InputArtifact, OutputArtifact>()
+    sealed class NonGroupingStep<InputArtifact, OutputArtifact> : TestStep<InputArtifact, OutputArtifact>()
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   OutputArtifact : ResultingArtifact<OutputArtifact> {
 
@@ -40,7 +40,7 @@ sealed class TestStep<InputArtifact, OutputArtifact>
 
         class FacadeStep<InputArtifact, OutputArtifact>(
             override val facade: AbstractTestFacade<InputArtifact, OutputArtifact>,
-        ) : FirstPhaseStep<InputArtifact, OutputArtifact>(), TestStep.FacadeStep<InputArtifact, OutputArtifact>
+        ) : NonGroupingStep<InputArtifact, OutputArtifact>(), TestStep.FacadeStep<InputArtifact, OutputArtifact>
                 where InputArtifact : ResultingArtifact<InputArtifact>,
                       OutputArtifact : ResultingArtifact<OutputArtifact> {
             override val inputArtifactKind: TestArtifactKind<InputArtifact>
@@ -72,7 +72,7 @@ sealed class TestStep<InputArtifact, OutputArtifact>
         class HandlersStep<InputArtifact : ResultingArtifact<InputArtifact>>(
             override val inputArtifactKind: TestArtifactKind<InputArtifact>,
             override val handlers: List<AnalysisHandler<InputArtifact>>
-        ) : FirstPhaseStep<InputArtifact, Nothing>(), TestStep.HandlersStep<InputArtifact> {
+        ) : NonGroupingStep<InputArtifact, Nothing>(), TestStep.HandlersStep<InputArtifact> {
             init {
                 for (handler in handlers) {
                     require(handler.artifactKind == inputArtifactKind) {
@@ -110,15 +110,15 @@ sealed class TestStep<InputArtifact, OutputArtifact>
         }
     }
 
-    sealed class SecondPhaseStep<InputArtifact, OutputArtifact> : TestStep<InputArtifact, OutputArtifact>()
+    sealed class GroupingPhaseStep<InputArtifact, OutputArtifact> : TestStep<InputArtifact, OutputArtifact>()
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   OutputArtifact : ResultingArtifact<OutputArtifact> {
 
         abstract fun process(inputArtifact: InputArtifact, thereWereExceptionsOnPreviousSteps: Boolean): StepResult<out OutputArtifact>
 
         class FacadeStep<InputArtifact, OutputArtifact>(
-            override val facade: AbstractSecondPhaseTestFacade<InputArtifact, OutputArtifact>,
-        ) : SecondPhaseStep<InputArtifact, OutputArtifact>(), TestStep.FacadeStep<InputArtifact, OutputArtifact>
+            override val facade: AbstractGroupingPhaseTestFacade<InputArtifact, OutputArtifact>,
+        ) : GroupingPhaseStep<InputArtifact, OutputArtifact>(), TestStep.FacadeStep<InputArtifact, OutputArtifact>
                 where InputArtifact : ResultingArtifact<InputArtifact>,
                       OutputArtifact : ResultingArtifact<OutputArtifact> {
             override val inputArtifactKind: TestArtifactKind<InputArtifact>
@@ -133,7 +133,7 @@ sealed class TestStep<InputArtifact, OutputArtifact>
                     facade.transform(inputArtifact) ?: return StepResult.NoArtifactFromFacade
                 } catch (e: Throwable) {
                     // TODO: remove inheritors of WrappedException.FromFacade
-                    return StepResult.ErrorFromFacade(WrappedException.FromSecondPhaseFacade(e, facade))
+                    return StepResult.ErrorFromFacade(WrappedException.FromGroupingFacade(e, facade))
                 }
                 return StepResult.Artifact(outputArtifact)
             }
@@ -145,8 +145,8 @@ sealed class TestStep<InputArtifact, OutputArtifact>
 
         class HandlersStep<InputArtifact : ResultingArtifact<InputArtifact>>(
             override val inputArtifactKind: TestArtifactKind<InputArtifact>,
-            override val handlers: List<SecondPhaseHandler<InputArtifact>>
-        ) : SecondPhaseStep<InputArtifact, Nothing>(), TestStep.HandlersStep<InputArtifact> {
+            override val handlers: List<GroupingPhaseHandler<InputArtifact>>
+        ) : GroupingPhaseStep<InputArtifact, Nothing>(), TestStep.HandlersStep<InputArtifact> {
             init {
                 for (handler in handlers) {
                     require(handler.artifactKind == inputArtifactKind) {
@@ -166,7 +166,7 @@ sealed class TestStep<InputArtifact, OutputArtifact>
                     try {
                         outputHandler.processArtifact(inputArtifact)
                     } catch (e: Throwable) {
-                        exceptions += WrappedException.FromSecondPhaseHandler(e, outputHandler)
+                        exceptions += WrappedException.FromGroupingHandler(e, outputHandler)
                         if (outputHandler.failureDisablesNextSteps) {
                             shouldRunNextSteps = false
                         }

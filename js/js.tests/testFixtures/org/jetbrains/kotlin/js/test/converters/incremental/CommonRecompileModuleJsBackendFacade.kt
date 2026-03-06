@@ -9,11 +9,11 @@ import com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.cli.common.disposeRootInWriteAction
 import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.test.TestInfrastructureInternals
-import org.jetbrains.kotlin.test.FirstPhaseTestRunner
+import org.jetbrains.kotlin.test.NonGroupingTestRunner
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.builders.testConfiguration
 import org.jetbrains.kotlin.test.directives.JsEnvironmentConfigurationDirectives.RECOMPILE
-import org.jetbrains.kotlin.test.impl.FirstPhaseTestConfigurationImpl
+import org.jetbrains.kotlin.test.impl.NonGroupingPhaseTestConfigurationImpl
 import org.jetbrains.kotlin.test.impl.testConfiguration
 import org.jetbrains.kotlin.test.model.*
 import org.jetbrains.kotlin.test.services.*
@@ -37,7 +37,7 @@ abstract class CommonRecompileModuleJsBackendFacade<R : ResultingArtifact.Fronte
     override fun transform(module: TestModule, inputArtifact: BinaryArtifacts.Js): BinaryArtifacts.Js {
         val filesToRecompile = module.files.filter { RECOMPILE in it.directives }
 
-        val builder = (testServices.testConfiguration as FirstPhaseTestConfigurationImpl).originalBuilder
+        val builder = (testServices.testConfiguration as NonGroupingPhaseTestConfigurationImpl).originalBuilder
         val incrementalConfiguration = testConfiguration(builder.testDataPath) {
             assertions = builder.assertions
             testInfo = builder.testInfo
@@ -65,7 +65,7 @@ abstract class CommonRecompileModuleJsBackendFacade<R : ResultingArtifact.Fronte
             },
             moduleStructure.originalTestDataFiles
         )
-        val incrementalRunner = FirstPhaseTestRunner(incrementalConfiguration)
+        val incrementalRunner = NonGroupingTestRunner(incrementalConfiguration)
         val incrementalArtifactsProvider = testServices.artifactsProvider.copy().also {
             it.unregisterAllArtifacts(module)
         }

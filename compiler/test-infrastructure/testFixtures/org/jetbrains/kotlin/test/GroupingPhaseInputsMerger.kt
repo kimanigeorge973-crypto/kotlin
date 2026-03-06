@@ -15,13 +15,13 @@ import org.jetbrains.kotlin.test.services.TestService
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.testInfo
 
-class SecondPhaseInputsMerger(val testServices: TestServices, val workers: List<Worker>) {
-    fun merge(firstPhaseOutputs: List<FirstPhaseOutput>): SecondPhaseInputArtifact {
+class GroupingPhaseInputsMerger(val testServices: TestServices, val workers: List<Worker>) {
+    fun merge(nonGroupingPhaseOutputs: List<NonGroupingPhaseOutput>): GroupingPhaseInputArtifact {
         val secondPhaseConfiguration = CompilerConfiguration.create(messageCollector = MessageCollector.NONE)
         workers.forEach { worker ->
-            worker.process(secondPhaseConfiguration, firstPhaseOutputs.map { it.testServices })
+            worker.process(secondPhaseConfiguration, nonGroupingPhaseOutputs.map { it.testServices })
         }
-        return SecondPhaseInputArtifact(secondPhaseConfiguration, firstPhaseOutputs)
+        return GroupingPhaseInputArtifact(secondPhaseConfiguration, nonGroupingPhaseOutputs)
     }
 
     abstract class Worker(val testServices: TestServices) {
@@ -29,7 +29,7 @@ class SecondPhaseInputsMerger(val testServices: TestServices, val workers: List<
     }
 }
 
-data class FirstPhaseOutput(
+data class NonGroupingPhaseOutput(
     val testServices: TestServices,
     val catchingExecutor: CatchingExecutor,
 ) {
@@ -41,17 +41,17 @@ data class FirstPhaseOutput(
 }
 
 
-class SecondPhaseInputArtifact(
+class GroupingPhaseInputArtifact(
     val secondPhaseConfiguration: CompilerConfiguration,
-    val firstPhaseOutputs: List<FirstPhaseOutput>
-) : ResultingArtifact<SecondPhaseInputArtifact>() {
-    object Kind : TestArtifactKind<SecondPhaseInputArtifact>("SecondPhaseInputArtifact")
+    val nonGroupingPhaseOutputs: List<NonGroupingPhaseOutput>
+) : ResultingArtifact<GroupingPhaseInputArtifact>() {
+    object Kind : TestArtifactKind<GroupingPhaseInputArtifact>("SecondPhaseInputArtifact")
 
     override val kind: Kind get() = Kind
 }
 
-class SecondStageInputsHolder(val firstPhaseOutputs: List<FirstPhaseOutput>) : TestService
+class GroupingPhaseInputsHolder(val nonGroupingPhaseOutputs: List<NonGroupingPhaseOutput>) : TestService
 
-private val TestServices.secondStageInputsHolder: SecondStageInputsHolder by TestServices.testServiceAccessor()
-val TestServices.secondPhaseInputs: List<FirstPhaseOutput>
-    get() = secondStageInputsHolder.firstPhaseOutputs
+private val TestServices.groupingPhaseInputsHolder: GroupingPhaseInputsHolder by TestServices.testServiceAccessor()
+val TestServices.groupingPhaseInputs: List<NonGroupingPhaseOutput>
+    get() = groupingPhaseInputsHolder.nonGroupingPhaseOutputs

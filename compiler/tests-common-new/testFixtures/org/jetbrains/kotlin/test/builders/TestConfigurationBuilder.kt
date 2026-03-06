@@ -9,8 +9,8 @@ import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.test.*
 import org.jetbrains.kotlin.test.backend.handlers.UpdateTestDataHandler
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
-import org.jetbrains.kotlin.test.impl.FirstPhaseTestConfigurationImpl
-import org.jetbrains.kotlin.test.impl.SecondPhaseTestConfigurationImpl
+import org.jetbrains.kotlin.test.impl.NonGroupingPhaseTestConfigurationImpl
+import org.jetbrains.kotlin.test.impl.GroupingPhaseTestConfigurationImpl
 import org.jetbrains.kotlin.test.model.*
 import org.jetbrains.kotlin.test.services.*
 import org.jetbrains.kotlin.util.PrivateForInline
@@ -195,15 +195,15 @@ sealed class OnePhaseTestConfigurationBuilderBase<
 }
 
 @OptIn(PrivateForInline::class)
-class FirstPhaseTestConfigurationBuilder :
-    OnePhaseTestConfigurationBuilderBase<FirstPhaseTestConfigurationBuilder, FirstPhaseTestConfiguration>() {
+class NonGroupingPhaseTestConfigurationBuilder :
+    OnePhaseTestConfigurationBuilderBase<NonGroupingPhaseTestConfigurationBuilder, NonGroupingPhaseTestConfiguration>() {
     lateinit var testInfo: KotlinTestInfo
     lateinit var startingArtifactFactory: (TestModule) -> ResultingArtifact<*>
 
     fun <I : ResultingArtifact<I>, O : ResultingArtifact<O>> facadeStep(
         facade: Constructor<AbstractTestFacade<I, O>>,
-    ): TestStepBuilder.FacadeStepBuilder.FirstPhase<I, O> {
-        return TestStepBuilder.FacadeStepBuilder.FirstPhase(facade).also {
+    ): TestStepBuilder.FacadeStepBuilder.NonGroupingPhase<I, O> {
+        return TestStepBuilder.FacadeStepBuilder.NonGroupingPhase(facade).also {
             steps.add(it)
         }
     }
@@ -211,11 +211,11 @@ class FirstPhaseTestConfigurationBuilder :
     inline fun <InputArtifact, InputArtifactKind> handlersStep(
         artifactKind: InputArtifactKind,
         compilationStage: CompilationStage,
-        init: TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>.() -> Unit,
-    ): TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>
+        init: TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>.() -> Unit,
+    ): TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   InputArtifactKind : TestArtifactKind<InputArtifact> {
-        return TestStepBuilder.HandlersStepBuilder.FirstPhase(artifactKind, compilationStage).also {
+        return TestStepBuilder.HandlersStepBuilder.NonGroupingPhase(artifactKind, compilationStage).also {
             it.init()
             steps += it
         }
@@ -225,8 +225,8 @@ class FirstPhaseTestConfigurationBuilder :
         name: String,
         artifactKind: InputArtifactKind,
         compilationStage: CompilationStage,
-        init: TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>.() -> Unit,
-    ): TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>
+        init: TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>.() -> Unit,
+    ): TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   InputArtifactKind : TestArtifactKind<InputArtifact> {
         val previouslyContainedStep = namedStepOfType<InputArtifact, InputArtifactKind>(name)
@@ -244,7 +244,7 @@ class FirstPhaseTestConfigurationBuilder :
         name: String,
         artifactKind: InputArtifactKind,
         skipMissingStep: Boolean = false,
-        init: TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>.() -> Unit,
+        init: TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>.() -> Unit,
     ) where InputArtifact : ResultingArtifact<InputArtifact>,
             InputArtifactKind : TestArtifactKind<InputArtifact> {
         val step = namedStepOfType<InputArtifact, InputArtifactKind>(name)
@@ -256,11 +256,11 @@ class FirstPhaseTestConfigurationBuilder :
         step.apply(init)
     }
 
-    fun <InputArtifact, InputArtifactKind> namedStepOfType(name: String): TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>?
+    fun <InputArtifact, InputArtifactKind> namedStepOfType(name: String): TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>?
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   InputArtifactKind : TestArtifactKind<InputArtifact> {
         @Suppress("UNCHECKED_CAST")
-        return namedSteps[name] as TestStepBuilder.HandlersStepBuilder.FirstPhase<InputArtifact, InputArtifactKind>?
+        return namedSteps[name] as TestStepBuilder.HandlersStepBuilder.NonGroupingPhase<InputArtifact, InputArtifactKind>?
     }
 
     fun enableMetaInfoHandler() {
@@ -268,7 +268,7 @@ class FirstPhaseTestConfigurationBuilder :
     }
 
     @OptIn(TestInfrastructureInternals::class)
-    override fun build(testDataPath: String): FirstPhaseTestConfiguration {
+    override fun build(testDataPath: String): NonGroupingPhaseTestConfiguration {
         applyConditionalConfigurations(testDataPath)
 
         // UpdateTestDataHandler should be _the very last_ handler at all times to avoid false-positive test data changes,
@@ -276,11 +276,11 @@ class FirstPhaseTestConfigurationBuilder :
         useAfterAnalysisCheckers(::UpdateTestDataHandler)
 
         @Suppress("UNCHECKED_CAST")
-        return FirstPhaseTestConfigurationImpl(
+        return NonGroupingPhaseTestConfigurationImpl(
             testInfo,
             defaultsProviderBuilder.build(),
             assertions,
-            steps as List<TestStepBuilder<*, *, TestStep.FirstPhaseStep<*, *>>>,
+            steps as List<TestStepBuilder<*, *, TestStep.NonGroupingStep<*, *>>>,
             sourcePreprocessors,
             additionalMetaInfoProcessors,
             environmentConfigurators,
@@ -300,7 +300,7 @@ class FirstPhaseTestConfigurationBuilder :
         )
     }
 
-    class ReadOnlyBuilder(private val builder: FirstPhaseTestConfigurationBuilder, val testDataPath: String) {
+    class ReadOnlyBuilder(private val builder: NonGroupingPhaseTestConfigurationBuilder, val testDataPath: String) {
         val assertions: AssertionsService
             get() = builder.assertions
         val sourcePreprocessors: List<Constructor<SourceFilePreprocessor>>
@@ -330,18 +330,18 @@ class FirstPhaseTestConfigurationBuilder :
     }
 }
 
-typealias TestConfigurationBuilder = FirstPhaseTestConfigurationBuilder
+typealias TestConfigurationBuilder = NonGroupingPhaseTestConfigurationBuilder
 
 @OptIn(PrivateForInline::class)
-class SecondPhaseTestConfigurationBuilder :
-    OnePhaseTestConfigurationBuilderBase<SecondPhaseTestConfigurationBuilder, SecondPhaseTestConfiguration>() {
+class GroupingPhaseTestConfigurationBuilder :
+    OnePhaseTestConfigurationBuilderBase<GroupingPhaseTestConfigurationBuilder, GroupingPhaseTestConfiguration>() {
     lateinit var testInfo: KotlinTestInfo
-    val mergerWorkers: MutableList<Constructor<SecondPhaseInputsMerger.Worker>> = mutableListOf()
+    val mergerWorkers: MutableList<Constructor<GroupingPhaseInputsMerger.Worker>> = mutableListOf()
 
     fun <I : ResultingArtifact<I>, O : ResultingArtifact<O>> facadeStep(
-        facade: Constructor<AbstractSecondPhaseTestFacade<I, O>>,
-    ): TestStepBuilder.FacadeStepBuilder.SecondPhase<I, O> {
-        return TestStepBuilder.FacadeStepBuilder.SecondPhase(facade).also {
+        facade: Constructor<AbstractGroupingPhaseTestFacade<I, O>>,
+    ): TestStepBuilder.FacadeStepBuilder.GroupingPhase<I, O> {
+        return TestStepBuilder.FacadeStepBuilder.GroupingPhase(facade).also {
             steps.add(it)
         }
     }
@@ -349,11 +349,11 @@ class SecondPhaseTestConfigurationBuilder :
     inline fun <InputArtifact, InputArtifactKind> handlersStep(
         artifactKind: InputArtifactKind,
         compilationStage: CompilationStage,
-        init: TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>.() -> Unit,
-    ): TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>
+        init: TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>.() -> Unit,
+    ): TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   InputArtifactKind : TestArtifactKind<InputArtifact> {
-        return TestStepBuilder.HandlersStepBuilder.SecondPhase(artifactKind, compilationStage).also {
+        return TestStepBuilder.HandlersStepBuilder.GroupingPhase(artifactKind, compilationStage).also {
             it.init()
             steps += it
         }
@@ -363,8 +363,8 @@ class SecondPhaseTestConfigurationBuilder :
         name: String,
         artifactKind: InputArtifactKind,
         compilationStage: CompilationStage,
-        init: TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>.() -> Unit,
-    ): TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>
+        init: TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>.() -> Unit,
+    ): TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   InputArtifactKind : TestArtifactKind<InputArtifact> {
         val previouslyContainedStep = namedStepOfType<InputArtifact, InputArtifactKind>(name)
@@ -382,7 +382,7 @@ class SecondPhaseTestConfigurationBuilder :
         name: String,
         artifactKind: InputArtifactKind,
         skipMissingStep: Boolean = false,
-        init: TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>.() -> Unit,
+        init: TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>.() -> Unit,
     ) where InputArtifact : ResultingArtifact<InputArtifact>,
             InputArtifactKind : TestArtifactKind<InputArtifact> {
         val step = namedStepOfType<InputArtifact, InputArtifactKind>(name)
@@ -394,19 +394,19 @@ class SecondPhaseTestConfigurationBuilder :
         step.apply(init)
     }
 
-    fun <InputArtifact, InputArtifactKind> namedStepOfType(name: String): TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>?
+    fun <InputArtifact, InputArtifactKind> namedStepOfType(name: String): TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>?
             where InputArtifact : ResultingArtifact<InputArtifact>,
                   InputArtifactKind : TestArtifactKind<InputArtifact> {
         @Suppress("UNCHECKED_CAST")
-        return namedSteps[name] as TestStepBuilder.HandlersStepBuilder.SecondPhase<InputArtifact, InputArtifactKind>?
+        return namedSteps[name] as TestStepBuilder.HandlersStepBuilder.GroupingPhase<InputArtifact, InputArtifactKind>?
     }
 
-    fun withMergerWorker(worker: Constructor<SecondPhaseInputsMerger.Worker>) {
+    fun withMergerWorker(worker: Constructor<GroupingPhaseInputsMerger.Worker>) {
         mergerWorkers += worker
     }
 
     @OptIn(TestInfrastructureInternals::class)
-    override fun build(testDataPath: String): SecondPhaseTestConfiguration {
+    override fun build(testDataPath: String): GroupingPhaseTestConfiguration {
         applyConditionalConfigurations(testDataPath)
 
         // UpdateTestDataHandler should be _the very last_ handler at all times to avoid false-positive test data changes,
@@ -414,11 +414,11 @@ class SecondPhaseTestConfigurationBuilder :
         useAfterAnalysisCheckers(::UpdateTestDataHandler)
 
         @Suppress("UNCHECKED_CAST")
-        return SecondPhaseTestConfigurationImpl(
+        return GroupingPhaseTestConfigurationImpl(
             testInfo,
             defaultsProviderBuilder.build(),
             assertions,
-            steps as List<TestStepBuilder<*, *, TestStep.SecondPhaseStep<*, *>>>,
+            steps as List<TestStepBuilder<*, *, TestStep.GroupingPhaseStep<*, *>>>,
             sourcePreprocessors,
             additionalMetaInfoProcessors,
             environmentConfigurators,
@@ -441,23 +441,26 @@ class SecondPhaseTestConfigurationBuilder :
 @DefaultsDsl
 @OptIn(TestInfrastructureInternals::class, PrivateForInline::class)
 class TwoPhaseTestConfigurationBuilder {
-    val firstPhaseBuilder = FirstPhaseTestConfigurationBuilder()
-    val secondPhaseBuilder = SecondPhaseTestConfigurationBuilder()
+    val firstPhaseBuilder = NonGroupingPhaseTestConfigurationBuilder()
+    val secondPhaseBuilder = GroupingPhaseTestConfigurationBuilder()
 
     fun commonConfiguration(init: TestConfigurationBuilderBase<*, *>.() -> Unit) {
         firstPhaseBuilder.apply(init)
         secondPhaseBuilder.apply(init)
     }
 
-    fun firstPhase(init: FirstPhaseTestConfigurationBuilder.() -> Unit) {
+    fun nonGroupingPhase(init: NonGroupingPhaseTestConfigurationBuilder.() -> Unit) {
         firstPhaseBuilder.apply(init)
     }
 
-    fun secondPhase(init: SecondPhaseTestConfigurationBuilder.() -> Unit) {
+    fun groupingPhase(init: GroupingPhaseTestConfigurationBuilder.() -> Unit) {
         secondPhaseBuilder.apply(init)
     }
 }
 
-inline fun testConfiguration(testDataPath: String, init: FirstPhaseTestConfigurationBuilder.() -> Unit): FirstPhaseTestConfiguration {
-    return FirstPhaseTestConfigurationBuilder().apply(init).build(testDataPath)
+inline fun testConfiguration(
+    testDataPath: String,
+    init: NonGroupingPhaseTestConfigurationBuilder.() -> Unit,
+): NonGroupingPhaseTestConfiguration {
+    return NonGroupingPhaseTestConfigurationBuilder().apply(init).build(testDataPath)
 }

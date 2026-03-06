@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.analysis.low.level.api.fir.diagnostic.compiler.base
 
 import org.jetbrains.kotlin.analysis.low.level.api.fir.compiler.based.AbstractLLCompilerBasedTest
 import org.jetbrains.kotlin.test.Constructor
-import org.jetbrains.kotlin.test.FirstPhaseTestConfiguration
+import org.jetbrains.kotlin.test.NonGroupingPhaseTestConfiguration
 import org.jetbrains.kotlin.test.InTextDirectivesUtils
 import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.test.backend.BlackBoxCodegenSuppressor
@@ -61,7 +61,7 @@ abstract class AbstractLLBlackBoxTestBase : AbstractLLCompilerBasedTest() {
         }
     }
 
-    override fun shouldSkipTest(filePath: String, configuration: FirstPhaseTestConfiguration): Boolean {
+    override fun shouldSkipTest(filePath: String, configuration: NonGroupingPhaseTestConfiguration): Boolean {
         val testDataFile = File(filePath)
         val targetBackend = TargetBackend.JVM_IR
         if (!InTextDirectivesUtils.isCompatibleTarget(targetBackend, testDataFile)) return true

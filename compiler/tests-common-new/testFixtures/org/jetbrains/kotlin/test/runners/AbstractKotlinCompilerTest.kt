@@ -9,11 +9,11 @@ import com.intellij.testFramework.TestDataFile
 import org.jetbrains.kotlin.test.Constructor
 import org.jetbrains.kotlin.test.ExecutionListenerBasedDisposableProvider
 import org.jetbrains.kotlin.test.TestInfrastructureInternals
-import org.jetbrains.kotlin.test.FirstPhaseTestRunner
+import org.jetbrains.kotlin.test.NonGroupingTestRunner
 import org.jetbrains.kotlin.test.backend.handlers.IrValidationErrorChecker
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilderBase
-import org.jetbrains.kotlin.test.builders.firstPhaseTestRunner
+import org.jetbrains.kotlin.test.builders.nonGroupingPhaseTestRunner
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives
 import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives
 import org.jetbrains.kotlin.test.frontend.classic.handlers.ClassicUnstableAndK2LanguageFeaturesSkipConfigurator
@@ -72,7 +72,7 @@ abstract class AbstractKotlinCompilerTest {
     }
 
     private lateinit var testInfo: KotlinTestInfo
-    lateinit var testRunner: FirstPhaseTestRunner
+    lateinit var testRunner: NonGroupingTestRunner
         private set
 
     open fun createApplicationDisposableProvider(): ApplicationDisposableProvider {
@@ -119,8 +119,8 @@ abstract class AbstractKotlinCompilerTest {
         initTestRunner(filePath).runTest(filePath)
     }
 
-    fun initTestRunner(@TestDataFile filePath: String): FirstPhaseTestRunner {
-        return firstPhaseTestRunner(filePath, configuration).also {
+    fun initTestRunner(@TestDataFile filePath: String): NonGroupingTestRunner {
+        return nonGroupingPhaseTestRunner(filePath, configuration).also {
             testRunner = it
         }
     }

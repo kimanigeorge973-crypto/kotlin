@@ -26,7 +26,7 @@ sealed class AbstractTestFacadeBase<InputArtifact, OutputArtifact> : ServicesAnd
     abstract val outputKind: TestArtifactKind<OutputArtifact>
 }
 
-// ----------------------------- first phase -----------------------------
+// ----------------------------- non-grouping phase -----------------------------
 
 abstract class AbstractTestFacade<InputArtifact, OutputArtifact> : AbstractTestFacadeBase<InputArtifact, OutputArtifact>()
         where InputArtifact : ResultingArtifact<InputArtifact>,
@@ -102,9 +102,9 @@ abstract class DeserializerFacade<BinaryArtifact, BackendInputArtifact>(
     }
 }
 
-// ----------------------------- second phase -----------------------------
+// ----------------------------- grouping phase -----------------------------
 
-abstract class AbstractSecondPhaseTestFacade<InputArtifact, OutputArtifact> : AbstractTestFacadeBase<InputArtifact, OutputArtifact>()
+abstract class AbstractGroupingPhaseTestFacade<InputArtifact, OutputArtifact> : AbstractTestFacadeBase<InputArtifact, OutputArtifact>()
         where InputArtifact : ResultingArtifact<InputArtifact>,
               OutputArtifact : ResultingArtifact<OutputArtifact>
 {

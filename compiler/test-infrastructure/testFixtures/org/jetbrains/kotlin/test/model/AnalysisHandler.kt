@@ -40,7 +40,7 @@ abstract class AnalysisHandlerBase<A : ResultingArtifact<A>>(
     }
 }
 
-// ----------------------------- first phase -----------------------------
+// ----------------------------- non-grouping handlers -----------------------------
 
 abstract class AnalysisHandler<A : ResultingArtifact<A>>(
     testServices: TestServices,
@@ -72,9 +72,9 @@ abstract class BinaryArtifactHandler<A : ResultingArtifact.Binary<A>>(
     doNotRunIfThereWerePreviousFailures: Boolean
 ) : AnalysisHandler<A>(testServices, failureDisablesNextSteps, doNotRunIfThereWerePreviousFailures)
 
-// ----------------------------- second phase -----------------------------
+// ----------------------------- grouping handlers -----------------------------
 
-abstract class SecondPhaseHandler<A : ResultingArtifact<A>>(
+abstract class GroupingPhaseHandler<A : ResultingArtifact<A>>(
     testServices: TestServices,
     failureDisablesNextSteps: Boolean,
     doNotRunIfThereWerePreviousFailures: Boolean

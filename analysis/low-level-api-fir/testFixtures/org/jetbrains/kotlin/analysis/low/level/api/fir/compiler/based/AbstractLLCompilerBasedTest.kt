@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.test.FirParser
-import org.jetbrains.kotlin.test.FirstPhaseTestConfiguration
+import org.jetbrains.kotlin.test.NonGroupingPhaseTestConfiguration
 import org.jetbrains.kotlin.test.TestInfrastructureInternals
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.builders.firHandlersStep
@@ -67,7 +67,7 @@ abstract class AbstractLLCompilerBasedTest : AbstractKotlinCompilerTest() {
         _disposable = null
     }
 
-    protected fun ignoreTest(filePath: String, configuration: FirstPhaseTestConfiguration): Boolean {
+    protected fun ignoreTest(filePath: String, configuration: NonGroupingPhaseTestConfiguration): Boolean {
         val modules = configuration.moduleStructureExtractor.splitTestDataByModules(filePath, configuration.directives)
 
         if (modules.modules.none { it.files.any { it.isKtFile } }) {
@@ -80,7 +80,7 @@ abstract class AbstractLLCompilerBasedTest : AbstractKotlinCompilerTest() {
     /**
      * Consider [org.jetbrains.kotlin.test.model.AfterAnalysisChecker.suppressIfNeeded] firstly
      */
-    protected open fun shouldSkipTest(filePath: String, configuration: FirstPhaseTestConfiguration): Boolean = false
+    protected open fun shouldSkipTest(filePath: String, configuration: NonGroupingPhaseTestConfiguration): Boolean = false
 
     @OptIn(TestInfrastructureInternals::class)
     override fun configureInternal(builder: TestConfigurationBuilder) = with(builder) {

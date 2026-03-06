@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.test.impl
 
 import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.test.*
-import org.jetbrains.kotlin.test.builders.FirstPhaseTestConfigurationBuilder
+import org.jetbrains.kotlin.test.builders.NonGroupingPhaseTestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.model.ComposedDirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.RegisteredDirectives
@@ -151,11 +151,11 @@ sealed class TestConfigurationImplBase<Step : TestStep<*, *>>(
 }
 
 @OptIn(TestInfrastructureInternals::class)
-class FirstPhaseTestConfigurationImpl(
+class NonGroupingPhaseTestConfigurationImpl(
     testInfo: KotlinTestInfo,
     defaultsProvider: DefaultsProvider,
     assertions: AssertionsService,
-    steps: List<TestStepBuilder<*, *, TestStep.FirstPhaseStep<*, *>>>,
+    steps: List<TestStepBuilder<*, *, TestStep.NonGroupingStep<*, *>>>,
     sourcePreprocessors: List<Constructor<SourceFilePreprocessor>>,
     additionalMetaInfoProcessors: List<Constructor<AdditionalMetaInfoProcessor>>,
     environmentConfigurators: List<Constructor<AbstractEnvironmentConfigurator>>,
@@ -171,20 +171,20 @@ class FirstPhaseTestConfigurationImpl(
     defaultRegisteredDirectives: RegisteredDirectives,
     override var startingArtifactFactory: (TestModule) -> ResultingArtifact<*>,
     additionalServices: List<ServiceRegistrationData>,
-    val originalBuilder: FirstPhaseTestConfigurationBuilder.ReadOnlyBuilder,
-) : TestConfigurationImplBase<TestStep.FirstPhaseStep<*, *>>(
+    val originalBuilder: NonGroupingPhaseTestConfigurationBuilder.ReadOnlyBuilder,
+) : TestConfigurationImplBase<TestStep.NonGroupingStep<*, *>>(
     testInfo, defaultsProvider, assertions, steps, sourcePreprocessors, additionalMetaInfoProcessors, environmentConfigurators,
     additionalSourceProviders, preAnalysisHandlers, moduleStructureTransformers, metaTestConfigurators, afterAnalysisCheckers,
     compilerConfigurationProvider, runtimeClasspathProviders, metaInfoHandlerEnabled, directives, defaultRegisteredDirectives,
     additionalServices
-), FirstPhaseTestConfiguration
+), NonGroupingPhaseTestConfiguration
 
 @OptIn(TestInfrastructureInternals::class)
-class SecondPhaseTestConfigurationImpl(
+class GroupingPhaseTestConfigurationImpl(
     testInfo: KotlinTestInfo,
     defaultsProvider: DefaultsProvider,
     assertions: AssertionsService,
-    steps: List<TestStepBuilder<*, *, TestStep.SecondPhaseStep<*, *>>>,
+    steps: List<TestStepBuilder<*, *, TestStep.GroupingPhaseStep<*, *>>>,
     sourcePreprocessors: List<Constructor<SourceFilePreprocessor>>,
     additionalMetaInfoProcessors: List<Constructor<AdditionalMetaInfoProcessor>>,
     environmentConfigurators: List<Constructor<AbstractEnvironmentConfigurator>>,
@@ -198,15 +198,15 @@ class SecondPhaseTestConfigurationImpl(
     metaInfoHandlerEnabled: Boolean,
     directives: List<DirectivesContainer>,
     defaultRegisteredDirectives: RegisteredDirectives,
-    mergerWorkers: List<Constructor<SecondPhaseInputsMerger.Worker>>,
+    mergerWorkers: List<Constructor<GroupingPhaseInputsMerger.Worker>>,
     additionalServices: List<ServiceRegistrationData>,
-) : TestConfigurationImplBase<TestStep.SecondPhaseStep<*, *>>(
+) : TestConfigurationImplBase<TestStep.GroupingPhaseStep<*, *>>(
     testInfo, defaultsProvider, assertions, steps, sourcePreprocessors, additionalMetaInfoProcessors, environmentConfigurators,
     additionalSourceProviders, preAnalysisHandlers, moduleStructureTransformers, metaTestConfigurators, afterAnalysisCheckers,
     compilerConfigurationProvider, runtimeClasspathProviders, metaInfoHandlerEnabled, directives, defaultRegisteredDirectives,
     additionalServices,
-), SecondPhaseTestConfiguration {
-    override val mergerWorkers: List<SecondPhaseInputsMerger.Worker> = mergerWorkers.map { it.invoke(testServices) }
+), GroupingPhaseTestConfiguration {
+    override val mergerWorkers: List<GroupingPhaseInputsMerger.Worker> = mergerWorkers.map { it.invoke(testServices) }
 }
 
 

@@ -126,9 +126,9 @@ sealed class TestRunner<Step : TestStep<*, *>, Configuration : TestConfiguration
     }
 }
 
-class FirstPhaseTestRunner(
-    testConfiguration: FirstPhaseTestConfiguration
-) : TestRunner<TestStep.FirstPhaseStep<*, *>, FirstPhaseTestConfiguration>(testConfiguration) {
+class NonGroupingTestRunner(
+    testConfiguration: NonGroupingPhaseTestConfiguration
+) : TestRunner<TestStep.NonGroupingStep<*, *>, NonGroupingPhaseTestConfiguration>(testConfiguration) {
     companion object {
         fun AnalysisHandler<*>.shouldRun(thereWasAnException: Boolean): Boolean {
             return !(doNotRunIfThereWerePreviousFailures && thereWasAnException)
@@ -137,7 +137,7 @@ class FirstPhaseTestRunner(
 
     private val allRanHandlers = mutableSetOf<AnalysisHandler<*>>()
 
-    fun runTest(@TestDataFile testDataFileName: String, beforeDispose: (FirstPhaseTestConfiguration) -> Unit = {}) {
+    fun runTest(@TestDataFile testDataFileName: String, beforeDispose: (NonGroupingPhaseTestConfiguration) -> Unit = {}) {
         try {
             prepareModuleStructure(testDataFileName) ?: return
             runTestPipeline()
@@ -234,7 +234,7 @@ class FirstPhaseTestRunner(
             },
             onArtifactResult = { artifactsProvider.registerArtifact(module, it) },
             onHandlersResult = { step ->
-                require(step is TestStep.FirstPhaseStep.HandlersStep<*>)
+                require(step is TestStep.NonGroupingStep.HandlersStep<*>)
                 allRanHandlers += step.handlers
             }
         )
@@ -242,17 +242,17 @@ class FirstPhaseTestRunner(
 
     // -------------------------------------- hacks --------------------------------------
 
-    private fun TestStep.FirstPhaseStep<*, *>.hackyProcessModule(
+    private fun TestStep.NonGroupingStep<*, *>.hackyProcessModule(
         module: TestModule,
         inputArtifact: ResultingArtifact<*>,
         thereWereExceptionsOnPreviousSteps: Boolean,
     ): TestStep.StepResult<*> {
         @Suppress("UNCHECKED_CAST")
-        return (this as TestStep.FirstPhaseStep<ResultingArtifact.Source, *>)
+        return (this as TestStep.NonGroupingStep<ResultingArtifact.Source, *>)
             .processModule(module, inputArtifact as ResultingArtifact<ResultingArtifact.Source>, thereWereExceptionsOnPreviousSteps)
     }
 
-    private fun <I : ResultingArtifact<I>> TestStep.FirstPhaseStep<I, *>.processModule(
+    private fun <I : ResultingArtifact<I>> TestStep.NonGroupingStep<I, *>.processModule(
         module: TestModule,
         artifact: ResultingArtifact<I>,
         thereWereExceptionsOnPreviousSteps: Boolean,
@@ -262,18 +262,18 @@ class FirstPhaseTestRunner(
     }
 }
 
-class SecondPhaseTestRunner(
-    testConfiguration: SecondPhaseTestConfiguration
-) : TestRunner<TestStep.SecondPhaseStep<*, *>, SecondPhaseTestConfiguration>(testConfiguration) {
+class GroupingTestRunner(
+    testConfiguration: GroupingPhaseTestConfiguration
+) : TestRunner<TestStep.GroupingPhaseStep<*, *>, GroupingPhaseTestConfiguration>(testConfiguration) {
     init {
         testServices.register(TestModuleStructure::class, EmptyModuleStructure)
     }
 
-    fun run(firstPhaseOutputs: List<FirstPhaseOutput>) {
-        testServices.register(SecondStageInputsHolder::class, SecondStageInputsHolder(firstPhaseOutputs))
-        val merger = SecondPhaseInputsMerger(testServices, testConfiguration.mergerWorkers)
+    fun run(nonGroupingPhaseOutputs: List<NonGroupingPhaseOutput>) {
+        testServices.register(GroupingPhaseInputsHolder::class, GroupingPhaseInputsHolder(nonGroupingPhaseOutputs))
+        val merger = GroupingPhaseInputsMerger(testServices, testConfiguration.mergerWorkers)
         runPipelineOnSingleUnit(
-            produceStartingArtifact = { merger.merge(firstPhaseOutputs) },
+            produceStartingArtifact = { merger.merge(nonGroupingPhaseOutputs) },
             shouldRunStep = { _, _ -> true },
             runStep = { step, input, thereWereCriticalExceptionsOnPreviousSteps ->
                 step.hackyProcess(input, thereWereCriticalExceptionsOnPreviousSteps)
@@ -292,16 +292,16 @@ class SecondPhaseTestRunner(
             get() = emptyList()
     }
 
-    private fun TestStep.SecondPhaseStep<*, *>.hackyProcess(
+    private fun TestStep.GroupingPhaseStep<*, *>.hackyProcess(
         inputArtifact: ResultingArtifact<*>,
         thereWereExceptionsOnPreviousSteps: Boolean,
     ): TestStep.StepResult<*> {
         @Suppress("UNCHECKED_CAST")
-        return (this as TestStep.SecondPhaseStep<SecondPhaseInputArtifact, *>)
-            .process(inputArtifact as ResultingArtifact<SecondPhaseInputArtifact>, thereWereExceptionsOnPreviousSteps)
+        return (this as TestStep.GroupingPhaseStep<GroupingPhaseInputArtifact, *>)
+            .process(inputArtifact as ResultingArtifact<GroupingPhaseInputArtifact>, thereWereExceptionsOnPreviousSteps)
     }
 
-    private fun <I : ResultingArtifact<I>> TestStep.SecondPhaseStep<I, *>.process(
+    private fun <I : ResultingArtifact<I>> TestStep.GroupingPhaseStep<I, *>.process(
         artifact: ResultingArtifact<I>,
         thereWereExceptionsOnPreviousSteps: Boolean,
     ): TestStep.StepResult<*> {

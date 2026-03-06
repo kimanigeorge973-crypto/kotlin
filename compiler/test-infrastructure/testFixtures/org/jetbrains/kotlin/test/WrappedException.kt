@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlin.test
 
-import org.jetbrains.kotlin.test.model.AbstractSecondPhaseTestFacade
+import org.jetbrains.kotlin.test.model.AbstractGroupingPhaseTestFacade
 import org.jetbrains.kotlin.test.model.AbstractTestFacade
 import org.jetbrains.kotlin.test.model.AnalysisHandler
-import org.jetbrains.kotlin.test.model.SecondPhaseHandler
+import org.jetbrains.kotlin.test.model.GroupingPhaseHandler
 import org.jetbrains.kotlin.test.model.TestModule
 
 sealed class WrappedException(
@@ -38,9 +38,9 @@ sealed class WrappedException(
         }
     }
 
-    class FromSecondPhaseFacade(
+    class FromGroupingFacade(
         cause: Throwable,
-        val facade: AbstractSecondPhaseTestFacade<*, *>,
+        val facade: AbstractGroupingPhaseTestFacade<*, *>,
     ) : WrappedException(cause, 0, 1) {
         override val failedModule: TestModule?
             get() = null
@@ -49,7 +49,7 @@ sealed class WrappedException(
             get() = "Exception was thrown"
 
         override fun withReplacedCause(newCause: Throwable): WrappedException {
-            return FromSecondPhaseFacade(newCause, facade)
+            return FromGroupingFacade(newCause, facade)
         }
     }
 
@@ -66,9 +66,9 @@ sealed class WrappedException(
         }
     }
 
-    class FromSecondPhaseHandler(
+    class FromGroupingHandler(
         cause: Throwable,
-        val handler: SecondPhaseHandler<*>,
+        val handler: GroupingPhaseHandler<*>,
     ) : WrappedException(cause, 1, 3) {
         override val failedModule: TestModule? get() = null
 
@@ -76,7 +76,7 @@ sealed class WrappedException(
             get() = handler.failureDisablesNextSteps
 
         override fun withReplacedCause(newCause: Throwable): WrappedException {
-            return FromSecondPhaseHandler(newCause, handler)
+            return FromGroupingHandler(newCause, handler)
         }
     }
 

@@ -27,33 +27,33 @@ sealed class TestStepBuilder<InputArtifact, OutputArtifact, out FacadeStep>
         @TestInfrastructureInternals
         abstract override fun createTestStep(testServices: TestServices): FacadeStep
 
-        class FirstPhase<InputArtifact, OutputArtifact>(
+        class NonGroupingPhase<InputArtifact, OutputArtifact>(
             facade: Constructor<AbstractTestFacade<InputArtifact, OutputArtifact>>,
         ) : FacadeStepBuilder<
                 InputArtifact,
                 OutputArtifact,
                 AbstractTestFacade<InputArtifact, OutputArtifact>,
-                TestStep.FirstPhaseStep.FacadeStep<InputArtifact, OutputArtifact>
+                TestStep.NonGroupingStep.FacadeStep<InputArtifact, OutputArtifact>
                 >(facade) where InputArtifact : ResultingArtifact<InputArtifact>,
                                 OutputArtifact : ResultingArtifact<OutputArtifact> {
             @TestInfrastructureInternals
-            override fun createTestStep(testServices: TestServices): TestStep.FirstPhaseStep.FacadeStep<InputArtifact, OutputArtifact> {
-                return TestStep.FirstPhaseStep.FacadeStep(facade.invoke(testServices))
+            override fun createTestStep(testServices: TestServices): TestStep.NonGroupingStep.FacadeStep<InputArtifact, OutputArtifact> {
+                return TestStep.NonGroupingStep.FacadeStep(facade.invoke(testServices))
             }
         }
 
-        class SecondPhase<InputArtifact, OutputArtifact>(
-            facade: Constructor<AbstractSecondPhaseTestFacade<InputArtifact, OutputArtifact>>,
+        class GroupingPhase<InputArtifact, OutputArtifact>(
+            facade: Constructor<AbstractGroupingPhaseTestFacade<InputArtifact, OutputArtifact>>,
         ) : FacadeStepBuilder<
                 InputArtifact,
                 OutputArtifact,
-                AbstractSecondPhaseTestFacade<InputArtifact, OutputArtifact>,
-                TestStep.SecondPhaseStep.FacadeStep<InputArtifact, OutputArtifact>
+                AbstractGroupingPhaseTestFacade<InputArtifact, OutputArtifact>,
+                TestStep.GroupingPhaseStep.FacadeStep<InputArtifact, OutputArtifact>
                 >(facade) where InputArtifact : ResultingArtifact<InputArtifact>,
                                 OutputArtifact : ResultingArtifact<OutputArtifact> {
             @TestInfrastructureInternals
-            override fun createTestStep(testServices: TestServices): TestStep.SecondPhaseStep.FacadeStep<InputArtifact, OutputArtifact> {
-                return TestStep.SecondPhaseStep.FacadeStep(facade.invoke(testServices))
+            override fun createTestStep(testServices: TestServices): TestStep.GroupingPhaseStep.FacadeStep<InputArtifact, OutputArtifact> {
+                return TestStep.GroupingPhaseStep.FacadeStep(facade.invoke(testServices))
             }
         }
     }
@@ -96,35 +96,35 @@ sealed class TestStepBuilder<InputArtifact, OutputArtifact, out FacadeStep>
 
         protected abstract fun createStep(handlers: List<Handler>): HandlersStep
 
-        class FirstPhase<InputArtifact, InputArtifactKind>(
+        class NonGroupingPhase<InputArtifact, InputArtifactKind>(
             artifactKind: InputArtifactKind,
             compilationStage: CompilationStage,
         ) : HandlersStepBuilder<
                 InputArtifact,
                 InputArtifactKind,
                 AnalysisHandler<InputArtifact>,
-                TestStep.FirstPhaseStep.HandlersStep<InputArtifact>>
+                TestStep.NonGroupingStep.HandlersStep<InputArtifact>>
             (artifactKind, compilationStage)
                 where InputArtifact : ResultingArtifact<InputArtifact>,
                       InputArtifactKind : TestArtifactKind<InputArtifact> {
-            override fun createStep(handlers: List<AnalysisHandler<InputArtifact>>): TestStep.FirstPhaseStep.HandlersStep<InputArtifact> {
-                return TestStep.FirstPhaseStep.HandlersStep(artifactKind, handlers)
+            override fun createStep(handlers: List<AnalysisHandler<InputArtifact>>): TestStep.NonGroupingStep.HandlersStep<InputArtifact> {
+                return TestStep.NonGroupingStep.HandlersStep(artifactKind, handlers)
             }
         }
 
-        class SecondPhase<InputArtifact, InputArtifactKind>(
+        class GroupingPhase<InputArtifact, InputArtifactKind>(
             artifactKind: InputArtifactKind,
             compilationStage: CompilationStage,
         ) : HandlersStepBuilder<
                 InputArtifact,
                 InputArtifactKind,
-                SecondPhaseHandler<InputArtifact>,
-                TestStep.SecondPhaseStep.HandlersStep<InputArtifact>>
+                GroupingPhaseHandler<InputArtifact>,
+                TestStep.GroupingPhaseStep.HandlersStep<InputArtifact>>
             (artifactKind, compilationStage)
                 where InputArtifact : ResultingArtifact<InputArtifact>,
                       InputArtifactKind : TestArtifactKind<InputArtifact> {
-            override fun createStep(handlers: List<SecondPhaseHandler<InputArtifact>>): TestStep.SecondPhaseStep.HandlersStep<InputArtifact> {
-                return TestStep.SecondPhaseStep.HandlersStep(artifactKind, handlers)
+            override fun createStep(handlers: List<GroupingPhaseHandler<InputArtifact>>): TestStep.GroupingPhaseStep.HandlersStep<InputArtifact> {
+                return TestStep.GroupingPhaseStep.HandlersStep(artifactKind, handlers)
             }
         }
     }
