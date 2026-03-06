@@ -46,6 +46,7 @@ class SimpleTestClassModel(
     override val tags: List<String>,
     private val additionalMethods: Collection<MethodModel<*>>,
     val skipTestAllFilesCheck: Boolean,
+    val additionalFileFilter: ((File) -> Boolean)? = null,
 ) : TestClassModel() {
     override val name: String
         get() = testClassName
@@ -78,6 +79,7 @@ class SimpleTestClassModel(
                 extractTagsFromDirectory(file),
                 additionalMethods.filter { it.shouldBeGeneratedForInnerTestClass },
                 skipTestAllFilesCheck,
+                additionalFileFilter,
             )
         }.sortedWith(BY_NAME)
     }
@@ -135,6 +137,9 @@ class SimpleTestClassModel(
                                 "Consider removing empty directory or revert removing of its' contents."
                     )
                 }
+
+                if (additionalFileFilter != null && !additionalFileFilter(file)) return@l null
+
                 SimpleTestMethodModel(
                     testInfraRevision,
                     rootFile,
