@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
@@ -22,11 +23,13 @@ internal class KlibConversionTest : BaseArgumentTest<String>("Xklib") {
     @DisplayName("Klib is converted to '-Xklib' argument")
     @Test
     fun testKlibToArgumentString() {
-        val klibPaths = workingDirectory.resolve("path/to/lib1.klibr").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/lib2.klib").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/lib3.klib").absolutePathString()
+        val klibPaths = klibStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/lib1.klib"),
+                workingDirectory.resolve("path/to/lib2.klib"),
+                workingDirectory.resolve("path/to/lib3.klib")
+            )
+        )
         val jvmOperation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get(".")).apply {
             compilerArguments[X_KLIB] = klibPaths
         }
@@ -55,11 +58,13 @@ internal class KlibConversionTest : BaseArgumentTest<String>("Xklib") {
     @DisplayName("Klib can be set and retrieved")
     @Test
     fun testKlibGetWhenSet() {
-        val expectedKlibPaths = workingDirectory.resolve("path/to/lib1.klibr").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/lib2.klib").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/lib3.klib").absolutePathString()
+        val expectedKlibPaths = klibStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/lib1.klib"),
+                workingDirectory.resolve("path/to/lib2.klib"),
+                workingDirectory.resolve("path/to/lib3.klib")
+            )
+        )
         val jvmOperation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get(".")).apply {
             compilerArguments[X_KLIB] = expectedKlibPaths
         }
@@ -77,31 +82,28 @@ internal class KlibConversionTest : BaseArgumentTest<String>("Xklib") {
         val klibPaths = jvmOperation.compilerArguments[X_KLIB]
 
         assertEquals(
-            getDefaultValueString(),
-            getValueString(klibPaths)
+            getDefaultValueString(), getValueString(klibPaths)
         )
     }
 
     @DisplayName("Raw argument strings '-Xklib=<paths>' are converted to Klib")
     @Test
     fun testRawArgumentsKlibConversion() {
-        val expectedKlibPaths = workingDirectory.resolve("path/to/lib1.klibr").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/lib2.klib").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/lib3.klib").absolutePathString()
+        val expectedKlibPaths = klibStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/lib1.klib"),
+                workingDirectory.resolve("path/to/lib2.klib"),
+                workingDirectory.resolve("path/to/lib3.klib")
+            )
+        )
         val operation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get("."))
 
         operation.compilerArguments.applyArgumentStrings(
-            expectedArgumentStringsFor(
-                getValueString(expectedKlibPaths),
-
-                )
+            expectedArgumentStringsFor(getValueString(expectedKlibPaths))
         )
 
         assertEquals(
-            expectedKlibPaths,
-            operation.compilerArguments[X_KLIB]
+            expectedKlibPaths, operation.compilerArguments[X_KLIB]
         )
     }
 
@@ -113,8 +115,7 @@ internal class KlibConversionTest : BaseArgumentTest<String>("Xklib") {
         operation.compilerArguments.applyArgumentStrings(listOf())
 
         assertEquals(
-            getDefaultValueString(),
-            getValueString(operation.compilerArguments[X_KLIB])
+            getDefaultValueString(), getValueString(operation.compilerArguments[X_KLIB])
         )
     }
 
@@ -123,4 +124,6 @@ internal class KlibConversionTest : BaseArgumentTest<String>("Xklib") {
     }
 
     override fun getValueString(argument: String?): String? = argument
+
+    private fun klibStringOf(paths: List<Path>): String = paths.joinToString(File.pathSeparator) { it.absolutePathString() }
 }

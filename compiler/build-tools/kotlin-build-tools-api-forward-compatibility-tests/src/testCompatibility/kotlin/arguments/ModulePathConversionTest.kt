@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
@@ -22,11 +23,14 @@ internal class ModulePathConversionTest : BaseArgumentTest<String>("Xmodule-path
     @DisplayName("ModulePath is converted to '-Xmodule-path' argument")
     @Test
     fun testModulePathToArgumentString() {
-        val modulePaths = workingDirectory.resolve("path/to/module1").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/module2").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/module3").absolutePathString()
+        val modulePaths = modulePathStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/module1"),
+                workingDirectory.resolve("path/to/module2"),
+                workingDirectory.resolve("path/to/module3")
+
+            )
+        )
         val jvmOperation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get(".")).apply {
             compilerArguments[X_MODULE_PATH] = modulePaths
         }
@@ -55,11 +59,14 @@ internal class ModulePathConversionTest : BaseArgumentTest<String>("Xmodule-path
     @DisplayName("ModulePath can be set and retrieved")
     @Test
     fun testModulePathGetWhenSet() {
-        val expectedModulePaths = workingDirectory.resolve("path/to/module1").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/module2").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/module3").absolutePathString()
+        val expectedModulePaths = modulePathStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/module1"),
+                workingDirectory.resolve("path/to/module2"),
+                workingDirectory.resolve("path/to/module3")
+
+            )
+        )
         val jvmOperation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get(".")).apply {
             compilerArguments[X_MODULE_PATH] = expectedModulePaths
         }
@@ -77,31 +84,29 @@ internal class ModulePathConversionTest : BaseArgumentTest<String>("Xmodule-path
         val modulePaths = jvmOperation.compilerArguments[X_MODULE_PATH]
 
         assertEquals(
-            getDefaultValueString(),
-            getValueString(modulePaths)
+            getDefaultValueString(), getValueString(modulePaths)
         )
     }
 
     @DisplayName("Raw argument strings '-Xmodule-path=<paths>' are converted to ModulePath")
     @Test
     fun testRawArgumentsModulePathConversion() {
-        val expectedModulePaths = workingDirectory.resolve("path/to/module1").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/module2").absolutePathString() +
-                "${File.pathSeparatorChar}" +
-                workingDirectory.resolve("path/to/module3").absolutePathString()
+        val expectedModulePaths = modulePathStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/module1"),
+                workingDirectory.resolve("path/to/module2"),
+                workingDirectory.resolve("path/to/module3")
+
+            )
+        )
         val operation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get("."))
 
         operation.compilerArguments.applyArgumentStrings(
-            expectedArgumentStringsFor(
-                getValueString(expectedModulePaths),
-
-                )
+            expectedArgumentStringsFor(getValueString(expectedModulePaths))
         )
 
         assertEquals(
-            expectedModulePaths,
-            operation.compilerArguments[X_MODULE_PATH]
+            expectedModulePaths, operation.compilerArguments[X_MODULE_PATH]
         )
     }
 
@@ -113,8 +118,7 @@ internal class ModulePathConversionTest : BaseArgumentTest<String>("Xmodule-path
         operation.compilerArguments.applyArgumentStrings(listOf())
 
         assertEquals(
-            getDefaultValueString(),
-            getValueString(operation.compilerArguments[X_MODULE_PATH])
+            getDefaultValueString(), getValueString(operation.compilerArguments[X_MODULE_PATH])
         )
     }
 
@@ -123,4 +127,6 @@ internal class ModulePathConversionTest : BaseArgumentTest<String>("Xmodule-path
     }
 
     override fun getValueString(argument: String?): String? = argument
+
+    private fun modulePathStringOf(paths: List<Path>): String = paths.joinToString(File.pathSeparator) { it.absolutePathString() }
 }

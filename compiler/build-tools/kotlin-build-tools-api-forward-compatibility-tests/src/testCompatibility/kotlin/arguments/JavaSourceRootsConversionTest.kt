@@ -77,8 +77,7 @@ internal class JavaSourceRootsConversionTest : BaseArgumentTest<Array<String>>("
         val javaSourceRoots = jvmOperation.compilerArguments[X_JAVA_SOURCE_ROOTS]
 
         assertEquals(
-            getDefaultValueString(),
-            getValueString(javaSourceRoots)
+            getDefaultValueString(), getValueString(javaSourceRoots)
         )
     }
 
@@ -93,15 +92,11 @@ internal class JavaSourceRootsConversionTest : BaseArgumentTest<Array<String>>("
         val operation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get("."))
 
         operation.compilerArguments.applyArgumentStrings(
-            expectedArgumentStringsFor(
-                getValueString(expectedJavaSourceRoots),
-
-                )
+            expectedArgumentStringsFor(getValueString(expectedJavaSourceRoots))
         )
 
         assertArrayEquals(
-            expectedJavaSourceRoots,
-            operation.compilerArguments[X_JAVA_SOURCE_ROOTS]
+            expectedJavaSourceRoots, operation.compilerArguments[X_JAVA_SOURCE_ROOTS]
         )
     }
 
@@ -113,8 +108,7 @@ internal class JavaSourceRootsConversionTest : BaseArgumentTest<Array<String>>("
         operation.compilerArguments.applyArgumentStrings(listOf())
 
         assertEquals(
-            getDefaultValueString(),
-            getValueString(operation.compilerArguments[X_JAVA_SOURCE_ROOTS])
+            getDefaultValueString(), getValueString(operation.compilerArguments[X_JAVA_SOURCE_ROOTS])
         )
     }
 
@@ -122,6 +116,5 @@ internal class JavaSourceRootsConversionTest : BaseArgumentTest<Array<String>>("
         return listOf("-$argumentName=$value")
     }
 
-    override fun getValueString(argument: Array<String>?): String? =
-        argument?.joinToString(",")
+    override fun getValueString(argument: Array<String>?): String? = argument?.joinToString(",")
 }

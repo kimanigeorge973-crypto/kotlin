@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
@@ -20,12 +21,13 @@ internal class ClasspathConversionTest : BaseArgumentTest<String>("classpath") {
     @DisplayName("Classpath is converted to '-classpath' argument")
     @Test
     fun testClasspathToArgumentString() {
-        val classpathPaths =
-            workingDirectory.resolve("path/to/lib1.jar").absolutePathString() +
-                    "${File.pathSeparatorChar}" +
-                    workingDirectory.resolve("path/to/lib2.jar").absolutePathString() +
-                    "${File.pathSeparatorChar}" +
-                    workingDirectory.resolve("path/to/classes").absolutePathString()
+        val classpathPaths = classpathStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/lib1.jar"),
+                workingDirectory.resolve("path/to/lib2.jar"),
+                workingDirectory.resolve("path/to/classes")
+            )
+        )
         val jvmOperation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get(".")).apply {
             compilerArguments[CLASSPATH] = classpathPaths
         }
@@ -54,12 +56,13 @@ internal class ClasspathConversionTest : BaseArgumentTest<String>("classpath") {
     @DisplayName("Classpath can be set and retrieved")
     @Test
     fun testClasspathGetWhenSet() {
-        val expectedClasspath =
-            workingDirectory.resolve("path/to/lib1.jar").absolutePathString() +
-                    "${File.pathSeparatorChar}" +
-                    workingDirectory.resolve("path/to/lib2.jar").absolutePathString() +
-                    "${File.pathSeparatorChar}" +
-                    workingDirectory.resolve("path/to/classes").absolutePathString()
+        val expectedClasspath = classpathStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/lib1.jar"),
+                workingDirectory.resolve("path/to/lib2.jar"),
+                workingDirectory.resolve("path/to/classes")
+            )
+        )
         val jvmOperation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get(".")).apply {
             compilerArguments[CLASSPATH] = expectedClasspath
         }
@@ -84,19 +87,17 @@ internal class ClasspathConversionTest : BaseArgumentTest<String>("classpath") {
     @DisplayName("Raw argument strings '-classpath <paths>' are converted to Classpath")
     @Test
     fun testRawArgumentsClasspathConversion() {
-        val expectedClasspathPaths =
-            workingDirectory.resolve("path/to/lib1.jar").absolutePathString() +
-                    "${File.pathSeparatorChar}" +
-                    workingDirectory.resolve("path/to/lib2.jar").absolutePathString() +
-                    "${File.pathSeparatorChar}" +
-                    workingDirectory.resolve("path/to/classes").absolutePathString()
+        val expectedClasspathPaths = classpathStringOf(
+            listOf(
+                workingDirectory.resolve("path/to/lib1.jar"),
+                workingDirectory.resolve("path/to/lib2.jar"),
+                workingDirectory.resolve("path/to/classes")
+            )
+        )
         val operation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get("."))
 
         operation.compilerArguments.applyArgumentStrings(
-            expectedArgumentStringsFor(
-                getValueString(expectedClasspathPaths),
-
-                )
+            expectedArgumentStringsFor(getValueString(expectedClasspathPaths))
         )
 
         assertEquals(
@@ -121,4 +122,6 @@ internal class ClasspathConversionTest : BaseArgumentTest<String>("classpath") {
     }
 
     override fun getValueString(argument: String?): String? = argument
+
+    private fun classpathStringOf(paths: List<Path>): String = paths.joinToString(File.pathSeparator) { it.absolutePathString() }
 }
