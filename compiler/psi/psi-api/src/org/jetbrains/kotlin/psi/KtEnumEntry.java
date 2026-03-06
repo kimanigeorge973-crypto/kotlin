@@ -118,7 +118,7 @@ public class KtEnumEntry extends KtClass implements KtDeclarationWithReturnType 
      * {@link KtEnumEntry}. Or we deleted the last {@link KtEnumEntry} (reparenting the
      * semicolon onto the parent {@link KtClassBody}) and inserted a new {@link KtEnumEntry}.
      *
-     * @return The added semicolon element.
+     * @return The added (or existing) semicolon element.
      */
     @NotNull
     public PsiElement addSemicolon() {

@@ -1059,7 +1059,6 @@ public abstract class org/jetbrains/kotlin/psi/KtClassOrObject : org/jetbrains/k
 	public fun <init> (Lorg/jetbrains/kotlin/psi/stubs/KotlinClassOrObjectStub;Lcom/intellij/psi/stubs/IStubElementType;)V
 	public final fun addSuperTypeListEntry (Lorg/jetbrains/kotlin/psi/KtSuperTypeListEntry;)Lorg/jetbrains/kotlin/psi/KtSuperTypeListEntry;
 	public fun delete ()V
-	public final fun ensureSemicolonIsPresentAfterEnumEntriesIfNecessaryForDeclaration (Lorg/jetbrains/kotlin/psi/KtDeclaration;)V
 	public final fun getAnonymousInitializers ()Ljava/util/List;
 	public fun getBody ()Lorg/jetbrains/kotlin/psi/KtClassBody;
 	public fun getClassId ()Lorg/jetbrains/kotlin/name/ClassId;

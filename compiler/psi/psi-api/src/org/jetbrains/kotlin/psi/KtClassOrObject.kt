@@ -69,16 +69,7 @@ abstract class KtClassOrObject :
         @Suppress("DEPRECATION") // KT-78356
         getStubOrPsiChild(KtStubBasedElementTypes.CLASS_BODY)
 
-    /**
-     * Ensures that a semicolon is present after the last enum entry in the class body, if this is an enum class.
-     */
-    fun ensureSemicolonIsPresentAfterEnumEntriesIfNecessaryForDeclaration(declaration: KtDeclaration) {
-        if (this !is KtClass || !isEnum() || declaration is KtEnumEntry) return
-
-        val body = getOrCreateBody()
-        body.ensureSemicolonIsPresentAfterEnumEntries()
-    }
-
+    @OptIn(KtImplementationDetail::class)
     inline fun <reified T : KtDeclaration> addDeclaration(declaration: T): T {
         ensureSemicolonIsPresentAfterEnumEntriesIfNecessaryForDeclaration(declaration)
         val body = getOrCreateBody()
@@ -90,12 +81,14 @@ abstract class KtClassOrObject :
         } as T
     }
 
+    @OptIn(KtImplementationDetail::class)
     inline fun <reified T : KtDeclaration> addDeclarationAfter(declaration: T, anchor: PsiElement?): T {
         val anchorBefore = anchor ?: declarations.lastOrNull() ?: return addDeclaration(declaration)
         ensureSemicolonIsPresentAfterEnumEntriesIfNecessaryForDeclaration(declaration)
         return getOrCreateBody().addAfter(declaration, anchorBefore) as T
     }
 
+    @OptIn(KtImplementationDetail::class)
     inline fun <reified T : KtDeclaration> addDeclarationBefore(declaration: T, anchor: PsiElement?): T {
         val anchorAfter = anchor ?: declarations.firstOrNull() ?: return addDeclaration(declaration)
         ensureSemicolonIsPresentAfterEnumEntriesIfNecessaryForDeclaration(declaration)
@@ -184,6 +177,33 @@ abstract class KtClassOrObject :
 
     override fun getContextReceivers(): List<KtContextReceiver> =
         modifierList?.contextParameterList?.contextReceivers().orEmpty()
+
+    /**
+     * Ensures that a semicolon is present after the last enum entry in the class body, if this is an enum class.
+     */
+    @KtImplementationDetail
+    fun ensureSemicolonIsPresentAfterEnumEntriesIfNecessaryForDeclaration(declaration: KtDeclaration) {
+        if (declaration is KtEnumEntry) return
+        if (!(this is KtClass && isEnum())) return
+
+        val body = getOrCreateBody()
+        val lastEnumEntry = body.children.filterIsInstance<KtEnumEntry>().lastOrNull()
+
+        if (lastEnumEntry != null) {
+            lastEnumEntry.addSemicolon()
+        } else {
+            val anchor = PsiTreeUtil.skipSiblingsBackward(body.rBrace ?: body.lastChild!!, PsiWhiteSpace::class.java)
+            if (anchor != null && anchor.elementType == KtTokens.SEMICOLON) {
+                // there's already a semicolon
+                return
+            }
+            val psiFactory = KtPsiFactory(project)
+            val semicolon = body.addAfter(psiFactory.createSemicolon(), anchor)
+            if (anchor == body.lBrace) {
+                body.addBefore(psiFactory.createNewLine(), semicolon)
+            }
+        }
+    }
 }
 
 
@@ -197,22 +217,3 @@ fun KtClassOrObject.getOrCreateBody(): KtClassBody {
 
 val KtClassOrObject.allConstructors
     get() = listOfNotNull(primaryConstructor) + secondaryConstructors
-
-private fun KtClassBody.ensureSemicolonIsPresentAfterEnumEntries() {
-    val lastEnumEntry = children.filterIsInstance<KtEnumEntry>().lastOrNull()
-
-    if (lastEnumEntry != null) {
-        lastEnumEntry.addSemicolon()
-    } else {
-        val anchor = PsiTreeUtil.skipSiblingsBackward(rBrace ?: lastChild!!, PsiWhiteSpace::class.java)
-        if (anchor != null && anchor.elementType == KtTokens.SEMICOLON) {
-            // there's already a semicolon
-            return
-        }
-        val psiFactory = KtPsiFactory(project)
-        val semicolon = addAfter(psiFactory.createSemicolon(), anchor)
-        if (anchor == lBrace) {
-            addBefore(psiFactory.createNewLine(), semicolon)
-        }
-    }
-}
