@@ -32,12 +32,11 @@ class KotlinPropertyAccessorStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinPropertyAccessorStubImpl) return false
-        if (this.isGetter != other.isGetter) return false
-        if (this.hasBody != other.hasBody) return false
-        if (this.hasNoExpressionBody != other.hasNoExpressionBody) return false
-        if (this.mayHaveContract != other.mayHaveContract) return false
-        return this.contract == other.contract
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinPropertyAccessorStubImpl &&
+                other.isGetter == isGetter &&
+                other.hasBody == hasBody &&
+                other.hasNoExpressionBody == hasNoExpressionBody &&
+                other.mayHaveContract == mayHaveContract &&
+                other.contract == contract
 }

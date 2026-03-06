@@ -30,8 +30,7 @@ class KotlinContextReceiverStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinContextReceiverStubImpl) return false
-        return this.label == other.label
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinContextReceiverStubImpl &&
+                other.labelRef == labelRef
 }

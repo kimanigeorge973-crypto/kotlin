@@ -43,12 +43,12 @@ class KotlinParameterStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinParameterStubImpl) return false
-        if (this.name != other.name) return false
-        if (this.isMutable != other.isMutable) return false
-        if (this.hasValOrVar != other.hasValOrVar) return false
-        if (this.hasDefaultValue != other.hasDefaultValue) return false
-        return this.functionTypeParameterName == other.functionTypeParameterName
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinParameterStubImpl &&
+                other.name == name &&
+                other.fqNameRef == fqNameRef &&
+                other.isMutable == isMutable &&
+                other.hasValOrVar == hasValOrVar &&
+                other.hasDefaultValue == hasDefaultValue &&
+                other.functionTypeParameterName == functionTypeParameterName
 }

@@ -28,8 +28,8 @@ class KotlinPlaceHolderWithTextStubImpl<T : KtElementImplStub<*>>(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinPlaceHolderWithTextStubImpl<*>) return false
-        return this.text == other.text
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinPlaceHolderWithTextStubImpl<*> &&
+                other.elementType == elementType &&
+                other.text == text
 }

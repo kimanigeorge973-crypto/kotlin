@@ -25,8 +25,7 @@ class KotlinStringInterpolationPrefixStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinStringInterpolationPrefixStubImpl) return false
-        return this.dollarSignCount == other.dollarSignCount
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinStringInterpolationPrefixStubImpl &&
+                other.dollarSignCount == dollarSignCount
 }

@@ -29,9 +29,8 @@ class KotlinValueArgumentStubImpl<T : KtValueArgument>(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinValueArgumentStubImpl<*>) return false
-        if (this.isSpread != other.isSpread) return false
-        return super.isEquivalentTo(other)
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinValueArgumentStubImpl<*> &&
+                other.isSpread == isSpread &&
+                super.isEquivalentTo(other)
 }

@@ -54,7 +54,7 @@ public class KotlinNameReferenceExpressionStubImpl extends KotlinStubBaseImpl<Kt
     @Override
     public boolean isEquivalentTo(@NotNull KotlinStubElement<?> other) {
         if (!(other instanceof KotlinNameReferenceExpressionStubImpl)) return false;
-        if (this.isClassRef() != ((KotlinNameReferenceExpressionStubImpl) other).isClassRef()) return false;
-        return this.getReferencedName().equals(((KotlinNameReferenceExpressionStubImpl) other).getReferencedName());
+        if (this.myClassRef != ((KotlinNameReferenceExpressionStubImpl) other).myClassRef) return false;
+        return this.referencedName.equals(((KotlinNameReferenceExpressionStubImpl) other).referencedName);
     }
 }

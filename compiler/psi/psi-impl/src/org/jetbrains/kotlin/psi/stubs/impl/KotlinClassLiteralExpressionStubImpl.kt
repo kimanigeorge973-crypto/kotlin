@@ -22,7 +22,6 @@ class KotlinClassLiteralExpressionStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        return other is KotlinClassLiteralExpressionStubImpl
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinClassLiteralExpressionStubImpl
 }

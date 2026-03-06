@@ -43,14 +43,13 @@ class KotlinObjectStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinObjectStubImpl) return false
-        if (this.name != other.name) return false
-        if (this.fqName != other.fqName) return false
-        if (this.classId != other.classId) return false
-        if (this.isTopLevel != other.isTopLevel) return false
-        if (this.isLocal != other.isLocal) return false
-        if (this.isObjectLiteral != other.isObjectLiteral) return false
-        return this.superNames == other.superNames
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinObjectStubImpl &&
+                other.name == name &&
+                other.fqName == fqName &&
+                other.classId == classId &&
+                other.isTopLevel == isTopLevel &&
+                other.isLocal == isLocal &&
+                other.isObjectLiteral == isObjectLiteral &&
+                other.superNameRefs.contentEquals(superNameRefs)
 }

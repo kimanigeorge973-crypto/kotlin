@@ -27,8 +27,7 @@ class KotlinImportAliasStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinImportAliasStubImpl) return false
-        return this.name == other.name
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinImportAliasStubImpl &&
+                other.name == name
 }

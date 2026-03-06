@@ -27,9 +27,8 @@ class KotlinBlockStringTemplateEntryStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinBlockStringTemplateEntryStubImpl) return false
-        if (this.hasMultipleExpressions != other.hasMultipleExpressions) return false
-        return text == other.text
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinBlockStringTemplateEntryStubImpl &&
+                other.hasMultipleExpressions == hasMultipleExpressions &&
+                other.text == text
 }

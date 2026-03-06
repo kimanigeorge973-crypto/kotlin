@@ -38,11 +38,10 @@ class KotlinUserTypeStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinUserTypeStubImpl) return false
-        if (this.abbreviatedType != other.abbreviatedType) return false
-        return this.upperBound == other.upperBound
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinUserTypeStubImpl &&
+                other.abbreviatedType == abbreviatedType &&
+                other.upperBound == upperBound
 }
 
 sealed interface KotlinTypeBean : KotlinTypeMarker {

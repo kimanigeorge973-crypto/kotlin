@@ -34,10 +34,9 @@ class KotlinAnnotationEntryStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinAnnotationEntryStubImpl) return false
-        if (this.shortName != other.shortName) return false
-        if (this.hasValueArguments != other.hasValueArguments) return false
-        return this.valueArguments == other.valueArguments
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinAnnotationEntryStubImpl &&
+                other.shortNameRef == shortNameRef &&
+                other.hasValueArguments == hasValueArguments &&
+                other.valueArguments == valueArguments
 }

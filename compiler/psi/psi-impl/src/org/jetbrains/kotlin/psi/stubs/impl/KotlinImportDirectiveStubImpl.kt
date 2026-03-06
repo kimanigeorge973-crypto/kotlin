@@ -33,10 +33,9 @@ class KotlinImportDirectiveStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinImportDirectiveStubImpl) return false
-        if (this.isAllUnder != other.isAllUnder) return false
-        if (this.importedFqNameRef != other.importedFqNameRef) return false
-        return this.isValid == other.isValid
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinImportDirectiveStubImpl &&
+                other.isAllUnder == isAllUnder &&
+                other.importedFqNameRef == importedFqNameRef &&
+                other.isValid == isValid
 }

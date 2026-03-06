@@ -44,12 +44,11 @@ class KotlinSecondaryConstructorStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinSecondaryConstructorStubImpl) return false
-        if (this.containingClassName != other.containingClassName) return false
-        if (this.hasBody != other.hasBody) return false
-        if (this.isDelegatedCallToThis != other.isDelegatedCallToThis) return false
-        if (this.isExplicitDelegationCall != other.isExplicitDelegationCall) return false
-        return this.mayHaveContract == other.mayHaveContract
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinSecondaryConstructorStubImpl &&
+                other.containingClassName == containingClassName &&
+                other.hasBody == hasBody &&
+                other.isDelegatedCallToThis == isDelegatedCallToThis &&
+                other.isExplicitDelegationCall == isExplicitDelegationCall &&
+                other.mayHaveContract == mayHaveContract
 }

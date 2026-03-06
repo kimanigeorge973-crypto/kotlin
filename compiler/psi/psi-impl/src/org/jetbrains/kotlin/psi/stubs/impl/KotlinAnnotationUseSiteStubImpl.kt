@@ -28,8 +28,7 @@ class KotlinAnnotationUseSiteTargetStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinAnnotationUseSiteTargetStubImpl) return false
-        return this.useSiteTarget == other.useSiteTarget
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinAnnotationUseSiteTargetStubImpl &&
+                other.useSiteTargetRef == useSiteTargetRef
 }

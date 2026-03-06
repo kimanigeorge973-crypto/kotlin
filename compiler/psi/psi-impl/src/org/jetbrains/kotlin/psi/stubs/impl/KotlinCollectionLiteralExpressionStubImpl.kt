@@ -27,8 +27,7 @@ class KotlinCollectionLiteralExpressionStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinCollectionLiteralExpressionStubImpl) return false
-        return this.innerExpressionCount == other.innerExpressionCount
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinCollectionLiteralExpressionStubImpl &&
+                other.innerExpressionCount == innerExpressionCount
 }

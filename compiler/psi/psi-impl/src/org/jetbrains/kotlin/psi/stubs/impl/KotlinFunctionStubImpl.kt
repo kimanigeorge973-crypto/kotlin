@@ -53,16 +53,16 @@ class KotlinFunctionStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinFunctionStubImpl) return false
-        if (this.fqName != other.fqName) return false
-        if (this.isTopLevel != other.isTopLevel) return false
-        if (this.isExtension != other.isExtension) return false
-        if (this.hasBody != other.hasBody) return false
-        if (this.hasNoExpressionBody != other.hasNoExpressionBody) return false
-        if (this.mayHaveContract != other.mayHaveContract) return false
-        if (this.hasTypeParameterListBeforeFunctionName != other.hasTypeParameterListBeforeFunctionName) return false
-        if (this.origin != other.origin) return false
-        return this.contract == other.contract
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinFunctionStubImpl &&
+                other.nameRef == nameRef &&
+                other.fqName == fqName &&
+                other.isTopLevel == isTopLevel &&
+                other.isExtension == isExtension &&
+                other.hasBody == hasBody &&
+                other.hasNoExpressionBody == hasNoExpressionBody &&
+                other.mayHaveContract == mayHaveContract &&
+                other.hasTypeParameterListBeforeFunctionName == hasTypeParameterListBeforeFunctionName &&
+                other.origin == origin &&
+                other.contract == contract
 }

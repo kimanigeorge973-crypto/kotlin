@@ -28,10 +28,8 @@ class KotlinContractEffectStubImpl(parent: StubElement<*>?) : KotlinPlaceHolderS
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinContractEffectStubImpl) return false
-        return super.isEquivalentTo(other)
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinContractEffectStubImpl && super.isEquivalentTo(other)
 }
 
 enum class KotlinContractEffectType {

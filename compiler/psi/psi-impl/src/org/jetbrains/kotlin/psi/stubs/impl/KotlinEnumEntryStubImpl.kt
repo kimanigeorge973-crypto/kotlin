@@ -64,11 +64,9 @@ class KotlinEnumEntryStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinEnumEntryStubImpl) return false
-        if (this.isLocal != other.isLocal) return false
-        if (this.name != other.name) return false
-        if (this.qualifiedName != other.qualifiedName) return false
-        return this.superNames == other.superNames
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinEnumEntryStubImpl &&
+                other.isLocal == isLocal &&
+                other.name == name &&
+                other.qualifiedName == qualifiedName
 }

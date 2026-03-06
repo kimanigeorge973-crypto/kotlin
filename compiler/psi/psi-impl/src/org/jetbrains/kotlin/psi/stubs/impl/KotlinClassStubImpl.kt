@@ -55,16 +55,15 @@ class KotlinClassStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinClassStubImpl) return false
-        if (this.name != other.name) return false
-        if (this.classId != other.classId) return false
-        if (this.isClsStubCompiledToJvmDefaultImplementation != other.isClsStubCompiledToJvmDefaultImplementation) return false
-        if (this.isLocal != other.isLocal) return false
-        if (this.isTopLevel != other.isTopLevel) return false
-        if (this.qualifiedName != other.qualifiedName) return false
-        if (this.superNames != other.superNames) return false
-        if (this.isInterface != other.isInterface) return false
-        return this.valueClassRepresentation == other.valueClassRepresentation
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinClassStubImpl &&
+                other.name == name &&
+                other.classId == classId &&
+                other.isClsStubCompiledToJvmDefaultImplementation == isClsStubCompiledToJvmDefaultImplementation &&
+                other.isLocal == isLocal &&
+                other.isTopLevel == isTopLevel &&
+                other.qualifiedName == qualifiedName &&
+                other.isInterface == isInterface &&
+                other.valueClassRepresentation == valueClassRepresentation &&
+                other.superNameRefs.contentEquals(superNameRefs)
 }

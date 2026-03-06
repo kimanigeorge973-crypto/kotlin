@@ -39,10 +39,10 @@ class KotlinTypeAliasStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinTypeAliasStubImpl) return false
-        if (this.fqName != other.fqName) return false
-        if (this.isTopLevel != other.isTopLevel) return false
-        return this.classId == other.classId
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinTypeAliasStubImpl &&
+                other.name == name &&
+                other.qualifiedName == qualifiedName &&
+                other.isTopLevel == isTopLevel &&
+                other.classId == classId
 }

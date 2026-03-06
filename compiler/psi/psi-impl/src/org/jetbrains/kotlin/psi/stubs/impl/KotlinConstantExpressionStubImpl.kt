@@ -33,9 +33,8 @@ class KotlinConstantExpressionStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinConstantExpressionStubImpl) return false
-        if (this.kind != other.kind) return false
-        return this.value == other.value
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinConstantExpressionStubImpl &&
+                other.kind == kind &&
+                other.valueRef == valueRef
 }

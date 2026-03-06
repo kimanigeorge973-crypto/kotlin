@@ -29,8 +29,7 @@ class KotlinEnumEntrySuperclassReferenceExpressionStubImpl(
         )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinEnumEntrySuperclassReferenceExpressionStubImpl) return false
-        return this.referencedName == other.referencedName
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinEnumEntrySuperclassReferenceExpressionStubImpl &&
+                other.referencedNameRef == referencedNameRef
 }

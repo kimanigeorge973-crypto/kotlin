@@ -37,8 +37,7 @@ class KotlinPrimaryConstructorStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinPrimaryConstructorStubImpl) return false
-        return this.containingClassName == other.containingClassName
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinPrimaryConstructorStubImpl &&
+                other.containingClassName == containingClassName
 }

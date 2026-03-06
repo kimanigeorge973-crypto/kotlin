@@ -29,8 +29,7 @@ class KotlinScriptStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinScriptStubImpl) return false
-        return this.fqName == other.fqName
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinScriptStubImpl &&
+                other.fqNameRef == fqNameRef
 }

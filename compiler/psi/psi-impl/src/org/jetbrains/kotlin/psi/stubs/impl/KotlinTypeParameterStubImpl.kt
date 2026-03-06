@@ -31,8 +31,7 @@ class KotlinTypeParameterStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinTypeParameterStubImpl) return false
-        return this.name == other.name
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinTypeParameterStubImpl &&
+                other.name == name
 }

@@ -28,8 +28,7 @@ class KotlinFunctionTypeStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinFunctionTypeStubImpl) return false
-        return this.abbreviatedType == other.abbreviatedType
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinFunctionTypeStubImpl &&
+                other.abbreviatedType == abbreviatedType
 }

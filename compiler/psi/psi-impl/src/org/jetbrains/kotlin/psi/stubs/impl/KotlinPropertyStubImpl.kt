@@ -61,19 +61,18 @@ class KotlinPropertyStubImpl(
     )
 
     @KtImplementationDetail
-    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean {
-        if (other !is KotlinPropertyStubImpl) return false
-        if (this.name != other.name) return false
-        if (this.fqName != other.fqName) return false
-        if (this.isTopLevel != other.isTopLevel) return false
-        if (this.hasDelegate != other.hasDelegate) return false
-        if (this.hasDelegateExpression != other.hasDelegateExpression) return false
-        if (this.hasInitializer != other.hasInitializer) return false
-        if (this.isExtension != other.isExtension) return false
-        if (this.hasReturnTypeRef != other.hasReturnTypeRef) return false
-        if (this.hasBackingField != other.hasBackingField) return false
-        if (this.origin != other.origin) return false
-        if (this.isVar != other.isVar) return false
-        return this.constantInitializer == other.constantInitializer
-    }
+    override fun isEquivalentTo(other: KotlinStubElement<*>): Boolean =
+        other is KotlinPropertyStubImpl &&
+                other.name == name &&
+                other.fqName == fqName &&
+                other.isTopLevel == isTopLevel &&
+                other.hasDelegate == hasDelegate &&
+                other.hasDelegateExpression == hasDelegateExpression &&
+                other.hasInitializer == hasInitializer &&
+                other.isExtension == isExtension &&
+                other.hasReturnTypeRef == hasReturnTypeRef &&
+                other.hasBackingField == hasBackingField &&
+                other.origin == origin &&
+                other.isVar == isVar &&
+                other.constantInitializer == constantInitializer
 }

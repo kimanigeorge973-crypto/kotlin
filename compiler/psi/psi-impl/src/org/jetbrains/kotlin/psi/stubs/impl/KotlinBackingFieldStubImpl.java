@@ -40,6 +40,6 @@ public class KotlinBackingFieldStubImpl extends KotlinStubBaseImpl<KtBackingFiel
     @Override
     public boolean isEquivalentTo(@NotNull KotlinStubElement<?> other) {
         if (!(other instanceof KotlinBackingFieldStubImpl)) return false;
-        return hasInitializer == ((KotlinBackingFieldStubImpl) other).getHasInitializer();
+        return hasInitializer == ((KotlinBackingFieldStubImpl) other).hasInitializer;
     }
 }
