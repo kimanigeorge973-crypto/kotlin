@@ -301,7 +301,7 @@ internal class JvmCompilerArgumentsImpl(
     try { this[X_PROFILE] = arguments.profileCompilerCommand?.toXprofile() } catch (_: NoSuchMethodError) {  }
     try { this[X_SAM_CONVERSIONS] = arguments.samConversions } catch (_: NoSuchMethodError) {  }
     try { this[X_SANITIZE_PARENTHESES] = arguments.sanitizeParentheses } catch (_: NoSuchMethodError) {  }
-    try { this[X_SCRIPT_RESOLVER_ENVIRONMENT] = arguments.scriptResolverEnvironment?.associate { val parts = it.split("=", limit = 2); Pair(parts[0], parts[1]) } } catch (_: NoSuchMethodError) {  }
+    try { this[X_SCRIPT_RESOLVER_ENVIRONMENT] = arguments.scriptResolverEnvironment?.associate { val parts = it.split("="); if (parts.size != 2) { throw CompilerArgumentsParseException("Invalid -Xscript-resolver-environment value format: $it")}; Pair(parts[0], parts[1]) } } catch (_: NoSuchMethodError) {  }
     try { this[X_SERIALIZE_IR] = arguments.getUsingReflection("serializeIr") } catch (_: NoSuchMethodError) {  }
     try { this[X_STRING_CONCAT] = arguments.stringConcat } catch (_: NoSuchMethodError) {  }
     try { this[X_SUPPORT_COMPATQUAL_CHECKER_FRAMEWORK_ANNOTATIONS] = arguments.supportCompatqualCheckerFrameworkAnnotations } catch (_: NoSuchMethodError) {  }

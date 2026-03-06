@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.buildtools.internal.arguments
 
+import org.jetbrains.kotlin.buildtools.api.CompilerArgumentsParseException
 import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.JvmCompilerArguments
 import org.jetbrains.kotlin.buildtools.api.arguments.types.ProfileCompilerCommand
@@ -165,6 +166,10 @@ private object JvmCompilerArgumentPre2_4_0ValueAdapter : CompilerArgumentValueAd
                 val arrayValue = value as Array<String>
                 arrayValue.associate {
                     val parts = it.split("=", limit = 2)
+                    if (parts.size != 2) {
+                        throw CompilerArgumentsParseException("Invalid -Xscript-resolver-environment value format: $it")
+                    }
+
                     Pair(parts[0], parts[1])
                 } as T
             }

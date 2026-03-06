@@ -218,7 +218,11 @@ internal class KotlinWrapperPre2_4_0(
 
                     val arrayValue = delegate[key] as Array<String>
                     arrayValue.associate {
-                        val parts = it.split("=", limit = 2)
+                        val parts = it.split("=")
+                        if (parts.size != 2) {
+                            throw CompilerArgumentsParseException("Invalid -Xscript-resolver-environment value format: $it")
+                        }
+
                         Pair(parts[0], parts[1])
                     } as V
                 }

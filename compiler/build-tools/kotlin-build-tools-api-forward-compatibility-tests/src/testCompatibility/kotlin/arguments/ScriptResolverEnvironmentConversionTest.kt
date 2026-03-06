@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.buildtools.tests.arguments
 
+import org.jetbrains.kotlin.buildtools.api.CompilerArgumentsParseException
 import org.jetbrains.kotlin.buildtools.api.arguments.ExperimentalCompilerArgument
 import org.jetbrains.kotlin.buildtools.api.arguments.JvmCompilerArguments.Companion.X_SCRIPT_RESOLVER_ENVIRONMENT
 import org.jetbrains.kotlin.buildtools.api.jvm.JvmPlatformToolchain.Companion.jvm
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.nio.file.Paths
 
 @OptIn(ExperimentalCompilerArgument::class)
@@ -104,6 +106,33 @@ internal class ScriptResolverEnvironmentConversionTest : BaseArgumentTest<Array<
             getValueString(operation.compilerArguments[X_SCRIPT_RESOLVER_ENVIRONMENT])
         )
     }
+
+    @DisplayName("Raw argument with non-existent ScriptResolverEnvironment value fails conversion")
+    @Test
+    fun testInvalidAssertionsModeConversionFails() {
+        val operation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get("."))
+
+        val exception = assertThrows<CompilerArgumentsParseException> {
+            operation.compilerArguments.applyArgumentStrings(
+                expectedArgumentStringsFor("non-existent-value")
+            )
+        }
+
+        assertEquals("Invalid -$argumentName value format: non-existent-value", exception.message)
+    }
+
+    @DisplayName("Setting non-existent ScriptResolverEnvironment value directly fails")
+    @Test
+    fun testInvalidAssertionsModeDirectAssignmentFails() {
+        val operation = toolchain.jvm.createJvmCompilationOperation(emptyList(), Paths.get("."))
+
+        val exception = assertThrows<CompilerArgumentsParseException> {
+            operation.compilerArguments[X_SCRIPT_RESOLVER_ENVIRONMENT] = arrayOf("non-existent-value")
+        }
+
+        assertEquals("Invalid -$argumentName value format: non-existent-value", exception.message)
+    }
+
 
     override fun expectedArgumentStringsFor(value: String): List<String> {
         return listOf("-$argumentName=$value")

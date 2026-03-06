@@ -476,8 +476,9 @@ internal class BtaImplGenerator(
             }
             argument.valueType.origin is StringMapType -> {
                 add(
-                    maybeGetNullabilitySign(argument) + ".%M { val parts = it.split(\"=\", limit = 2); %T(parts[0], parts[1]) }",
+                    maybeGetNullabilitySign(argument) + $$".%M { val parts = it.split(\"=\"); if (parts.size != 2) { throw %M(\"Invalid -$${argument.name} value format: $it\")}; %T(parts[0], parts[1]) }",
                     MemberName(KOTLIN_COLLECTIONS, "associate"),
+                    MemberName("org.jetbrains.kotlin.buildtools.api", "CompilerArgumentsParseException"),
                     Pair::class.asTypeName()
                 )
             }
