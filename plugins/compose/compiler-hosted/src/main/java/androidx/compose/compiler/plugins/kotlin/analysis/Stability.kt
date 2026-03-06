@@ -267,11 +267,14 @@ class StabilityInferencer(
         val typeParameters = declaration.typeParameters
         val fileContainingDeclaration = declaration.fileOrNull
         // To support incremental compilation, we are forced to use runtime stability when
-        // [declaration] is `public` or `internal` and is contained in a different file than
-        // [fileContainingDependent].
+        // [declaration] is `public` or `internal`, is contained in a different file than
+        // [fileContainingDependent], and has a stability bitmask attached to it.
         val forcedToUseRuntimeStability = isTargetJvm &&
                 (declaration.visibility.isPublicAPI || declaration.visibility == DescriptorVisibilities.INTERNAL) &&
-                (fileContainingDeclaration == null || fileContainingDeclaration != fileContainingDependent)
+                (fileContainingDeclaration == null || fileContainingDeclaration != fileContainingDependent) &&
+                // If [declaration] is in the current module, a stability bitmask may not have been attached to [declaration] yet, but it
+                // will be later.
+                (declaration.isInCurrentModule() || declaration.stabilityParamBitmask() != null)
 
         if (
             KnownStableConstructs.stableTypes.contains(fqName) ||
@@ -443,7 +446,6 @@ class StabilityInferencer(
         fileContainingDependent: IrFile?,
     ): Stability {
         return when {
-            type.isAny() -> Stability.Unstable
             type is IrErrorType -> Stability.Unstable
             type is IrDynamicType -> Stability.Unstable
 
