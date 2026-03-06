@@ -599,7 +599,18 @@ object Ordering : TemplateGroupBase() {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
+    private fun MemberBuilder.appendFloatingPointNote() {
+        if (f == ArraysOfPrimitives && primitive?.isFloatingPoint() == true) {
+            doc {
+                doc + """
+                For floating-point arrays, `NaN` is considered greater than any other value
+                (including positive infinity), and `-0.0` is considered less than `0.0`,
+                consistent with [${primitive!!.name}.compareTo].
+                """
+            }
+        }
+    }
+
     val f_isSortedWith = fn("isSortedWith(comparator: Comparator<in T>)") {
         includeDefault()
         include(ArraysOfUnsigned)
@@ -643,7 +654,6 @@ object Ordering : TemplateGroupBase() {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     val f_isSorted = fn("isSorted()") {
         includeDefault()
         include(ArraysOfUnsigned)
@@ -664,6 +674,7 @@ object Ordering : TemplateGroupBase() {
             """
         }
         appendIterationOrderNote()
+        appendFloatingPointNote()
         sample(isSortedSampleRef("isSorted"))
         body { "return isSortedWith(naturalOrder())" }
         body(ArraysOfPrimitives, ArraysOfUnsigned) {
@@ -680,7 +691,6 @@ object Ordering : TemplateGroupBase() {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     val f_isSortedDescending = fn("isSortedDescending()") {
         includeDefault()
         include(ArraysOfUnsigned)
@@ -701,6 +711,7 @@ object Ordering : TemplateGroupBase() {
             """
         }
         appendIterationOrderNote()
+        appendFloatingPointNote()
         sample(isSortedSampleRef("isSortedDescending"))
         body { "return isSortedWith(reverseOrder())" }
         body(ArraysOfPrimitives, ArraysOfUnsigned) {
@@ -717,7 +728,6 @@ object Ordering : TemplateGroupBase() {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     val f_isSortedBy = fn("isSortedBy(selector: (T) -> R?)") {
         includeDefault()
         include(ArraysOfUnsigned)
@@ -737,6 +747,8 @@ object Ordering : TemplateGroupBase() {
             The [selector] values of adjacent elements are compared sequentially,
             and the ${f.collection} is considered sorted if for each pair of adjacent elements
             the [selector] value of the preceding element is not greater than that of the following one.
+
+            If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
             """
         }
         appendIterationOrderNote()
@@ -745,26 +757,29 @@ object Ordering : TemplateGroupBase() {
             """
             val iterator = iterator()
             if (!iterator.hasNext()) return true
-            var currentValue = selector(iterator.next())
+            var previousValue = selector(iterator.next())
             while (iterator.hasNext()) {
-                val nextValue = selector(iterator.next())
-                if (compareValues(currentValue, nextValue) > 0) return false
-                currentValue = nextValue
+                val currentValue = selector(iterator.next())
+                if (compareValues(previousValue, currentValue) > 0) return false
+                previousValue = currentValue
             }
             return true
             """
         }
         body(ArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned) {
             """
+            if (isEmpty()) return true
+            var previousValue = selector(this[0])
             for (i in 1..lastIndex) {
-                if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+                val currentValue = selector(this[i])
+                if (compareValues(previousValue, currentValue) > 0) return false
+                previousValue = currentValue
             }
             return true
             """
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     val f_isSortedByDescending = fn("isSortedByDescending(selector: (T) -> R?)") {
         includeDefault()
         include(ArraysOfUnsigned)
@@ -785,6 +800,8 @@ object Ordering : TemplateGroupBase() {
             and the ${f.collection} is considered sorted in descending order if for each pair
             of adjacent elements the [selector] value of the preceding element is not less
             than that of the following one.
+
+            If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
             """
         }
         appendIterationOrderNote()
@@ -793,19 +810,23 @@ object Ordering : TemplateGroupBase() {
             """
             val iterator = iterator()
             if (!iterator.hasNext()) return true
-            var currentValue = selector(iterator.next())
+            var previousValue = selector(iterator.next())
             while (iterator.hasNext()) {
-                val nextValue = selector(iterator.next())
-                if (compareValues(currentValue, nextValue) < 0) return false
-                currentValue = nextValue
+                val currentValue = selector(iterator.next())
+                if (compareValues(previousValue, currentValue) < 0) return false
+                previousValue = currentValue
             }
             return true
             """
         }
         body(ArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned) {
             """
+            if (isEmpty()) return true
+            var previousValue = selector(this[0])
             for (i in 1..lastIndex) {
-                if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+                val currentValue = selector(this[i])
+                if (compareValues(previousValue, currentValue) < 0) return false
+                previousValue = currentValue
             }
             return true
             """

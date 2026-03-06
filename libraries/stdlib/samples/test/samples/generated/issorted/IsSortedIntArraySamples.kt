@@ -36,10 +36,12 @@ class IsSortedIntArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = intArrayOf(1, -2, 3, -4, 5)
-        assertPrints(values.isSortedWith(compareBy { it * it }), "true")
-        assertPrints(values.isSortedWith(compareBy { abs(it) }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = intArrayOf(1, 2, 3, 4, 5)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = intArrayOf(5, 4, 3, 2, 1)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

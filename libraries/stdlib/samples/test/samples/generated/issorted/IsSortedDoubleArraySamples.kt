@@ -36,10 +36,12 @@ class IsSortedDoubleArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = doubleArrayOf(-0.5, 1.0, -1.5, 2.0)
-        assertPrints(values.isSortedWith(compareBy { it * it }), "true")
-        assertPrints(values.isSortedWith(compareBy { abs(it) }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = doubleArrayOf(1.0, 2.5, 3.14)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = doubleArrayOf(3.14, 2.5, 1.0)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

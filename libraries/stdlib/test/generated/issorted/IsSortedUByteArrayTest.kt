@@ -46,14 +46,20 @@ class IsSortedUByteArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(ubyteArrayOf().isSortedBy { it })
+        assertTrue(ubyteArrayOf(1u).isSortedBy { it })
         assertTrue(ubyteArrayOf(1u, 2u, 3u, 4u, 5u).isSortedBy { it })
         assertFalse(ubyteArrayOf(5u, 4u, 3u, 2u, 1u).isSortedBy { it })
+        assertFalse(ubyteArrayOf(2u, 1u, 3u, 4u, 5u).isSortedBy { it })
+        assertTrue(ubyteArrayOf(1u, 2u, 3u, 4u, 5u).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(ubyteArrayOf().isSortedByDescending { it })
+        assertTrue(ubyteArrayOf(5u).isSortedByDescending { it })
         assertTrue(ubyteArrayOf(5u, 4u, 3u, 2u, 1u).isSortedByDescending { it })
         assertFalse(ubyteArrayOf(1u, 2u, 3u, 4u, 5u).isSortedByDescending { it })
+        assertFalse(ubyteArrayOf(4u, 5u, 3u, 2u, 1u).isSortedByDescending { it })
+        assertTrue(ubyteArrayOf(5u, 4u, 3u, 2u, 1u).isSortedByDescending { 0 })
     }
 }

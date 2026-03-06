@@ -36,10 +36,12 @@ class IsSortedFloatArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = floatArrayOf(-0.5f, 1.0f, -1.5f, 2.0f)
-        assertPrints(values.isSortedWith(compareBy { it * it }), "true")
-        assertPrints(values.isSortedWith(compareBy { abs(it) }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = floatArrayOf(1.0f, 2.5f, 3.14f)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = floatArrayOf(3.14f, 2.5f, 1.0f)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

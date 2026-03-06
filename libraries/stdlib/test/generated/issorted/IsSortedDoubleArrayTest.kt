@@ -46,15 +46,21 @@ class IsSortedDoubleArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(doubleArrayOf().isSortedBy { it })
+        assertTrue(doubleArrayOf(1.0).isSortedBy { it })
         assertTrue(doubleArrayOf(1.0, 2.5, 3.14).isSortedBy { it })
         assertFalse(doubleArrayOf(3.14, 2.5, 1.0).isSortedBy { it })
+        assertFalse(doubleArrayOf(2.5, 1.0, 3.14).isSortedBy { it })
+        assertTrue(doubleArrayOf(1.0, 2.5, 3.14).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(doubleArrayOf().isSortedByDescending { it })
+        assertTrue(doubleArrayOf(3.14).isSortedByDescending { it })
         assertTrue(doubleArrayOf(3.14, 2.5, 1.0).isSortedByDescending { it })
         assertFalse(doubleArrayOf(1.0, 2.5, 3.14).isSortedByDescending { it })
+        assertFalse(doubleArrayOf(2.5, 3.14, 1.0).isSortedByDescending { it })
+        assertTrue(doubleArrayOf(3.14, 2.5, 1.0).isSortedByDescending { 0 })
     }
 
     @Test
@@ -65,6 +71,8 @@ class IsSortedDoubleArrayTest {
         assertTrue(doubleArrayOf(Double.NaN, Double.NaN).isSorted())
         assertTrue(doubleArrayOf(Double.NaN, 2.0, 1.0).isSortedDescending())
         assertFalse(doubleArrayOf(2.0, 1.0, Double.NaN).isSortedDescending())
+        assertFalse(doubleArrayOf(2.0, Double.NaN, 1.0).isSortedDescending())
+        assertTrue(doubleArrayOf(Double.NaN, Double.NaN).isSortedDescending())
     }
 
     @Test
@@ -73,5 +81,41 @@ class IsSortedDoubleArrayTest {
         assertFalse(doubleArrayOf(0.0, -0.0).isSorted())
         assertTrue(doubleArrayOf(0.0, -0.0).isSortedDescending())
         assertFalse(doubleArrayOf(-0.0, 0.0).isSortedDescending())
+    }
+
+    @Test
+    fun isSortedWithNaNDouble() {
+        assertTrue(doubleArrayOf(1.0, 2.0, Double.NaN).isSortedWith(naturalOrder()))
+        assertFalse(doubleArrayOf(Double.NaN, 1.0, 2.0).isSortedWith(naturalOrder()))
+        assertTrue(doubleArrayOf(Double.NaN, 2.0, 1.0).isSortedWith(reverseOrder()))
+        assertFalse(doubleArrayOf(2.0, 1.0, Double.NaN).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedWithNegativeZeroDouble() {
+        assertTrue(doubleArrayOf(-0.0, 0.0).isSortedWith(naturalOrder()))
+        assertFalse(doubleArrayOf(0.0, -0.0).isSortedWith(naturalOrder()))
+        assertTrue(doubleArrayOf(0.0, -0.0).isSortedWith(reverseOrder()))
+        assertFalse(doubleArrayOf(-0.0, 0.0).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedByNaNDouble() {
+        assertTrue(doubleArrayOf(1.0, 2.0, Double.NaN).isSortedBy { it })
+        assertFalse(doubleArrayOf(Double.NaN, 1.0, 2.0).isSortedBy { it })
+        assertFalse(doubleArrayOf(1.0, Double.NaN, 2.0).isSortedBy { it })
+        assertTrue(doubleArrayOf(Double.NaN, Double.NaN).isSortedBy { it })
+        assertTrue(doubleArrayOf(Double.NaN, 2.0, 1.0).isSortedByDescending { it })
+        assertFalse(doubleArrayOf(2.0, 1.0, Double.NaN).isSortedByDescending { it })
+        assertFalse(doubleArrayOf(2.0, Double.NaN, 1.0).isSortedByDescending { it })
+        assertTrue(doubleArrayOf(Double.NaN, Double.NaN).isSortedByDescending { it })
+    }
+
+    @Test
+    fun isSortedByNegativeZeroDouble() {
+        assertTrue(doubleArrayOf(-0.0, 0.0).isSortedBy { it })
+        assertFalse(doubleArrayOf(0.0, -0.0).isSortedBy { it })
+        assertTrue(doubleArrayOf(0.0, -0.0).isSortedByDescending { it })
+        assertFalse(doubleArrayOf(-0.0, 0.0).isSortedByDescending { it })
     }
 }

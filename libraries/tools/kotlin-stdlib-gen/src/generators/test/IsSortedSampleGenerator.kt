@@ -7,7 +7,6 @@ package generators.test
 
 import templates.*
 import java.io.BufferedWriter
-import java.io.File
 
 object IsSortedSampleGenerator {
     fun generate() {
@@ -21,35 +20,19 @@ object IsSortedSampleGenerator {
         val sorted = config.sampleSortedValues
         val unsorted = swapAdjacentPair(sorted)
         val className = "IsSorted${collectionClass}Samples"
-        val file = File("libraries/stdlib/samples/test/samples/generated/issorted/$className.kt")
-        file.parentFile.mkdirs()
-        file.bufferedWriter().use { writer ->
-            writer.apply {
-                val needsAbsImport = config.sampleSelectorAssertions.any { it.first.contains("abs(") }
-                writeHeader(className, needsAbsImport)
-
-                writeSimpleSample("isSorted", ctor, sorted, unsorted)
-
-                val descSorted = sorted.reversed()
-                val descUnsorted = swapAdjacentPair(descSorted)
-                writeSimpleSample("isSortedDescending", ctor, descSorted, descUnsorted)
-
-                writeSelectorSample("isSortedWith", ctor, config.sampleSelectorValues, config.sampleSelectorAssertions) { selector ->
-                    "isSortedWith(compareBy { $selector })"
-                }
-
-                writeSelectorSample("isSortedBy", ctor, config.sampleSelectorValues, config.sampleSelectorAssertions) { selector ->
-                    "isSortedBy { $selector }"
-                }
-
-                writeSelectorSample(
-                    "isSortedByDescending", ctor, config.sampleSelectorValues.reversed(), config.sampleSelectorAssertions
-                ) { selector ->
-                    "isSortedByDescending { $selector }"
-                }
-
-                appendLine("}")
-            }
+        writeGeneratedFile("libraries/stdlib/samples/test/samples/generated/issorted/$className.kt") {
+            val needsAbsImport = config.sampleNeedsAbsImport
+            writeHeader(className, needsAbsImport)
+            writeSimpleSample("isSorted", ctor, sorted, unsorted)
+            val descSorted = sorted.reversed()
+            val descUnsorted = swapAdjacentPair(descSorted)
+            writeSimpleSample("isSortedDescending", ctor, descSorted, descUnsorted)
+            writeComparatorSample(ctor, sorted, config.caseInsensitiveValues?.sorted)
+            writeSelectorSample("isSortedBy", ctor, config.sampleSelectorValues, config.sampleSelectorAssertions)
+            writeSelectorSample(
+                "isSortedByDescending", ctor, config.sampleSelectorValues.reversed(), config.sampleSelectorAssertions
+            )
+            appendLine("}")
         }
     }
 
@@ -70,7 +53,7 @@ object IsSortedSampleGenerator {
 
     private fun BufferedWriter.writeSimpleSample(
         name: String,
-        collectionOf: String,
+        ctor: String,
         sortedValues: List<String>,
         unsortedValues: List<String>,
     ) {
@@ -80,31 +63,58 @@ object IsSortedSampleGenerator {
             """
     @Sample
     fun $name() {
-        val sorted = $collectionOf($sortedArgs)
+        val sorted = $ctor($sortedArgs)
         assertPrints(sorted.$name(), "true")
 
-        val unsorted = $collectionOf($unsortedArgs)
+        val unsorted = $ctor($unsortedArgs)
         assertPrints(unsorted.$name(), "false")
+    }"""
+        )
+    }
+
+    private fun BufferedWriter.writeComparatorSample(
+        ctor: String,
+        sortedValues: List<String>,
+        caseInsensitiveSortedValues: List<String>?,
+    ) {
+        val sortedArgs = sortedValues.joinToString(", ")
+        val reversedArgs = sortedValues.reversed().joinToString(", ")
+        val caseInsensitiveLines = caseInsensitiveSortedValues?.let { values ->
+            val caseArgs = values.joinToString(", ")
+            """
+
+        val caseInsensitive = $ctor($caseArgs)
+        assertPrints(caseInsensitive.isSortedWith(String.CASE_INSENSITIVE_ORDER), "true")"""
+        } ?: ""
+        appendLine(
+            """
+    @Sample
+    fun isSortedWith() {
+        val sorted = $ctor($sortedArgs)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = $ctor($reversedArgs)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")$caseInsensitiveLines
     }"""
         )
     }
 
     private fun BufferedWriter.writeSelectorSample(
         name: String,
-        collectionOf: String,
+        ctor: String,
         selectorValues: List<String>,
         assertions: List<Pair<String, Boolean>>,
-        callExpr: (String) -> String,
     ) {
         val args = selectorValues.joinToString(", ")
         val assertLines = assertions.joinToString("\n") { (selector, expected) ->
-            "        assertPrints(values.${callExpr(selector)}, \"$expected\")"
+            "        assertPrints(values.$name { $selector }, \"$expected\")"
         }
         appendLine(
             """
     @Sample
     fun $name() {
-        val values = $collectionOf($args)
+        val values = $ctor($args)
 $assertLines
     }"""
         )

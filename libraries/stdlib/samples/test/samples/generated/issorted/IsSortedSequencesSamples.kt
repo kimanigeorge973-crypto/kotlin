@@ -35,9 +35,15 @@ class IsSortedSequencesSamples {
 
     @Sample
     fun isSortedWith() {
-        val values = sequenceOf("c", "bb", "aaa")
-        assertPrints(values.isSortedWith(compareBy { it.length }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = sequenceOf("apple", "banana", "cherry")
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = sequenceOf("cherry", "banana", "apple")
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
+
+        val caseInsensitive = sequenceOf("Apple", "banana", "Cherry")
+        assertPrints(caseInsensitive.isSortedWith(String.CASE_INSENSITIVE_ORDER), "true")
     }
 
     @Sample

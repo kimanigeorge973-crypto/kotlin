@@ -35,10 +35,12 @@ class IsSortedCharArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = charArrayOf('A', 'b', 'C')
-        assertPrints(values.isSortedWith(compareBy { it.uppercaseChar() }), "true")
-        assertPrints(values.isSortedWith(compareBy { it.lowercaseChar() }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = charArrayOf('a', 'b', 'c')
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = charArrayOf('c', 'b', 'a')
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

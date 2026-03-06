@@ -36,10 +36,12 @@ class IsSortedShortArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = shortArrayOf(1, -2, 3, -4, 5)
-        assertPrints(values.isSortedWith(compareBy { it * it }), "true")
-        assertPrints(values.isSortedWith(compareBy { abs(it.toInt()) }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = shortArrayOf(1, 2, 3, 4, 5)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = shortArrayOf(5, 4, 3, 2, 1)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

@@ -35,9 +35,12 @@ class IsSortedUIntArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = uintArrayOf(3u, 1u, 4u, 2u)
-        assertPrints(values.isSortedWith(compareBy { it % 3u }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = uintArrayOf(1u, 2u, 3u, 4u, 5u)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = uintArrayOf(5u, 4u, 3u, 2u, 1u)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

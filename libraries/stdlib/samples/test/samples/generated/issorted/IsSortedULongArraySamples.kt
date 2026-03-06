@@ -35,9 +35,12 @@ class IsSortedULongArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = ulongArrayOf(3uL, 1uL, 4uL, 2uL)
-        assertPrints(values.isSortedWith(compareBy { it % 3uL }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = ulongArrayOf(1uL, 2uL, 3uL, 4uL, 5uL)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = ulongArrayOf(5uL, 4uL, 3uL, 2uL, 1uL)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

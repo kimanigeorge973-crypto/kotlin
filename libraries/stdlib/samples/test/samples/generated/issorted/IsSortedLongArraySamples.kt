@@ -36,10 +36,12 @@ class IsSortedLongArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = longArrayOf(1L, -2L, 3L, -4L, 5L)
-        assertPrints(values.isSortedWith(compareBy { it * it }), "true")
-        assertPrints(values.isSortedWith(compareBy { abs(it) }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "false")
+        val sorted = longArrayOf(1L, 2L, 3L, 4L, 5L)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = longArrayOf(5L, 4L, 3L, 2L, 1L)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

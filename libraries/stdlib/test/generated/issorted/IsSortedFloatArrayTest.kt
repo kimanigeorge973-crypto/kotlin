@@ -46,15 +46,21 @@ class IsSortedFloatArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(floatArrayOf().isSortedBy { it })
+        assertTrue(floatArrayOf(1.0f).isSortedBy { it })
         assertTrue(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedBy { it })
         assertFalse(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedBy { it })
+        assertFalse(floatArrayOf(2.5f, 1.0f, 3.14f).isSortedBy { it })
+        assertTrue(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(floatArrayOf().isSortedByDescending { it })
+        assertTrue(floatArrayOf(3.14f).isSortedByDescending { it })
         assertTrue(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedByDescending { it })
         assertFalse(floatArrayOf(1.0f, 2.5f, 3.14f).isSortedByDescending { it })
+        assertFalse(floatArrayOf(2.5f, 3.14f, 1.0f).isSortedByDescending { it })
+        assertTrue(floatArrayOf(3.14f, 2.5f, 1.0f).isSortedByDescending { 0 })
     }
 
     @Test
@@ -65,6 +71,8 @@ class IsSortedFloatArrayTest {
         assertTrue(floatArrayOf(Float.NaN, Float.NaN).isSorted())
         assertTrue(floatArrayOf(Float.NaN, 2.0f, 1.0f).isSortedDescending())
         assertFalse(floatArrayOf(2.0f, 1.0f, Float.NaN).isSortedDescending())
+        assertFalse(floatArrayOf(2.0f, Float.NaN, 1.0f).isSortedDescending())
+        assertTrue(floatArrayOf(Float.NaN, Float.NaN).isSortedDescending())
     }
 
     @Test
@@ -73,5 +81,41 @@ class IsSortedFloatArrayTest {
         assertFalse(floatArrayOf(0.0f, -0.0f).isSorted())
         assertTrue(floatArrayOf(0.0f, -0.0f).isSortedDescending())
         assertFalse(floatArrayOf(-0.0f, 0.0f).isSortedDescending())
+    }
+
+    @Test
+    fun isSortedWithNaNFloat() {
+        assertTrue(floatArrayOf(1.0f, 2.0f, Float.NaN).isSortedWith(naturalOrder()))
+        assertFalse(floatArrayOf(Float.NaN, 1.0f, 2.0f).isSortedWith(naturalOrder()))
+        assertTrue(floatArrayOf(Float.NaN, 2.0f, 1.0f).isSortedWith(reverseOrder()))
+        assertFalse(floatArrayOf(2.0f, 1.0f, Float.NaN).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedWithNegativeZeroFloat() {
+        assertTrue(floatArrayOf(-0.0f, 0.0f).isSortedWith(naturalOrder()))
+        assertFalse(floatArrayOf(0.0f, -0.0f).isSortedWith(naturalOrder()))
+        assertTrue(floatArrayOf(0.0f, -0.0f).isSortedWith(reverseOrder()))
+        assertFalse(floatArrayOf(-0.0f, 0.0f).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedByNaNFloat() {
+        assertTrue(floatArrayOf(1.0f, 2.0f, Float.NaN).isSortedBy { it })
+        assertFalse(floatArrayOf(Float.NaN, 1.0f, 2.0f).isSortedBy { it })
+        assertFalse(floatArrayOf(1.0f, Float.NaN, 2.0f).isSortedBy { it })
+        assertTrue(floatArrayOf(Float.NaN, Float.NaN).isSortedBy { it })
+        assertTrue(floatArrayOf(Float.NaN, 2.0f, 1.0f).isSortedByDescending { it })
+        assertFalse(floatArrayOf(2.0f, 1.0f, Float.NaN).isSortedByDescending { it })
+        assertFalse(floatArrayOf(2.0f, Float.NaN, 1.0f).isSortedByDescending { it })
+        assertTrue(floatArrayOf(Float.NaN, Float.NaN).isSortedByDescending { it })
+    }
+
+    @Test
+    fun isSortedByNegativeZeroFloat() {
+        assertTrue(floatArrayOf(-0.0f, 0.0f).isSortedBy { it })
+        assertFalse(floatArrayOf(0.0f, -0.0f).isSortedBy { it })
+        assertTrue(floatArrayOf(0.0f, -0.0f).isSortedByDescending { it })
+        assertFalse(floatArrayOf(-0.0f, 0.0f).isSortedByDescending { it })
     }
 }

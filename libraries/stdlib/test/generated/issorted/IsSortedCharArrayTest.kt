@@ -46,14 +46,20 @@ class IsSortedCharArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(charArrayOf().isSortedBy { it })
+        assertTrue(charArrayOf('a').isSortedBy { it })
         assertTrue(charArrayOf('a', 'b', 'c').isSortedBy { it })
         assertFalse(charArrayOf('c', 'b', 'a').isSortedBy { it })
+        assertFalse(charArrayOf('b', 'a', 'c').isSortedBy { it })
+        assertTrue(charArrayOf('a', 'b', 'c').isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(charArrayOf().isSortedByDescending { it })
+        assertTrue(charArrayOf('c').isSortedByDescending { it })
         assertTrue(charArrayOf('c', 'b', 'a').isSortedByDescending { it })
         assertFalse(charArrayOf('a', 'b', 'c').isSortedByDescending { it })
+        assertFalse(charArrayOf('b', 'c', 'a').isSortedByDescending { it })
+        assertTrue(charArrayOf('c', 'b', 'a').isSortedByDescending { 0 })
     }
 }

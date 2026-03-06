@@ -2842,13 +2842,19 @@ public fun UShortArray.isSorted(): Boolean {
  * and the array is considered sorted if for each pair of adjacent elements
  * the [selector] value of the preceding element is not greater than that of the following one.
  * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
+ * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> UIntArray.isSortedBy(selector: (UInt) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) > 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2862,14 +2868,20 @@ public inline fun <R : Comparable<R>> UIntArray.isSortedBy(selector: (UInt) -> R
  * The [selector] values of adjacent elements are compared sequentially,
  * and the array is considered sorted if for each pair of adjacent elements
  * the [selector] value of the preceding element is not greater than that of the following one.
+ * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> ULongArray.isSortedBy(selector: (ULong) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) > 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2883,14 +2895,20 @@ public inline fun <R : Comparable<R>> ULongArray.isSortedBy(selector: (ULong) ->
  * The [selector] values of adjacent elements are compared sequentially,
  * and the array is considered sorted if for each pair of adjacent elements
  * the [selector] value of the preceding element is not greater than that of the following one.
+ * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> UByteArray.isSortedBy(selector: (UByte) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) > 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2905,13 +2923,19 @@ public inline fun <R : Comparable<R>> UByteArray.isSortedBy(selector: (UByte) ->
  * and the array is considered sorted if for each pair of adjacent elements
  * the [selector] value of the preceding element is not greater than that of the following one.
  * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
+ * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSortedBy
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> UShortArray.isSortedBy(selector: (UShort) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) > 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) > 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2926,14 +2950,20 @@ public inline fun <R : Comparable<R>> UShortArray.isSortedBy(selector: (UShort) 
  * and the array is considered sorted in descending order if for each pair
  * of adjacent elements the [selector] value of the preceding element is not less
  * than that of the following one.
+ * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
  * 
  * @sample samples.generated.issorted.IsSortedUIntArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> UIntArray.isSortedByDescending(selector: (UInt) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) < 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2948,14 +2978,20 @@ public inline fun <R : Comparable<R>> UIntArray.isSortedByDescending(selector: (
  * and the array is considered sorted in descending order if for each pair
  * of adjacent elements the [selector] value of the preceding element is not less
  * than that of the following one.
+ * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
  * 
  * @sample samples.generated.issorted.IsSortedULongArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> ULongArray.isSortedByDescending(selector: (ULong) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) < 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2970,14 +3006,20 @@ public inline fun <R : Comparable<R>> ULongArray.isSortedByDescending(selector: 
  * and the array is considered sorted in descending order if for each pair
  * of adjacent elements the [selector] value of the preceding element is not less
  * than that of the following one.
+ * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
  * 
  * @sample samples.generated.issorted.IsSortedUByteArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> UByteArray.isSortedByDescending(selector: (UByte) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) < 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -2993,13 +3035,19 @@ public inline fun <R : Comparable<R>> UByteArray.isSortedByDescending(selector: 
  * of adjacent elements the [selector] value of the preceding element is not less
  * than that of the following one.
  * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
+ * 
  * @sample samples.generated.issorted.IsSortedUShortArraySamples.isSortedByDescending
  */
 @SinceKotlin("2.4")
 @ExperimentalUnsignedTypes
 public inline fun <R : Comparable<R>> UShortArray.isSortedByDescending(selector: (UShort) -> R?): Boolean {
+    if (isEmpty()) return true
+    var previousValue = selector(this[0])
     for (i in 1..lastIndex) {
-        if (compareValues(selector(this[i - 1]), selector(this[i])) < 0) return false
+        val currentValue = selector(this[i])
+        if (compareValues(previousValue, currentValue) < 0) return false
+        previousValue = currentValue
     }
     return true
 }

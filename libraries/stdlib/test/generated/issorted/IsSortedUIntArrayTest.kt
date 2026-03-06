@@ -46,14 +46,20 @@ class IsSortedUIntArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(uintArrayOf().isSortedBy { it })
+        assertTrue(uintArrayOf(1u).isSortedBy { it })
         assertTrue(uintArrayOf(1u, 2u, 3u, 4u, 5u).isSortedBy { it })
         assertFalse(uintArrayOf(5u, 4u, 3u, 2u, 1u).isSortedBy { it })
+        assertFalse(uintArrayOf(2u, 1u, 3u, 4u, 5u).isSortedBy { it })
+        assertTrue(uintArrayOf(1u, 2u, 3u, 4u, 5u).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(uintArrayOf().isSortedByDescending { it })
+        assertTrue(uintArrayOf(5u).isSortedByDescending { it })
         assertTrue(uintArrayOf(5u, 4u, 3u, 2u, 1u).isSortedByDescending { it })
         assertFalse(uintArrayOf(1u, 2u, 3u, 4u, 5u).isSortedByDescending { it })
+        assertFalse(uintArrayOf(4u, 5u, 3u, 2u, 1u).isSortedByDescending { it })
+        assertTrue(uintArrayOf(5u, 4u, 3u, 2u, 1u).isSortedByDescending { 0 })
     }
 }

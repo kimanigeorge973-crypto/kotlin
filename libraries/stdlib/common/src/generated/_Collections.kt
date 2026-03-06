@@ -1012,6 +1012,8 @@ public fun <T : Comparable<T>> Iterable<T>.isSorted(): Boolean {
  * and the collection is considered sorted if for each pair of adjacent elements
  * the [selector] value of the preceding element is not greater than that of the following one.
  * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
+ * 
  * Note that the result depends on the iteration order of the collection.
  * The iteration order of some [Iterable] implementations may be unstable
  * (change from one invocation to the next),
@@ -1023,11 +1025,11 @@ public fun <T : Comparable<T>> Iterable<T>.isSorted(): Boolean {
 public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(selector: (T) -> R?): Boolean {
     val iterator = iterator()
     if (!iterator.hasNext()) return true
-    var currentValue = selector(iterator.next())
+    var previousValue = selector(iterator.next())
     while (iterator.hasNext()) {
-        val nextValue = selector(iterator.next())
-        if (compareValues(currentValue, nextValue) > 0) return false
-        currentValue = nextValue
+        val currentValue = selector(iterator.next())
+        if (compareValues(previousValue, currentValue) > 0) return false
+        previousValue = currentValue
     }
     return true
 }
@@ -1043,6 +1045,8 @@ public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(selector: (T) ->
  * of adjacent elements the [selector] value of the preceding element is not less
  * than that of the following one.
  * 
+ * If the [selector] returns `null` for an element, the `null` value is treated as less than any non-null value.
+ * 
  * Note that the result depends on the iteration order of the collection.
  * The iteration order of some [Iterable] implementations may be unstable
  * (change from one invocation to the next),
@@ -1054,11 +1058,11 @@ public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(selector: (T) ->
 public inline fun <T, R : Comparable<R>> Iterable<T>.isSortedByDescending(selector: (T) -> R?): Boolean {
     val iterator = iterator()
     if (!iterator.hasNext()) return true
-    var currentValue = selector(iterator.next())
+    var previousValue = selector(iterator.next())
     while (iterator.hasNext()) {
-        val nextValue = selector(iterator.next())
-        if (compareValues(currentValue, nextValue) < 0) return false
-        currentValue = nextValue
+        val currentValue = selector(iterator.next())
+        if (compareValues(previousValue, currentValue) < 0) return false
+        previousValue = currentValue
     }
     return true
 }

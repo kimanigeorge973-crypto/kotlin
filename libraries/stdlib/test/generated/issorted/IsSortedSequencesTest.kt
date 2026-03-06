@@ -47,16 +47,31 @@ class IsSortedSequencesTest {
 
     @Test
     fun isSortedBy() {
-        assertTrue(sequenceOf<String>().isSortedBy { it })
+        assertTrue(sequenceOf<String>().isSortedBy { it.length })
+        assertTrue(sequenceOf("a").isSortedBy { it.length })
         assertTrue(sequenceOf("a", "bb", "ccc").isSortedBy { it.length })
         assertFalse(sequenceOf("ccc", "bb", "a").isSortedBy { it.length })
+        assertFalse(sequenceOf("bb", "a", "ccc").isSortedBy { it.length })
+        assertTrue(sequenceOf("a", "bb", "ccc").isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
-        assertTrue(sequenceOf<String>().isSortedByDescending { it })
+        assertTrue(sequenceOf<String>().isSortedByDescending { it.length })
+        assertTrue(sequenceOf("ccc").isSortedByDescending { it.length })
         assertTrue(sequenceOf("ccc", "bb", "a").isSortedByDescending { it.length })
         assertFalse(sequenceOf("a", "bb", "ccc").isSortedByDescending { it.length })
+        assertFalse(sequenceOf("bb", "ccc", "a").isSortedByDescending { it.length })
+        assertTrue(sequenceOf("ccc", "bb", "a").isSortedByDescending { 0 })
+    }
+
+    @Test
+    fun isSortedByNullSelector() {
+        assertTrue(sequenceOf("b", "a").isSortedBy<String, String> { null })
+        assertTrue(sequenceOf("a", "a", "b").isSortedBy { if (it == "a") null else it })
+        assertFalse(sequenceOf("b", "a").isSortedBy { if (it == "a") null else it })
+        assertTrue(sequenceOf("b", "a").isSortedByDescending { if (it == "a") null else it })
+        assertFalse(sequenceOf("a", "b").isSortedByDescending { if (it == "a") null else it })
     }
 
     @Test
@@ -67,6 +82,8 @@ class IsSortedSequencesTest {
         assertTrue(sequenceOf(Double.NaN, Double.NaN).isSorted())
         assertTrue(sequenceOf(Double.NaN, 2.0, 1.0).isSortedDescending())
         assertFalse(sequenceOf(2.0, 1.0, Double.NaN).isSortedDescending())
+        assertFalse(sequenceOf(2.0, Double.NaN, 1.0).isSortedDescending())
+        assertTrue(sequenceOf(Double.NaN, Double.NaN).isSortedDescending())
     }
 
     @Test
@@ -78,6 +95,42 @@ class IsSortedSequencesTest {
     }
 
     @Test
+    fun isSortedWithNaNDouble() {
+        assertTrue(sequenceOf(1.0, 2.0, Double.NaN).isSortedWith(naturalOrder()))
+        assertFalse(sequenceOf(Double.NaN, 1.0, 2.0).isSortedWith(naturalOrder()))
+        assertTrue(sequenceOf(Double.NaN, 2.0, 1.0).isSortedWith(reverseOrder()))
+        assertFalse(sequenceOf(2.0, 1.0, Double.NaN).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedWithNegativeZeroDouble() {
+        assertTrue(sequenceOf(-0.0, 0.0).isSortedWith(naturalOrder()))
+        assertFalse(sequenceOf(0.0, -0.0).isSortedWith(naturalOrder()))
+        assertTrue(sequenceOf(0.0, -0.0).isSortedWith(reverseOrder()))
+        assertFalse(sequenceOf(-0.0, 0.0).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedByNaNDouble() {
+        assertTrue(sequenceOf(1.0, 2.0, Double.NaN).isSortedBy { it })
+        assertFalse(sequenceOf(Double.NaN, 1.0, 2.0).isSortedBy { it })
+        assertFalse(sequenceOf(1.0, Double.NaN, 2.0).isSortedBy { it })
+        assertTrue(sequenceOf(Double.NaN, Double.NaN).isSortedBy { it })
+        assertTrue(sequenceOf(Double.NaN, 2.0, 1.0).isSortedByDescending { it })
+        assertFalse(sequenceOf(2.0, 1.0, Double.NaN).isSortedByDescending { it })
+        assertFalse(sequenceOf(2.0, Double.NaN, 1.0).isSortedByDescending { it })
+        assertTrue(sequenceOf(Double.NaN, Double.NaN).isSortedByDescending { it })
+    }
+
+    @Test
+    fun isSortedByNegativeZeroDouble() {
+        assertTrue(sequenceOf(-0.0, 0.0).isSortedBy { it })
+        assertFalse(sequenceOf(0.0, -0.0).isSortedBy { it })
+        assertTrue(sequenceOf(0.0, -0.0).isSortedByDescending { it })
+        assertFalse(sequenceOf(-0.0, 0.0).isSortedByDescending { it })
+    }
+
+    @Test
     fun isSortedNaNFloat() {
         assertTrue(sequenceOf(1.0f, 2.0f, Float.NaN).isSorted())
         assertFalse(sequenceOf(Float.NaN, 1.0f, 2.0f).isSorted())
@@ -85,6 +138,8 @@ class IsSortedSequencesTest {
         assertTrue(sequenceOf(Float.NaN, Float.NaN).isSorted())
         assertTrue(sequenceOf(Float.NaN, 2.0f, 1.0f).isSortedDescending())
         assertFalse(sequenceOf(2.0f, 1.0f, Float.NaN).isSortedDescending())
+        assertFalse(sequenceOf(2.0f, Float.NaN, 1.0f).isSortedDescending())
+        assertTrue(sequenceOf(Float.NaN, Float.NaN).isSortedDescending())
     }
 
     @Test
@@ -93,5 +148,41 @@ class IsSortedSequencesTest {
         assertFalse(sequenceOf(0.0f, -0.0f).isSorted())
         assertTrue(sequenceOf(0.0f, -0.0f).isSortedDescending())
         assertFalse(sequenceOf(-0.0f, 0.0f).isSortedDescending())
+    }
+
+    @Test
+    fun isSortedWithNaNFloat() {
+        assertTrue(sequenceOf(1.0f, 2.0f, Float.NaN).isSortedWith(naturalOrder()))
+        assertFalse(sequenceOf(Float.NaN, 1.0f, 2.0f).isSortedWith(naturalOrder()))
+        assertTrue(sequenceOf(Float.NaN, 2.0f, 1.0f).isSortedWith(reverseOrder()))
+        assertFalse(sequenceOf(2.0f, 1.0f, Float.NaN).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedWithNegativeZeroFloat() {
+        assertTrue(sequenceOf(-0.0f, 0.0f).isSortedWith(naturalOrder()))
+        assertFalse(sequenceOf(0.0f, -0.0f).isSortedWith(naturalOrder()))
+        assertTrue(sequenceOf(0.0f, -0.0f).isSortedWith(reverseOrder()))
+        assertFalse(sequenceOf(-0.0f, 0.0f).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedByNaNFloat() {
+        assertTrue(sequenceOf(1.0f, 2.0f, Float.NaN).isSortedBy { it })
+        assertFalse(sequenceOf(Float.NaN, 1.0f, 2.0f).isSortedBy { it })
+        assertFalse(sequenceOf(1.0f, Float.NaN, 2.0f).isSortedBy { it })
+        assertTrue(sequenceOf(Float.NaN, Float.NaN).isSortedBy { it })
+        assertTrue(sequenceOf(Float.NaN, 2.0f, 1.0f).isSortedByDescending { it })
+        assertFalse(sequenceOf(2.0f, 1.0f, Float.NaN).isSortedByDescending { it })
+        assertFalse(sequenceOf(2.0f, Float.NaN, 1.0f).isSortedByDescending { it })
+        assertTrue(sequenceOf(Float.NaN, Float.NaN).isSortedByDescending { it })
+    }
+
+    @Test
+    fun isSortedByNegativeZeroFloat() {
+        assertTrue(sequenceOf(-0.0f, 0.0f).isSortedBy { it })
+        assertFalse(sequenceOf(0.0f, -0.0f).isSortedBy { it })
+        assertTrue(sequenceOf(0.0f, -0.0f).isSortedByDescending { it })
+        assertFalse(sequenceOf(-0.0f, 0.0f).isSortedByDescending { it })
     }
 }

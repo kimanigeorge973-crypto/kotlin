@@ -46,14 +46,20 @@ class IsSortedULongArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(ulongArrayOf().isSortedBy { it })
+        assertTrue(ulongArrayOf(1uL).isSortedBy { it })
         assertTrue(ulongArrayOf(1uL, 2uL, 3uL, 4uL, 5uL).isSortedBy { it })
         assertFalse(ulongArrayOf(5uL, 4uL, 3uL, 2uL, 1uL).isSortedBy { it })
+        assertFalse(ulongArrayOf(2uL, 1uL, 3uL, 4uL, 5uL).isSortedBy { it })
+        assertTrue(ulongArrayOf(1uL, 2uL, 3uL, 4uL, 5uL).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(ulongArrayOf().isSortedByDescending { it })
+        assertTrue(ulongArrayOf(5uL).isSortedByDescending { it })
         assertTrue(ulongArrayOf(5uL, 4uL, 3uL, 2uL, 1uL).isSortedByDescending { it })
         assertFalse(ulongArrayOf(1uL, 2uL, 3uL, 4uL, 5uL).isSortedByDescending { it })
+        assertFalse(ulongArrayOf(4uL, 5uL, 3uL, 2uL, 1uL).isSortedByDescending { it })
+        assertTrue(ulongArrayOf(5uL, 4uL, 3uL, 2uL, 1uL).isSortedByDescending { 0 })
     }
 }

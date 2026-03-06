@@ -46,14 +46,20 @@ class IsSortedShortArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(shortArrayOf().isSortedBy { it })
+        assertTrue(shortArrayOf(1).isSortedBy { it })
         assertTrue(shortArrayOf(1, 2, 3, 4, 5).isSortedBy { it })
         assertFalse(shortArrayOf(5, 4, 3, 2, 1).isSortedBy { it })
+        assertFalse(shortArrayOf(2, 1, 3, 4, 5).isSortedBy { it })
+        assertTrue(shortArrayOf(1, 2, 3, 4, 5).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(shortArrayOf().isSortedByDescending { it })
+        assertTrue(shortArrayOf(5).isSortedByDescending { it })
         assertTrue(shortArrayOf(5, 4, 3, 2, 1).isSortedByDescending { it })
         assertFalse(shortArrayOf(1, 2, 3, 4, 5).isSortedByDescending { it })
+        assertFalse(shortArrayOf(4, 5, 3, 2, 1).isSortedByDescending { it })
+        assertTrue(shortArrayOf(5, 4, 3, 2, 1).isSortedByDescending { 0 })
     }
 }

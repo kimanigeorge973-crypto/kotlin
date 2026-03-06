@@ -7,7 +7,6 @@ package generators.test
 
 import templates.*
 import java.io.BufferedWriter
-import java.io.File
 
 object IsSortedTestGenerator {
     fun generate() {
@@ -20,27 +19,26 @@ object IsSortedTestGenerator {
         val config = isSortedConfigFor(primitive)
         val emptyCollection = if (primitive == null) "$ctor<String>()" else "$ctor()"
         val fpTypes = when (primitive) {
-            null -> listOf(PrimitiveType.Double, PrimitiveType.Float)
-            PrimitiveType.Float, PrimitiveType.Double -> listOf(primitive)
+            null -> PrimitiveType.floatingPointPrimitives.toList()
+            in PrimitiveType.floatingPointPrimitives -> listOf(primitive)
             else -> emptyList()
         }
 
         val className = "IsSorted${collectionClass}Test"
-        val file = File("libraries/stdlib/test/generated/issorted/$className.kt")
-        file.parentFile.mkdirs()
-        file.bufferedWriter().use { writer ->
-            writer.apply {
-                writeHeader(className)
-                writeIsSortedTest(ctor, config, emptyCollection, descending = false)
-                writeIsSortedTest(ctor, config, emptyCollection, descending = true)
-                writeIsSortedWithTest(ctor, config, emptyCollection)
-                writeIsSortedByTest(ctor, config, emptyCollection, descending = false)
-                writeIsSortedByTest(ctor, config, emptyCollection, descending = true)
-                for (fpType in fpTypes) {
-                    writeFpTests(ctor, fpType)
-                }
-                appendLine("}")
+        writeGeneratedFile("libraries/stdlib/test/generated/issorted/$className.kt") {
+            writeHeader(className)
+            writeIsSortedTest(ctor, config, emptyCollection, descending = false)
+            writeIsSortedTest(ctor, config, emptyCollection, descending = true)
+            writeIsSortedWithTest(ctor, config, emptyCollection)
+            writeIsSortedByTest(ctor, config, emptyCollection, descending = false)
+            writeIsSortedByTest(ctor, config, emptyCollection, descending = true)
+            if (primitive == null || primitive == PrimitiveType.Int) {
+                writeIsSortedByNullSelectorTest(ctor, primitive)
             }
+            for (fpType in fpTypes) {
+                writeFpTests(ctor, fpType)
+            }
+            appendLine("}")
         }
     }
 
@@ -58,20 +56,17 @@ object IsSortedTestGenerator {
 
     private fun BufferedWriter.writeIsSortedTest(ctor: String, config: IsSortedTypeConfig, emptyCollection: String, descending: Boolean) {
         val funcName = if (descending) "isSortedDescending" else "isSorted"
-        val sorted = config.sortedValues
-        val equalElement = sorted[1]
-        val ascValues = sorted.joinToString()
-        val descValues = sorted.reversed().joinToString()
-        val expectedSorted = if (descending) descValues else ascValues
-        val expectedUnsorted = if (descending) ascValues else descValues
+        val orderedValues = if (descending) config.sortedValues.reversed() else config.sortedValues
+        val reversedValues = orderedValues.reversed()
+        val equalElement = config.sortedValues[1]
         appendLine(
             """
     @Test
     fun $funcName() {
         assertTrue($emptyCollection.$funcName())
-        assertTrue($ctor(${sorted.take(1).joinToString()}).$funcName())
-        assertTrue($ctor($expectedSorted).$funcName())
-        assertFalse($ctor($expectedUnsorted).$funcName())
+        assertTrue($ctor(${config.sortedValues.first()}).$funcName())
+        assertTrue($ctor(${orderedValues.joinToString()}).$funcName())
+        assertFalse($ctor(${reversedValues.joinToString()}).$funcName())
         assertFalse($ctor(${config.unsortedValues.joinToString()}).$funcName())
         assertTrue($ctor($equalElement, $equalElement, $equalElement).$funcName())
     }"""
@@ -102,14 +97,36 @@ object IsSortedTestGenerator {
         val funcName = if (descending) "isSortedByDescending" else "isSortedBy"
         val selectorExpr = config.selectorExpr
         val sortedValues = if (descending) config.selectorSortedValues.reversed() else config.selectorSortedValues
-        val unsortedValues = if (descending) config.selectorSortedValues else config.selectorSortedValues.reversed()
+        val reversedValues = sortedValues.reversed()
+        val swappedValues = swapAdjacentPair(sortedValues)
         appendLine(
             """
     @Test
     fun $funcName() {
-        assertTrue($emptyCollection.$funcName { it })
+        assertTrue($emptyCollection.$funcName { $selectorExpr })
+        assertTrue($ctor(${sortedValues.first()}).$funcName { $selectorExpr })
         assertTrue($ctor(${sortedValues.joinToString()}).$funcName { $selectorExpr })
-        assertFalse($ctor(${unsortedValues.joinToString()}).$funcName { $selectorExpr })
+        assertFalse($ctor(${reversedValues.joinToString()}).$funcName { $selectorExpr })
+        assertFalse($ctor(${swappedValues.joinToString()}).$funcName { $selectorExpr })
+        assertTrue($ctor(${sortedValues.joinToString()}).$funcName { 0 })
+    }"""
+        )
+    }
+
+    private fun BufferedWriter.writeIsSortedByNullSelectorTest(ctor: String, primitive: PrimitiveType?) {
+        val a = if (primitive == null) "\"a\"" else "1"
+        val b = if (primitive == null) "\"b\"" else "2"
+        val nullSelectorTypeArgs = if (primitive == null) "<String, String>" else "<Int>"
+        val conditionalNullTypeArgs = if (primitive == null) "" else "<Int>"
+        appendLine(
+            """
+    @Test
+    fun isSortedByNullSelector() {
+        assertTrue($ctor($b, $a).isSortedBy$nullSelectorTypeArgs { null })
+        assertTrue($ctor($a, $a, $b).isSortedBy$conditionalNullTypeArgs { if (it == $a) null else it })
+        assertFalse($ctor($b, $a).isSortedBy$conditionalNullTypeArgs { if (it == $a) null else it })
+        assertTrue($ctor($b, $a).isSortedByDescending$conditionalNullTypeArgs { if (it == $a) null else it })
+        assertFalse($ctor($a, $b).isSortedByDescending$conditionalNullTypeArgs { if (it == $a) null else it })
     }"""
         )
     }
@@ -132,6 +149,8 @@ object IsSortedTestGenerator {
         assertTrue($ctor($nanVal, $nanVal).isSorted())
         assertTrue($ctor($nanVal, $val2, $val1).isSortedDescending())
         assertFalse($ctor($val2, $val1, $nanVal).isSortedDescending())
+        assertFalse($ctor($val2, $nanVal, $val1).isSortedDescending())
+        assertTrue($ctor($nanVal, $nanVal).isSortedDescending())
     }
 
     @Test
@@ -140,6 +159,42 @@ object IsSortedTestGenerator {
         assertFalse($ctor($zeroPos, $zeroNeg).isSorted())
         assertTrue($ctor($zeroPos, $zeroNeg).isSortedDescending())
         assertFalse($ctor($zeroNeg, $zeroPos).isSortedDescending())
+    }
+
+    @Test
+    fun isSortedWithNaN$typeName() {
+        assertTrue($ctor($val1, $val2, $nanVal).isSortedWith(naturalOrder()))
+        assertFalse($ctor($nanVal, $val1, $val2).isSortedWith(naturalOrder()))
+        assertTrue($ctor($nanVal, $val2, $val1).isSortedWith(reverseOrder()))
+        assertFalse($ctor($val2, $val1, $nanVal).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedWithNegativeZero$typeName() {
+        assertTrue($ctor($zeroNeg, $zeroPos).isSortedWith(naturalOrder()))
+        assertFalse($ctor($zeroPos, $zeroNeg).isSortedWith(naturalOrder()))
+        assertTrue($ctor($zeroPos, $zeroNeg).isSortedWith(reverseOrder()))
+        assertFalse($ctor($zeroNeg, $zeroPos).isSortedWith(reverseOrder()))
+    }
+
+    @Test
+    fun isSortedByNaN$typeName() {
+        assertTrue($ctor($val1, $val2, $nanVal).isSortedBy { it })
+        assertFalse($ctor($nanVal, $val1, $val2).isSortedBy { it })
+        assertFalse($ctor($val1, $nanVal, $val2).isSortedBy { it })
+        assertTrue($ctor($nanVal, $nanVal).isSortedBy { it })
+        assertTrue($ctor($nanVal, $val2, $val1).isSortedByDescending { it })
+        assertFalse($ctor($val2, $val1, $nanVal).isSortedByDescending { it })
+        assertFalse($ctor($val2, $nanVal, $val1).isSortedByDescending { it })
+        assertTrue($ctor($nanVal, $nanVal).isSortedByDescending { it })
+    }
+
+    @Test
+    fun isSortedByNegativeZero$typeName() {
+        assertTrue($ctor($zeroNeg, $zeroPos).isSortedBy { it })
+        assertFalse($ctor($zeroPos, $zeroNeg).isSortedBy { it })
+        assertTrue($ctor($zeroPos, $zeroNeg).isSortedByDescending { it })
+        assertFalse($ctor($zeroNeg, $zeroPos).isSortedByDescending { it })
     }"""
         )
     }

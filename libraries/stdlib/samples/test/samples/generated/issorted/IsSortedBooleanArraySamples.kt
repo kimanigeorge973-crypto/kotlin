@@ -35,10 +35,12 @@ class IsSortedBooleanArraySamples {
 
     @Sample
     fun isSortedWith() {
-        val values = booleanArrayOf(false, false, true)
-        assertPrints(values.isSortedWith(compareBy { it.compareTo(false) }), "true")
-        assertPrints(values.isSortedWith(compareBy { it }), "true")
-        assertPrints(values.isSortedWith(compareBy { !it }), "false")
+        val sorted = booleanArrayOf(false, false, true)
+        assertPrints(sorted.isSortedWith(naturalOrder()), "true")
+        assertPrints(sorted.isSortedWith(reverseOrder()), "false")
+
+        val reversed = booleanArrayOf(true, false, false)
+        assertPrints(reversed.isSortedWith(reverseOrder()), "true")
     }
 
     @Sample

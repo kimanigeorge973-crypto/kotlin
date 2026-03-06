@@ -46,14 +46,20 @@ class IsSortedByteArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(byteArrayOf().isSortedBy { it })
+        assertTrue(byteArrayOf(1).isSortedBy { it })
         assertTrue(byteArrayOf(1, 2, 3, 4, 5).isSortedBy { it })
         assertFalse(byteArrayOf(5, 4, 3, 2, 1).isSortedBy { it })
+        assertFalse(byteArrayOf(2, 1, 3, 4, 5).isSortedBy { it })
+        assertTrue(byteArrayOf(1, 2, 3, 4, 5).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(byteArrayOf().isSortedByDescending { it })
+        assertTrue(byteArrayOf(5).isSortedByDescending { it })
         assertTrue(byteArrayOf(5, 4, 3, 2, 1).isSortedByDescending { it })
         assertFalse(byteArrayOf(1, 2, 3, 4, 5).isSortedByDescending { it })
+        assertFalse(byteArrayOf(4, 5, 3, 2, 1).isSortedByDescending { it })
+        assertTrue(byteArrayOf(5, 4, 3, 2, 1).isSortedByDescending { 0 })
     }
 }

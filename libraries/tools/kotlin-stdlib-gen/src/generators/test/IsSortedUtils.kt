@@ -8,6 +8,8 @@ package generators.test
 import templates.Family
 import templates.Family.*
 import templates.PrimitiveType
+import java.io.BufferedWriter
+import java.io.File
 
 fun collectionClassName(family: Family, primitive: PrimitiveType?): String = when (family) {
     Iterables, Sequences -> family.toString()
@@ -36,17 +38,27 @@ fun forEachIsSortedFamily(action: (Family, PrimitiveType?) -> Unit) {
     }
 }
 
+fun writeGeneratedFile(path: String, block: BufferedWriter.() -> Unit) {
+    val file = File(path)
+    file.parentFile.mkdirs()
+    file.bufferedWriter().use { it.block() }
+}
+
 fun swapAdjacentPair(values: List<String>): List<String> {
     val i = values.zipWithNext().indexOfFirst { (a, b) -> a != b }
+    check(i >= 0) { "Cannot swap: all elements are equal" }
     return values.toMutableList().apply { this[i] = this[i + 1].also { this[i + 1] = this[i] } }
 }
+
+data class CaseInsensitiveTestData(val sorted: List<String>, val unsorted: List<String>)
 
 class IsSortedTypeConfig(
     val sortedValues: List<String>,
     val unsortedValues: List<String> = swapAdjacentPair(sortedValues),
     val selectorExpr: String = "it",
     val selectorSortedValues: List<String> = sortedValues,
-    val caseInsensitiveValues: Pair<List<String>, List<String>>? = null,
+    val caseInsensitiveValues: CaseInsensitiveTestData? = null,
+    val sampleNeedsAbsImport: Boolean = false,
     val sampleSortedValues: List<String> = sortedValues,
     val sampleSelectorValues: List<String>,
     val sampleSelectorAssertions: List<Pair<String, Boolean>>,
@@ -54,6 +66,7 @@ class IsSortedTypeConfig(
 
 private fun signedIntConfig(suffix: String, absExpr: String): IsSortedTypeConfig = IsSortedTypeConfig(
     sortedValues = (1..5).map { "$it$suffix" },
+    sampleNeedsAbsImport = true,
     sampleSelectorValues = listOf("1", "-2", "3", "-4", "5").map { "$it$suffix" },
     sampleSelectorAssertions = listOf("it * it" to true, absExpr to true, "it" to false)
 )
@@ -66,6 +79,7 @@ private fun unsignedIntConfig(suffix: String, modExpr: String): IsSortedTypeConf
 
 private fun floatingPointConfig(suffix: String): IsSortedTypeConfig = IsSortedTypeConfig(
     sortedValues = listOf("1.0", "2.5", "3.14").map { "$it$suffix" },
+    sampleNeedsAbsImport = true,
     sampleSelectorValues = listOf("-0.5", "1.0", "-1.5", "2.0").map { "$it$suffix" },
     sampleSelectorAssertions = listOf("it * it" to true, "abs(it)" to true, "it" to false)
 )
@@ -87,7 +101,10 @@ fun isSortedConfigFor(primitive: PrimitiveType?): IsSortedTypeConfig = when (pri
         sortedValues = listOf("\"a\"", "\"b\"", "\"c\""),
         selectorExpr = "it.length",
         selectorSortedValues = listOf("\"a\"", "\"bb\"", "\"ccc\""),
-        caseInsensitiveValues = listOf("\"Apple\"", "\"banana\"", "\"Cherry\"") to listOf("\"banana\"", "\"Apple\"", "\"Cherry\""),
+        caseInsensitiveValues = CaseInsensitiveTestData(
+            sorted = listOf("\"Apple\"", "\"banana\"", "\"Cherry\""),
+            unsorted = listOf("\"banana\"", "\"Apple\"", "\"Cherry\"")
+        ),
         sampleSortedValues = listOf("\"apple\"", "\"banana\"", "\"cherry\""),
         sampleSelectorValues = listOf("\"c\"", "\"bb\"", "\"aaa\""),
         sampleSelectorAssertions = listOf("it.length" to true, "it" to false)

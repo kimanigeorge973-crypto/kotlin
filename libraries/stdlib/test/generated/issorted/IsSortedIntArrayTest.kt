@@ -46,14 +46,29 @@ class IsSortedIntArrayTest {
     @Test
     fun isSortedBy() {
         assertTrue(intArrayOf().isSortedBy { it })
+        assertTrue(intArrayOf(1).isSortedBy { it })
         assertTrue(intArrayOf(1, 2, 3, 4, 5).isSortedBy { it })
         assertFalse(intArrayOf(5, 4, 3, 2, 1).isSortedBy { it })
+        assertFalse(intArrayOf(2, 1, 3, 4, 5).isSortedBy { it })
+        assertTrue(intArrayOf(1, 2, 3, 4, 5).isSortedBy { 0 })
     }
 
     @Test
     fun isSortedByDescending() {
         assertTrue(intArrayOf().isSortedByDescending { it })
+        assertTrue(intArrayOf(5).isSortedByDescending { it })
         assertTrue(intArrayOf(5, 4, 3, 2, 1).isSortedByDescending { it })
         assertFalse(intArrayOf(1, 2, 3, 4, 5).isSortedByDescending { it })
+        assertFalse(intArrayOf(4, 5, 3, 2, 1).isSortedByDescending { it })
+        assertTrue(intArrayOf(5, 4, 3, 2, 1).isSortedByDescending { 0 })
+    }
+
+    @Test
+    fun isSortedByNullSelector() {
+        assertTrue(intArrayOf(2, 1).isSortedBy<Int> { null })
+        assertTrue(intArrayOf(1, 1, 2).isSortedBy<Int> { if (it == 1) null else it })
+        assertFalse(intArrayOf(2, 1).isSortedBy<Int> { if (it == 1) null else it })
+        assertTrue(intArrayOf(2, 1).isSortedByDescending<Int> { if (it == 1) null else it })
+        assertFalse(intArrayOf(1, 2).isSortedByDescending<Int> { if (it == 1) null else it })
     }
 }
