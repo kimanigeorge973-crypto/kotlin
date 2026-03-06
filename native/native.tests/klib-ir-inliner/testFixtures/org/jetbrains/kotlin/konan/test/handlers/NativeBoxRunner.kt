@@ -23,9 +23,9 @@ import org.jetbrains.kotlin.konan.test.blackbox.support.util.computePackageName
 import org.jetbrains.kotlin.konan.test.blackbox.testRunSettings
 import org.jetbrains.kotlin.native.executors.Executor
 import org.jetbrains.kotlin.test.backend.handlers.NativeBinaryArtifactHandler
+import org.jetbrains.kotlin.test.groupingPhaseInputs
 import org.jetbrains.kotlin.test.model.*
 import org.jetbrains.kotlin.test.model.TestModule
-import org.jetbrains.kotlin.test.secondPhaseInputs
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.configuration.NativeEnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.moduleStructure
@@ -58,7 +58,7 @@ class NativeBoxRunner(testServices: TestServices) : NativeBinaryArtifactHandler(
     }
 }
 
-class NativeBoxRunnerSecondPhase(testServices: TestServices) : SecondPhaseHandler<BinaryArtifacts.Native>(
+class NativeBoxRunnerGroupingPhase(testServices: TestServices) : GroupingPhaseHandler<BinaryArtifacts.Native>(
     testServices,
     failureDisablesNextSteps = false,
     doNotRunIfThereWerePreviousFailures = false
@@ -218,7 +218,7 @@ class PrettyResultsHandler(
             .distinct()
             .map { it[1] to it[2] }
             .toList()
-        val phaseInputs = testServices.secondPhaseInputs
+        val phaseInputs = testServices.groupingPhaseInputs
         for ((className, methodName) in failedTests) {
             val correspondingInput = phaseInputs.find {
                 val testInfo = it.testInfo

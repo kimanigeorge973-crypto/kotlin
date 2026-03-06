@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.konan.test.blackbox.support.settings.KotlinNativeTar
 import org.jetbrains.kotlin.konan.test.blackbox.support.settings.OptimizationMode
 import org.jetbrains.kotlin.konan.test.blackbox.support.settings.withPlatformLibs
 import org.jetbrains.kotlin.konan.test.blackbox.testRunSettings
-import org.jetbrains.kotlin.test.SecondPhaseInputArtifact
+import org.jetbrains.kotlin.test.GroupingPhaseInputArtifact
 import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives
 import org.jetbrains.kotlin.test.directives.NativeEnvironmentConfigurationDirectives.WITH_PLATFORM_LIBS
 import org.jetbrains.kotlin.test.klib.CustomKlibCompilerException
@@ -41,7 +41,7 @@ class NativeCompilerSecondStageFacade private constructor(
     val testServices: TestServices,
     private val customNativeCompilerSettings: CustomNativeCompilerSettings
 ) {
-    class FirstPhase(
+    class NonGrouping(
         testServices: TestServices,
         private val customNativeCompilerSettings: CustomNativeCompilerSettings,
     ) : CustomKlibCompilerSecondStageFacade<BinaryArtifacts.Native>(testServices) {
@@ -83,18 +83,18 @@ class NativeCompilerSecondStageFacade private constructor(
         }
     }
 
-    class SecondPhase(
+    class Grouping(
         val testServices: TestServices,
         private val customNativeCompilerSettings: CustomNativeCompilerSettings
-    ) : AbstractSecondPhaseTestFacade<SecondPhaseInputArtifact, BinaryArtifacts.Native>() {
-        override fun transform(inputArtifact: SecondPhaseInputArtifact): BinaryArtifacts.Native {
-            val someModule = inputArtifact.firstPhaseOutputs.first().testServices.moduleStructure.modules.last()
+    ) : AbstractGroupingPhaseTestFacade<GroupingPhaseInputArtifact, BinaryArtifacts.Native>() {
+        override fun transform(inputArtifact: GroupingPhaseInputArtifact): BinaryArtifacts.Native {
+            val someModule = inputArtifact.nonGroupingPhaseOutputs.first().testServices.moduleStructure.modules.last()
             var someLibrary: File? = null
 
             val regularDependencies = mutableSetOf<String>()
             val friendDependencies = mutableSetOf<String>()
             val mainLibraries = mutableListOf<String>()
-            for ((services, _) in inputArtifact.firstPhaseOutputs) {
+            for ((services, _) in inputArtifact.nonGroupingPhaseOutputs) {
                 val mainModule = services.moduleStructure.modules.last()
                 mainModule.collectDependencies(services).let { (regular, friend) ->
                     regularDependencies += regular
@@ -128,8 +128,8 @@ class NativeCompilerSecondStageFacade private constructor(
             }
         }
 
-        override val inputKind: TestArtifactKind<SecondPhaseInputArtifact>
-            get() = SecondPhaseInputArtifact.Kind
+        override val inputKind: TestArtifactKind<GroupingPhaseInputArtifact>
+            get() = GroupingPhaseInputArtifact.Kind
         override val outputKind: TestArtifactKind<BinaryArtifacts.Native>
             get() = ArtifactKinds.Native
     }

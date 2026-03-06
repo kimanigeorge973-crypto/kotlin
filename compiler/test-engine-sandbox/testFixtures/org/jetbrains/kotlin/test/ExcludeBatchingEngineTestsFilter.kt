@@ -12,7 +12,7 @@ import kotlin.jvm.optionals.getOrNull
 
 /**
  * Filters out tests inheriting [AbstractTwoStageKotlinCompilerTest] from engines other than
- * [CompilerSecondStageBatchingTestEngine].
+ * [CompilerTestGroupingTestEngine].
  *
  * This prevents the standard JUnit Jupiter engine from running tests that should
  * only be executed by the batching engine.
@@ -20,7 +20,7 @@ import kotlin.jvm.optionals.getOrNull
 class ExcludeBatchingEngineTestsFilter : PostDiscoveryFilter {
     override fun apply(descriptor: TestDescriptor): FilterResult {
         // Allow all tests from the batching engine
-        if (descriptor.uniqueId.engineId.getOrNull() == CompilerSecondStageBatchingTestEngine.ID) {
+        if (descriptor.uniqueId.engineId.getOrNull() == CompilerTestGroupingTestEngine.ID) {
             return FilterResult.included("Batching engine test")
         }
 

@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.konan.test.blackbox.support.NativeTestSupport.create
 import org.jetbrains.kotlin.konan.test.blackbox.support.NativeTestSupport.getOrCreateTestRunProvider
 import org.jetbrains.kotlin.konan.test.blackbox.support.TestDirectives
 import org.jetbrains.kotlin.konan.test.configuration.commonConfigurationForNativeFirstStageUpToSerialization
-import org.jetbrains.kotlin.konan.test.handlers.NativeBoxRunnerSecondPhase
+import org.jetbrains.kotlin.konan.test.handlers.NativeBoxRunnerGroupingPhase
 import org.jetbrains.kotlin.konan.test.klib.NativeCompilerSecondStageFacade
 import org.jetbrains.kotlin.konan.test.klib.currentCustomNativeCompilerSettings
 import org.jetbrains.kotlin.konan.test.services.CInteropTestSkipper
@@ -77,7 +77,7 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
             }
         }
 
-        firstPhase {
+        nonGroupingPhase {
             useConfigurators(::NativeFirstStageEnvironmentConfigurator)
 
             commonConfigurationForNativeFirstStageUpToSerialization(
@@ -98,12 +98,12 @@ abstract class AbstractMyNativeTwoPhaseTest : AbstractTwoStageKotlinCompilerTest
             enableMetaInfoHandler()
         }
 
-        secondPhase {
+        groupingPhase {
             useConfigurators(::NativeSecondStageEnvironmentConfigurator)
 
-            facadeStep(NativeCompilerSecondStageFacade::SecondPhase.bind(currentCustomNativeCompilerSettings))
+            facadeStep(NativeCompilerSecondStageFacade::Grouping.bind(currentCustomNativeCompilerSettings))
             handlersStep(ArtifactKinds.Native, CompilationStage.SECOND) {
-                useHandlers(::NativeBoxRunnerSecondPhase)
+                useHandlers(::NativeBoxRunnerGroupingPhase)
             }
         }
     }

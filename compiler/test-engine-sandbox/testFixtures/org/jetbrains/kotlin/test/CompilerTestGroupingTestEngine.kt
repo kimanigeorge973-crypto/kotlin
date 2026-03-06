@@ -21,9 +21,9 @@ import org.junit.platform.engine.support.hierarchical.Node
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector
 import java.util.concurrent.Future
 
-class CompilerSecondStageBatchingTestEngine : TestEngine {
+class CompilerTestGroupingTestEngine : TestEngine {
     companion object {
-        const val ID = "kotlin-compiler-second-stage-batching"
+        const val ID = "kotlin-compiler-grouping-engine"
     }
 
     override fun getId(): String = ID
@@ -43,17 +43,17 @@ class CompilerSecondStageBatchingTestEngine : TestEngine {
                 TestMethodInfo(method, methodContext, testInstance)
             }
 
-            testInfos.forEach { it.runFirstPhase() }
-            runSecondPhase(context, classDescriptor, testInfos)
+            testInfos.forEach { it.runNonGroupingPhase() }
+            runGroupingPhase(context, classDescriptor, testInfos)
         }
     }
 
-    private fun runSecondPhase(context: JupiterEngineExecutionContext, classDescriptor: TestDescriptor, tests: List<TestMethodInfo>) {
+    private fun runGroupingPhase(context: JupiterEngineExecutionContext, classDescriptor: TestDescriptor, tests: List<TestMethodInfo>) {
         val successfulTests = tests.filterNot { it.failed }
         if (successfulTests.isEmpty()) return
         val batches = groupTestsInBatches(successfulTests)
         batches.forEachIndexed { index, batch ->
-            runSecondPhaseOnBatch(context, classDescriptor, batch, index)
+            runGroupingPhaseOnBatch(context, classDescriptor, batch, index)
         }
     }
 
@@ -61,15 +61,15 @@ class CompilerSecondStageBatchingTestEngine : TestEngine {
         return listOf(infos)
     }
 
-    private fun runSecondPhaseOnBatch(
+    private fun runGroupingPhaseOnBatch(
         context: JupiterEngineExecutionContext,
         classDescriptor: TestDescriptor,
         batch: List<TestMethodInfo>,
         index: Int,
     ) {
-        val testDescriptor = SecondPhaseTestDescriptor(
+        val testDescriptor = GroupingPhaseTestDescriptor(
             uniqueId = batch.first().descriptor.uniqueId.removeLastSegment().append("dynamic-test", "batch"),
-            displayName = "Second phase batch #${index + 1}"
+            displayName = "Grouped batch #${index + 1}"
         )
         classDescriptor.addChild(testDescriptor)
         val throwableCollector = createThrowableCollector()
@@ -79,23 +79,23 @@ class CompilerSecondStageBatchingTestEngine : TestEngine {
         executionListener.dynamicTestRegistered(testDescriptor)
         executionListener.executionStarted(testDescriptor)
         throwableCollector.execute {
-            val testRunner = someTestInstance.secondPhaseRunner
-            val firstPhaseOutputs = batch.map { methodInfo ->
-                FirstPhaseOutput(
-                    testServices = methodInfo.testInstance.firstPhaseRunner.testServices,
+            val testRunner = someTestInstance.groupingPhaseRunner
+            val nonGroupingPhaseOutputs = batch.map { methodInfo ->
+                NonGroupingPhaseOutput(
+                    testServices = methodInfo.testInstance.nonGroupingRunner.testServices,
                     catchingExecutor = { block ->
                         methodInfo.context.throwableCollector.execute(block)
                     }
                 )
             }
-            testRunner.run(firstPhaseOutputs)
+            testRunner.run(nonGroupingPhaseOutputs)
             testRunner.reportFailures()
         }
         executionListener.executionFinished(testDescriptor, throwableCollector.toTestExecutionResult())
         batch.forEach {
-            it.finalizeFirstPhase()
+            it.finalizeNonGroupingPhase()
             it.updateFailed()
-            val collector = if (it.failed) it.firstPhaseThrowableCollector else throwableCollector
+            val collector = if (it.failed) it.nonGroupingPhaseThrowableCollector else throwableCollector
             it.reportFinished(collector)
         }
     }
@@ -188,7 +188,7 @@ private object DynamicTestExecutorStub : Node.DynamicTestExecutor {
     }
 }
 
-private class SecondPhaseTestDescriptor(
+private class GroupingPhaseTestDescriptor(
     uniqueId: UniqueId,
     displayName: String,
 ) : AbstractTestDescriptor(uniqueId, displayName, /* source = */ null) {
@@ -206,35 +206,35 @@ private data class TestMethodInfo(
     var finalized: Boolean = false
         private set
 
-    val firstPhaseThrowableCollector: ThrowableCollector
+    val nonGroupingPhaseThrowableCollector: ThrowableCollector
         get() = context.throwableCollector
 
     fun updateFailed() {
-        failed = failed || firstPhaseThrowableCollector.isNotEmpty
+        failed = failed || nonGroupingPhaseThrowableCollector.isNotEmpty
     }
 
-    fun finalizeFirstPhase() {
+    fun finalizeNonGroupingPhase() {
         if (finalized) return
-        firstPhaseThrowableCollector.execute {
-            if (testInstance.firstPhaseRunnerInitialized) {
-                testInstance.firstPhaseRunner.finalizeAndDispose()
+        nonGroupingPhaseThrowableCollector.execute {
+            if (testInstance.nonGroupingPhaseRunnerInitialized) {
+                testInstance.nonGroupingRunner.finalizeAndDispose()
             }
         }
         finalized = true
     }
 }
 
-private fun TestMethodInfo.runFirstPhase() {
-    firstPhaseThrowableCollector.execute {
-        val testRunner = testInstance.firstPhaseRunner
+private fun TestMethodInfo.runNonGroupingPhase() {
+    nonGroupingPhaseThrowableCollector.execute {
+        val testRunner = testInstance.nonGroupingRunner
         testRunner.runTestPreprocessing()
         testRunner.runSteps()
         testRunner.reportFailures()
     }
     updateFailed()
     if (failed) {
-        finalizeFirstPhase()
-        reportFinished(firstPhaseThrowableCollector)
+        finalizeNonGroupingPhase()
+        reportFinished(nonGroupingPhaseThrowableCollector)
     }
 }
 

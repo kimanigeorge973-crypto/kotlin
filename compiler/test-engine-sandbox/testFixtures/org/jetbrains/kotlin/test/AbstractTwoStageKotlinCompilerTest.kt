@@ -28,12 +28,12 @@ abstract class AbstractTwoStageKotlinCompilerTest {
             useAfterAnalysisCheckers(::IrValidationErrorChecker)
         }
 
-        firstPhase {
+        nonGroupingPhase {
             startingArtifactFactory = { ResultingArtifact.Source() }
             testInfo = this@AbstractTwoStageKotlinCompilerTest.testInfo
         }
 
-        secondPhase {
+        groupingPhase {
             testInfo = this@AbstractTwoStageKotlinCompilerTest.testInfo
         }
 
@@ -42,13 +42,13 @@ abstract class AbstractTwoStageKotlinCompilerTest {
 
 
     private lateinit var testInfo: KotlinTestInfo
-    lateinit var firstPhaseRunner: FirstPhaseTestRunner
+    lateinit var nonGroupingRunner: NonGroupingTestRunner
         private set
 
-    var firstPhaseRunnerInitialized: Boolean = false
+    var nonGroupingPhaseRunnerInitialized: Boolean = false
         private set
 
-    lateinit var secondPhaseRunner: SecondPhaseTestRunner
+    lateinit var groupingPhaseRunner: GroupingTestRunner
         private set
 
     var secondPhaseRunnerInitialized: Boolean = false
@@ -75,17 +75,17 @@ abstract class AbstractTwoStageKotlinCompilerTest {
 
     fun initTestRunners(@TestDataFile filePath: String) {
         val configurationBuilder = TwoPhaseTestConfigurationBuilder().apply(configurationBuilder)
-        firstPhaseRunner = FirstPhaseTestRunner(configurationBuilder.firstPhaseBuilder.build(filePath)).also {
-            firstPhaseRunnerInitialized = true
+        nonGroupingRunner = NonGroupingTestRunner(configurationBuilder.firstPhaseBuilder.build(filePath)).also {
+            nonGroupingPhaseRunnerInitialized = true
         }
-        secondPhaseRunner = SecondPhaseTestRunner(configurationBuilder.secondPhaseBuilder.build(filePath)).also {
+        groupingPhaseRunner = GroupingTestRunner(configurationBuilder.secondPhaseBuilder.build(filePath)).also {
             secondPhaseRunnerInitialized = true
         }
     }
 
     fun initTestRunnerAndCreateModuleStructure(@TestDataFile filePath: String) {
         initTestRunners(filePath)
-        firstPhaseRunner.prepareModuleStructure(filePath)
+        nonGroupingRunner.prepareModuleStructure(filePath)
     }
 }
 
