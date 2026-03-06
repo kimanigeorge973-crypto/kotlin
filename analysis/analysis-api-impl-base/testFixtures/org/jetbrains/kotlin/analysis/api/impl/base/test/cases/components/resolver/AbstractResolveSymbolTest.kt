@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2025 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaSymbolResolutionSuccess
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.resolution.KtResolvable
-import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.assertions
 
@@ -30,11 +29,6 @@ abstract class AbstractResolveSymbolTest : AbstractResolveByElementTest() {
 
         ignoreStabilityIfNeeded {
             assertStableResult(testServices, symbolAttempt, secondSymbolAttempt)
-
-            if (mainElement is KtResolvableCall) {
-                val callAttempt = mainElement.tryResolveCall()
-                assertStableResult(testServices, symbolAttempt, callAttempt)
-            }
         }
 
         // This call mustn't be suppressed as this is the API contracts

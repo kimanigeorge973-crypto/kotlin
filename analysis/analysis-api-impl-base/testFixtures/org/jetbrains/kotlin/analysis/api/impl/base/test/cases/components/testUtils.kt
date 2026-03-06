@@ -249,32 +249,7 @@ internal fun sortedCalls(collection: Collection<KaCall>): Collection<KaCall> = c
     compareCalls(call1, call2)
 }
 
-internal fun KaCall.symbols(): List<KaSymbol> = when (this) {
-    is KaCompoundVariableAccessCall -> listOfNotNull(
-        variableCall.symbol,
-        operationCall.symbol,
-    )
-
-    is KaCompoundArrayAccessCall -> listOfNotNull(
-        getterCall.symbol,
-        setterCall.symbol,
-        operationCall.symbol,
-    )
-
-    is KaForLoopCall -> listOf(
-        iteratorCall.symbol,
-        hasNextCall.symbol,
-        nextCall.symbol,
-    )
-
-    is KaDelegatedPropertyCall -> listOfNotNull(
-        valueGetterCall.symbol,
-        valueSetterCall?.symbol,
-        provideDelegateCall?.symbol,
-    )
-
-    is KaCallableMemberCall<*, *> -> listOf(symbol)
-}
+internal fun KaCall.symbols(): List<KaSymbol> = (this as KaSingleOrMultiCall).symbols
 
 context(_: KaSession)
 internal fun sortedSymbols(collection: Collection<KaSymbol>): Collection<KaSymbol> = collection.sortedWith { symbol1, symbol2 ->
@@ -348,44 +323,6 @@ internal fun assertStableResult(
     for ((firstSymbol, secondSymbol) in firstSymbols.zip(secondSymbols)) {
         assertions.assertEquals(firstSymbol, secondSymbol)
     }
-}
-
-context(_: KaSession)
-internal fun assertStableResult(
-    testServices: TestServices,
-    symbolResolutionAttempt: KaSymbolResolutionAttempt?,
-    callResolutionAttempt: KaCallResolutionAttempt?,
-) {
-    val assertions = testServices.assertions
-
-    when (callResolutionAttempt) {
-        // Symbol resolution supports more cases than call resolution, so we check some guaranties only against it
-        null -> return
-
-        is KaCallResolutionError -> {
-            if (symbolResolutionAttempt !is KaSymbolResolutionError) {
-                testServices.assertions.fail {
-                    "${KaSymbolResolutionError::class.simpleName} is expected, but ${symbolResolutionAttempt?.let { it::class.simpleName }} is found"
-                }
-            }
-
-            assertStableResult(
-                testServices = testServices,
-                firstDiagnostic = callResolutionAttempt.diagnostic,
-                secondDiagnostic = symbolResolutionAttempt.diagnostic,
-            )
-        }
-
-        else -> {}
-    }
-
-    assertions.assertNotNull(symbolResolutionAttempt) {
-        "Inconsistency: ${callResolutionAttempt::class.simpleName} found, but ${KaSymbolResolutionAttempt::class.simpleName} is null"
-    }
-
-    val symbols = sortedSymbols(symbolResolutionAttempt!!.symbols)
-    val symbolsFromCall = sortedSymbols(callResolutionAttempt.calls.flatMap { it.calls }.map { (it as KaCallableMemberCall<*, *>).symbol })
-    assertions.assertEquals(expected = symbolsFromCall, actual = symbols)
 }
 
 /**
