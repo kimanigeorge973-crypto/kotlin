@@ -131,11 +131,13 @@ fun compileToLoweredIr(
         TypeScriptFragment(exportModelToDtsTranslator.generateTypeScript("", listOf(fragment)))
     }
 
-    lowerPreservingTags(
-        allModules,
-        context,
-        context.irFactory.stageController as WholeWorldStageController,
-    )
+    configuration.perfManager.tryMeasurePhaseTime(PhaseType.IrLowering) {
+        lowerPreservingTags(
+            allModules,
+            context,
+            context.irFactory.stageController as WholeWorldStageController,
+        )
+    }
 
     overrideBuiltInsSignatures(context)
 
