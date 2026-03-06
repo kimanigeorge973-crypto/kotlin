@@ -135,6 +135,7 @@ val businessLogicTestSuits = setOf(
     "testCompilerPlugins",
     "testBuildMetrics",
     "testKotlinLogger",
+    "testDefaultOptions",
 )
 
 fun JvmTestSuite.addSnapshotBuildToolsImpl() {
@@ -255,6 +256,12 @@ testing {
         named<JvmTestSuite>("testEscapableCharacters") {
             configurations.named(sources.runtimeClasspathConfigurationName) {
                 testSymlinkTransformation.resolveAgainstSymlinkedArtifacts(this)
+            }
+        }
+
+        named<JvmTestSuite>("testDefaultOptions") {
+            dependencies {
+                implementation(project(":daemon-common"))
             }
         }
 

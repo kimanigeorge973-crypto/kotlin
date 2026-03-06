@@ -44,11 +44,16 @@ internal abstract class BuildOperationImpl<R> : BuildOperation<R> {
     }
 
     class Option<V> : BaseOptionWithDefault<V> {
-        constructor(id: String) : super(id)
-        constructor(id: String, default: V) : super(id, default = default)
+        constructor(id: String) : super(id, optionsRegistry)
+        constructor(id: String, default: V) : super(id, default = default, optionsRegistry)
     }
 
     companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on BuildOperation.
+         */
+        internal val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf()
+
         val METRICS_COLLECTOR: Option<BuildMetricsCollector?> = Option("METRICS_COLLECTOR", default = null)
         val XX_KGP_METRICS_COLLECTOR: Option<Boolean> = Option("XX_KGP_METRICS_COLLECTOR", default = false)
         val XX_KGP_METRICS_COLLECTOR_OUT: Option<ByteArray?> = Option("XX_KGP_METRICS_COLLECTOR_OUT", default = null)

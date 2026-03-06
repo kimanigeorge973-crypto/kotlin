@@ -24,7 +24,8 @@ internal class JvmSnapshotBasedIncrementalCompilationConfigurationImpl(
     @Deprecated("Use `get` and `set` directly instead. This property will be removed in a future release.") // Remove in 2.7
     override val options: JvmSnapshotBasedIncrementalCompilationOptionsImpl = JvmSnapshotBasedIncrementalCompilationOptionsImpl(
         Options(
-            JvmSnapshotBasedIncrementalCompilationConfiguration::class
+            JvmSnapshotBasedIncrementalCompilationConfiguration::class,
+            JvmSnapshotBasedIncrementalCompilationOptionsImpl.optionsRegistry
         )
     ),
 ) : JvmSnapshotBasedIncrementalCompilationConfiguration(
@@ -72,11 +73,11 @@ internal class JvmSnapshotBasedIncrementalCompilationConfigurationImpl(
 @Deprecated("Use `JvmSnapshotBasedIncrementalCompilationConfiguration` and `JvmCompilationOperation.snapshotBasedIcConfigurationBuilder`. This interface will be removed in a future release.")
 internal class JvmSnapshotBasedIncrementalCompilationOptionsImpl internal constructor(
     internal val options: Options = Options(
-        JvmSnapshotBasedIncrementalCompilationOptions::class
+        JvmSnapshotBasedIncrementalCompilationOptions::class, optionsRegistry
     ),
 ) : JvmSnapshotBasedIncrementalCompilationOptions, DeepCopyable<JvmSnapshotBasedIncrementalCompilationOptionsImpl>, HasSnapshotBasedIcOptionsAccessor {
 
-    constructor() : this(Options(JvmSnapshotBasedIncrementalCompilationOptions::class))
+    constructor() : this(Options(JvmSnapshotBasedIncrementalCompilationOptions::class, optionsRegistry))
 
     override fun deepCopy(): JvmSnapshotBasedIncrementalCompilationOptionsImpl =
         JvmSnapshotBasedIncrementalCompilationOptionsImpl(options.deepCopy())
@@ -97,11 +98,16 @@ internal class JvmSnapshotBasedIncrementalCompilationOptionsImpl internal constr
     }
 
     open class Option<V> : BaseOptionWithDefault<V> {
-        constructor(id: String) : super(id)
-        constructor(id: String, default: V) : super(id, default = default)
+        constructor(id: String) : super(id, optionsRegistry)
+        constructor(id: String, default: V) : super(id, default = default, optionsRegistry)
     }
 
     companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on JvmSnapshotBasedIncrementalCompilationOptions.
+         */
+        internal val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf()
+
         val ROOT_PROJECT_DIR: Option<Path?> = Option("ROOT_PROJECT_DIR", null)
 
         val MODULE_BUILD_DIR: Option<Path?> = Option("MODULE_BUILD_DIR", null)

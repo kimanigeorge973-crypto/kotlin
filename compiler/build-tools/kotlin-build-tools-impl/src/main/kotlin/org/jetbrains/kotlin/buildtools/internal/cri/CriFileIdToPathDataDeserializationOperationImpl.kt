@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.buildtools.api.KotlinLogger
 import org.jetbrains.kotlin.buildtools.api.ProjectId
 import org.jetbrains.kotlin.buildtools.api.cri.CriFileIdToPathDataDeserializationOperation
 import org.jetbrains.kotlin.buildtools.api.cri.FileIdToPathEntry
+import org.jetbrains.kotlin.buildtools.internal.BaseOptionWithDefault
 import org.jetbrains.kotlin.buildtools.internal.BuildOperationImpl
 import org.jetbrains.kotlin.buildtools.internal.Options
 
@@ -17,7 +18,7 @@ internal class CriFileIdToPathDataDeserializationOperationImpl(
     private val deserializer: CriDataDeserializerImpl,
     private val data: ByteArray,
 ) : BuildOperationImpl<Iterable<FileIdToPathEntry>>(), CriFileIdToPathDataDeserializationOperation {
-    override val options: Options = Options(CriFileIdToPathDataDeserializationOperation::class)
+    override val options: Options = Options(CriFileIdToPathDataDeserializationOperation::class, optionsRegistry)
 
     override fun executeImpl(
         projectId: ProjectId,
@@ -25,5 +26,14 @@ internal class CriFileIdToPathDataDeserializationOperationImpl(
         logger: KotlinLogger?,
     ): Iterable<FileIdToPathEntry> {
         return deserializer.deserializeFileIdToPathData(data)
+    }
+
+    companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on the CriFileIdToPathDataDeserializationOperation hierarchy.
+         */
+        private val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf<String, BaseOptionWithDefault<*>>().apply {
+            putAll(BuildOperationImpl.optionsRegistry)
+        }
     }
 }

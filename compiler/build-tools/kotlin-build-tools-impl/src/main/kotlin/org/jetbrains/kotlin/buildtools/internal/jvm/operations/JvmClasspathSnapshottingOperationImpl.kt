@@ -17,13 +17,13 @@ import org.jetbrains.kotlin.incremental.classpathDiff.ClasspathEntrySnapshotter
 import java.nio.file.Path
 
 internal class JvmClasspathSnapshottingOperationImpl private constructor(
-    override val options: Options = Options(JvmClasspathSnapshottingOperation::class),
+    override val options: Options = Options(JvmClasspathSnapshottingOperation::class, optionsRegistry),
     override val classpathEntry: Path,
 ) : BuildOperationImpl<ClasspathEntrySnapshot>(), JvmClasspathSnapshottingOperation, JvmClasspathSnapshottingOperation.Builder,
     DeepCopyable<JvmClasspathSnapshottingOperation> {
 
     constructor(classpathEntry: Path) : this(
-        options = Options(JvmClasspathSnapshottingOperation::class),
+        options = Options(JvmClasspathSnapshottingOperation::class, optionsRegistry),
         classpathEntry = classpathEntry
     )
 
@@ -59,11 +59,18 @@ internal class JvmClasspathSnapshottingOperationImpl private constructor(
     }
 
     class Option<V> : BaseOptionWithDefault<V> {
-        constructor(id: String) : super(id)
-        constructor(id: String, default: V) : super(id, default = default)
+        constructor(id: String) : super(id, optionsRegistry)
+        constructor(id: String, default: V) : super(id, default = default, optionsRegistry)
     }
 
     companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on the JvmClasspathSnapshottingOperation hierarchy.
+         */
+        private val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf<String, BaseOptionWithDefault<*>>().apply {
+            putAll(BuildOperationImpl.optionsRegistry)
+        }
+
         @JvmField
         val GRANULARITY: Option<ClassSnapshotGranularity> = Option("GRANULARITY", ClassSnapshotGranularity.CLASS_MEMBER_LEVEL)
 

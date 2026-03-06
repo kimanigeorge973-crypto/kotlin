@@ -12,10 +12,10 @@ import kotlin.io.path.Path
 
 internal object InProcessExecutionPolicyImpl : ExecutionPolicy.InProcess
 
-internal class DaemonExecutionPolicyImpl private constructor(private val options: Options = Options(ExecutionPolicy.WithDaemon::class)) :
+internal class DaemonExecutionPolicyImpl private constructor(private val options: Options = Options(ExecutionPolicy.WithDaemon::class, optionsRegistry)) :
     ExecutionPolicy.WithDaemon, ExecutionPolicy.WithDaemon.Builder, DeepCopyable<DaemonExecutionPolicyImpl> {
 
-    constructor() : this(Options(ExecutionPolicy.WithDaemon::class))
+    constructor() : this(Options(ExecutionPolicy.WithDaemon::class, optionsRegistry))
 
     @UseFromImplModuleRestricted
     override fun <V> get(key: ExecutionPolicy.WithDaemon.Option<V>): V = options[key.id]
@@ -41,11 +41,16 @@ internal class DaemonExecutionPolicyImpl private constructor(private val options
     }
 
     class Option<V> : BaseOptionWithDefault<V> {
-        constructor(id: String) : super(id)
-        constructor(id: String, default: V) : super(id, default = default)
+        constructor(id: String) : super(id, optionsRegistry = optionsRegistry)
+        constructor(id: String, default: V) : super(id, default = default, optionsRegistry = optionsRegistry)
     }
 
     companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on ExecutionPolicy.WithDaemon.
+         */
+        private val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf()
+
         /**
          * A list of JVM arguments to pass to the Kotlin daemon.
          */

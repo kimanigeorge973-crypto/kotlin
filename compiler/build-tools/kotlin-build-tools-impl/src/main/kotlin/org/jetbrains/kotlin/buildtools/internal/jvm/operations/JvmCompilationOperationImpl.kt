@@ -63,7 +63,7 @@ import java.nio.file.Path
 import java.rmi.RemoteException
 
 internal class JvmCompilationOperationImpl private constructor(
-    override val options: Options = Options(JvmCompilationOperation::class),
+    override val options: Options = Options(JvmCompilationOperation::class, optionsRegistry),
     override val sources: List<Path>,
     override val destinationDirectory: Path,
     override val compilerArguments: JvmCompilerArgumentsImpl = JvmCompilerArgumentsImpl(),
@@ -76,7 +76,7 @@ internal class JvmCompilationOperationImpl private constructor(
         compilerArguments: JvmCompilerArgumentsImpl = JvmCompilerArgumentsImpl(),
         buildIdToSessionFlagFile: MutableMap<ProjectId, File>,
     ) : this(
-        options = Options(JvmCompilationOperation::class),
+        options = Options(JvmCompilationOperation::class, optionsRegistry),
         sources = sources,
         destinationDirectory = destinationDirectory,
         compilerArguments = compilerArguments,
@@ -112,8 +112,8 @@ internal class JvmCompilationOperationImpl private constructor(
     }
 
     class Option<V> : BaseOptionWithDefault<V> {
-        constructor(id: String) : super(id)
-        constructor(id: String, default: V) : super(id, default = default)
+        constructor(id: String) : super(id, optionsRegistry)
+        constructor(id: String, default: V) : super(id, default = default, optionsRegistry)
     }
 
     @Deprecated("Use `snapshotBasedIcConfigurationBuilder` instead.")
@@ -516,6 +516,13 @@ internal class JvmCompilationOperationImpl private constructor(
     }
 
     companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on the JvmCompilationOperation hierarchy.
+         */
+        private val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf<String, BaseOptionWithDefault<*>>().apply {
+            putAll(BuildOperationImpl.optionsRegistry)
+        }
+
         val INCREMENTAL_COMPILATION: Option<JvmIncrementalCompilationConfiguration?> = Option("INCREMENTAL_COMPILATION", null)
 
         val LOOKUP_TRACKER: Option<CompilerLookupTracker?> = Option("LOOKUP_TRACKER", null)

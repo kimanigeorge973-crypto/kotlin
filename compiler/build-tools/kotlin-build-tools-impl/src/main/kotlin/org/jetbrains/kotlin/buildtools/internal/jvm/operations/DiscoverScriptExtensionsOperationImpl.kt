@@ -17,12 +17,12 @@ import java.nio.file.Path
 import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 
 internal class DiscoverScriptExtensionsOperationImpl private constructor(
-    override val options: Options = Options(DiscoverScriptExtensionsOperation::class),
+    override val options: Options = Options(DiscoverScriptExtensionsOperation::class, optionsRegistry),
     override val classpath: List<Path>,
 ) : BuildOperationImpl<Collection<String>>(), DiscoverScriptExtensionsOperation, DiscoverScriptExtensionsOperation.Builder,
     DeepCopyable<DiscoverScriptExtensionsOperation> {
 
-    constructor(classpath: List<Path>) : this(Options(DiscoverScriptExtensionsOperation::class), classpath)
+    constructor(classpath: List<Path>) : this(Options(DiscoverScriptExtensionsOperation::class, optionsRegistry), classpath)
 
     override fun executeImpl(
         projectId: ProjectId,
@@ -54,7 +54,25 @@ internal class DiscoverScriptExtensionsOperationImpl private constructor(
 
     override fun deepCopy(): DiscoverScriptExtensionsOperationImpl = DiscoverScriptExtensionsOperationImpl(options.deepCopy(), classpath)
 
+    private operator fun <V> get(key: Option<V>): V = options[key]
+
+    private operator fun <V> set(key: Option<V>, value: V) {
+        options[key] = value
+    }
+
+    class Option<V> : BaseOptionWithDefault<V> {
+        constructor(id: String) : super(id, optionsRegistry)
+        constructor(id: String, default: V) : super(id, default = default, optionsRegistry)
+    }
+
     companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on the DiscoverScriptExtensionsOperation hierarchy.
+         */
+        private val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf<String, BaseOptionWithDefault<*>>().apply {
+            putAll(BuildOperationImpl.optionsRegistry)
+        }
+
         val COMPILER_MESSAGE_RENDERER: Option<CompilerMessageRenderer> =
             Option("COMPILER_MESSAGE_RENDERER", default = DefaultCompilerMessageRenderer)
     }

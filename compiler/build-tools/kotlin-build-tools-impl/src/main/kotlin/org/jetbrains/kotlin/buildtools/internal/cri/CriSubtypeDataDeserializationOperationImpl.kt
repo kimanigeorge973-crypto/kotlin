@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.buildtools.api.KotlinLogger
 import org.jetbrains.kotlin.buildtools.api.ProjectId
 import org.jetbrains.kotlin.buildtools.api.cri.CriSubtypeDataDeserializationOperation
 import org.jetbrains.kotlin.buildtools.api.cri.SubtypeEntry
+import org.jetbrains.kotlin.buildtools.internal.BaseOptionWithDefault
 import org.jetbrains.kotlin.buildtools.internal.BuildOperationImpl
 import org.jetbrains.kotlin.buildtools.internal.Options
 
@@ -17,7 +18,7 @@ internal class CriSubtypeDataDeserializationOperationImpl(
     private val deserializer: CriDataDeserializerImpl,
     private val data: ByteArray,
 ) : BuildOperationImpl<Iterable<SubtypeEntry>>(), CriSubtypeDataDeserializationOperation {
-    override val options: Options = Options(CriSubtypeDataDeserializationOperation::class)
+    override val options: Options = Options(CriSubtypeDataDeserializationOperation::class, optionsRegistry)
 
     override fun executeImpl(
         projectId: ProjectId,
@@ -25,5 +26,14 @@ internal class CriSubtypeDataDeserializationOperationImpl(
         logger: KotlinLogger?,
     ): Iterable<SubtypeEntry> {
         return deserializer.deserializeSubtypeData(data)
+    }
+
+    companion object {
+        /**
+         * ID to [[BaseOptionWithDefault]] mapping for finding defaults for any option available on the CriSubtypeDataDeserializationOperation hierarchy.
+         */
+        private val optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>> = mutableMapOf<String, BaseOptionWithDefault<*>>().apply {
+            putAll(BuildOperationImpl.optionsRegistry)
+        }
     }
 }

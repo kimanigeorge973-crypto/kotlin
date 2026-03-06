@@ -11,9 +11,20 @@ internal abstract class BaseOptionWithDefault<V> private constructor(
     id: String,
     private val hasDefault: Boolean = false,
     private val default: V? = null,
+    optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>>,
 ) : BaseOption<V>(id) {
-    constructor(id: String) : this(id, false, null)
-    constructor(id: String, default: V) : this(id, true, default)
+    constructor(id: String, optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>>) : this(id, false, null, optionsRegistry)
+    constructor(id: String, default: V, optionsRegistry: MutableMap<String, BaseOptionWithDefault<*>>) : this(
+        id,
+        true,
+        default,
+        optionsRegistry
+    )
+
+    init {
+        assert(optionsRegistry[id] == null)
+        optionsRegistry[id] = this
+    }
 
     @Suppress("UNCHECKED_CAST")
     val defaultValue: V

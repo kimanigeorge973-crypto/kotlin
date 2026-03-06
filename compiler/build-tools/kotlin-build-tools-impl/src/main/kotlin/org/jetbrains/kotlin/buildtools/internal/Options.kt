@@ -9,8 +9,11 @@ import org.jetbrains.kotlin.buildtools.api.internal.BaseOption
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
-internal class Options(private val optionsName: String) : DeepCopyable<Options> {
-    constructor(typeForName: KClass<*>) : this(typeForName.qualifiedName ?: typeForName.jvmName)
+internal class Options(
+    private val optionsName: String,
+    private val registeredDefaults: Map<String, BaseOptionWithDefault<*>>,
+) : DeepCopyable<Options> {
+    constructor(typeForName: KClass<*>, registeredDefaults: Map<String, BaseOptionWithDefault<*>>) : this(typeForName.qualifiedName ?: typeForName.jvmName, registeredDefaults)
 
     private val optionsMap: MutableMap<String, Any?> = mutableMapOf()
 
@@ -39,13 +42,15 @@ internal class Options(private val optionsName: String) : DeepCopyable<Options> 
 
     operator fun <V> get(key: String): V {
         @Suppress("UNCHECKED_CAST")
-        return if (key !in optionsMap) {
-            error("$key was not set in $optionsName")
-        } else optionsMap[key] as V
+        return when (key) {
+            in optionsMap -> optionsMap[key] as V
+            in registeredDefaults -> registeredDefaults[key]!!.defaultValue as V
+            else -> error("$key was not set in $optionsName")
+        }
     }
 
     override fun deepCopy(): Options {
-        return Options(optionsName).also { newOptions ->
+        return Options(optionsName, registeredDefaults).also { newOptions ->
             newOptions.optionsMap.putAll(optionsMap.entries.map {
                 it.key to when (val value = it.value) {
                     is DeepCopyable<*> -> value.deepCopy()
