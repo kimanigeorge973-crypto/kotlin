@@ -15,6 +15,11 @@ import org.jetbrains.kotlin.test.services.TestService
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.testInfo
 
+/**
+ * Prepares the input artifact for the grouping phase by merging non-grouping phase outputs.
+ *
+ * The services in the WIP state and could be changed in the future
+ */
 class GroupingPhaseInputsMerger(val testServices: TestServices, val workers: List<Worker>) {
     fun merge(nonGroupingPhaseOutputs: List<NonGroupingPhaseOutput>): GroupingPhaseInputArtifact {
         val secondPhaseConfiguration = CompilerConfiguration.create(messageCollector = MessageCollector.NONE)
@@ -24,6 +29,9 @@ class GroupingPhaseInputsMerger(val testServices: TestServices, val workers: Lis
         return GroupingPhaseInputArtifact(secondPhaseConfiguration, nonGroupingPhaseOutputs)
     }
 
+    /**
+     * Single unit of an artifact merging processing. Several workers could be registered in the test configuration.
+     */
     abstract class Worker(val testServices: TestServices) {
         abstract fun process(configuration: CompilerConfiguration, firstPhaseServices: List<TestServices>)
     }
@@ -35,6 +43,11 @@ data class NonGroupingPhaseOutput(
 ) {
     val testInfo: KotlinTestInfo get() = testServices.testInfo
 
+    /**
+     * Allows executing code which potentially throws an exception during the grouping phase, so this exception
+     * would be reported as a failure of the single test, not the whole group. The actual implementation is provided
+     * by the test engine.
+     */
     fun interface CatchingExecutor {
         fun executeWithCatching(block: () -> Unit)
     }

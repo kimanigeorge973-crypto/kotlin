@@ -18,7 +18,7 @@ import kotlin.io.path.Path
 
 @DefaultsDsl
 @OptIn(TestInfrastructureInternals::class, PrivateForInline::class)
-abstract class TestConfigurationBuilderBase<B : TestConfigurationBuilderBase<B, C>, C : TestConfiguration<*>> {
+abstract class TestConfigurationBuilderBase<Self : TestConfigurationBuilderBase<Self, C>, C : TestConfiguration<*>> {
     val defaultsProviderBuilder: DefaultsProviderBuilder = DefaultsProviderBuilder()
     lateinit var assertions: AssertionsService
 
@@ -38,8 +38,8 @@ abstract class TestConfigurationBuilderBase<B : TestConfigurationBuilderBase<B, 
     protected val directives: MutableList<DirectivesContainer> = mutableListOf()
     val defaultRegisteredDirectivesBuilder: RegisteredDirectivesBuilder = RegisteredDirectivesBuilder()
 
-    protected val configurationsByPositiveTestDataCondition: MutableList<Pair<Regex, B.() -> Unit>> = mutableListOf()
-    protected val configurationsByNegativeTestDataCondition: MutableList<Pair<Regex, B.() -> Unit>> = mutableListOf()
+    protected val configurationsByPositiveTestDataCondition: MutableList<Pair<Regex, Self.() -> Unit>> = mutableListOf()
+    protected val configurationsByNegativeTestDataCondition: MutableList<Pair<Regex, Self.() -> Unit>> = mutableListOf()
     protected val additionalServices: MutableList<ServiceRegistrationData> = mutableListOf()
 
     protected var compilerConfigurationProvider: ((TestServices, Disposable, List<AbstractEnvironmentConfigurator>) -> CompilerConfigurationProvider)? =
@@ -129,12 +129,12 @@ abstract class TestConfigurationBuilderBase<B : TestConfigurationBuilderBase<B, 
         defaultRegisteredDirectivesBuilder.apply(init)
     }
 
-    fun forTestsMatching(pattern: String, configuration: B.() -> Unit) {
+    fun forTestsMatching(pattern: String, configuration: Self.() -> Unit) {
         val regex = pattern.toMatchingRegexString().toRegex()
         forTestsMatching(regex, configuration)
     }
 
-    fun forTestsNotMatching(pattern: String, configuration: B.() -> Unit) {
+    fun forTestsNotMatching(pattern: String, configuration: Self.() -> Unit) {
         val regex = pattern.toMatchingRegexString().toRegex()
         forTestsNotMatching(regex, configuration)
     }
@@ -148,11 +148,11 @@ abstract class TestConfigurationBuilderBase<B : TestConfigurationBuilderBase<B, 
         else -> """^.*/(${replace("*", ".*")})$"""
     }
 
-    fun forTestsMatching(pattern: Regex, configuration: B.() -> Unit) {
+    fun forTestsMatching(pattern: Regex, configuration: Self.() -> Unit) {
         configurationsByPositiveTestDataCondition += pattern to configuration
     }
 
-    fun forTestsNotMatching(pattern: Regex, configuration: B.() -> Unit) {
+    fun forTestsNotMatching(pattern: Regex, configuration: Self.() -> Unit) {
         configurationsByNegativeTestDataCondition += pattern to configuration
     }
 
@@ -165,13 +165,13 @@ abstract class TestConfigurationBuilderBase<B : TestConfigurationBuilderBase<B, 
         for ((regex, configuration) in configurationsByPositiveTestDataCondition) {
             if (regex.matches(absoluteTestDataPath)) {
                 @Suppress("UNCHECKED_CAST")
-                configuration(this as B)
+                configuration(this as Self)
             }
         }
         for ((regex, configuration) in configurationsByNegativeTestDataCondition) {
             if (!regex.matches(absoluteTestDataPath)) {
                 @Suppress("UNCHECKED_CAST")
-                configuration(this as B)
+                configuration(this as Self)
             }
         }
     }
@@ -180,10 +180,10 @@ abstract class TestConfigurationBuilderBase<B : TestConfigurationBuilderBase<B, 
 
 @DefaultsDsl
 @OptIn(TestInfrastructureInternals::class, PrivateForInline::class)
-sealed class OnePhaseTestConfigurationBuilderBase<
-        B : TestConfigurationBuilderBase<B, C>,
-        C : TestConfiguration<*>,
-        > : TestConfigurationBuilderBase<B, C>() {
+sealed class OnePhaseTestConfigurationBuilderBase<Self, C> : TestConfigurationBuilderBase<Self, C>()
+        where Self : TestConfigurationBuilderBase<Self, C>,
+              C : TestConfiguration<*>
+{
     private typealias Step = TestStep<*, *>
     private typealias StepBuilder = TestStepBuilder<*, *, Step>
 

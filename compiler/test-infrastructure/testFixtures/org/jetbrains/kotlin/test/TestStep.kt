@@ -132,7 +132,6 @@ sealed class TestStep<InputArtifact, OutputArtifact>
                 val outputArtifact = try {
                     facade.transform(inputArtifact) ?: return StepResult.NoArtifactFromFacade
                 } catch (e: Throwable) {
-                    // TODO: remove inheritors of WrappedException.FromFacade
                     return StepResult.ErrorFromFacade(WrappedException.FromGroupingFacade(e, facade))
                 }
                 return StepResult.Artifact(outputArtifact)
