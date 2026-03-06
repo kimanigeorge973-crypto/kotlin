@@ -129,7 +129,6 @@ class CompilerTestGroupingTestEngine : TestEngine {
             return true
         }
 
-        // For test classes, check if they have @UseBatchingEngine in their hierarchy
         if (descriptor.isContainer) {
             val testClass = (descriptor as? ClassTestDescriptor)?.testClass
             if (testClass != null) {

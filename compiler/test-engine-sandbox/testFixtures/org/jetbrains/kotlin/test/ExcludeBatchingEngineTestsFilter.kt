@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.test
 
+import org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor
+import org.junit.jupiter.engine.descriptor.MethodBasedTestDescriptor
 import org.junit.platform.engine.FilterResult
 import org.junit.platform.engine.TestDescriptor
 import org.junit.platform.launcher.PostDiscoveryFilter
@@ -36,23 +38,17 @@ class ExcludeBatchingEngineTestsFilter : PostDiscoveryFilter {
         // Check if this descriptor or any parent has @UseBatchingEngine
         var current: TestDescriptor? = descriptor
         while (current != null) {
-            val testClass = getTestClass(current)
+            val testClass = when (current) {
+                is MethodBasedTestDescriptor -> current.testClass
+                is ClassBasedTestDescriptor -> current.testClass
+                else -> null
+            }
             if (testClass != null && testClass.isTwoStageKotlinCompilerTest()) {
                 return true
             }
             current = current.parent.getOrNull()
         }
         return false
-    }
-
-    private fun getTestClass(descriptor: TestDescriptor): Class<*>? {
-        return try {
-            // Try to get test class using reflection (works for JUnit Jupiter descriptors)
-            val method = descriptor.javaClass.methods.find { it.name == "getTestClass" }
-            method?.invoke(descriptor) as? Class<*>
-        } catch (_: Exception) {
-            null
-        }
     }
 }
 

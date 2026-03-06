@@ -24,7 +24,6 @@ abstract class AbstractTwoStageKotlinCompilerTest {
             AbstractKotlinCompilerTest.defaultConfiguration(this)
             useAdditionalService { createApplicationDisposableProvider() }
             useAdditionalService { createKotlinStandardLibrariesPathProvider() }
-            @OptIn(TestInfrastructureInternals::class)
             useAfterAnalysisCheckers(::IrValidationErrorChecker)
         }
 
