@@ -6,14 +6,13 @@
 package org.jetbrains.kotlin.analysis.api.fir.projectStructure
 
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.ASTStructure
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.stubs.StubElement
-import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.util.ThreeState
@@ -23,7 +22,6 @@ import com.intellij.util.diff.DiffTreeChangeBuilder
 import com.intellij.util.diff.ShallowNodeComparator
 import org.jetbrains.kotlin.analysis.api.platform.modification.KaElementModificationType
 import org.jetbrains.kotlin.analysis.api.platform.modification.KaSourceModificationLocality
-import org.jetbrains.kotlin.analysis.api.platform.modification.createProjectWideSourceModificationTracker
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaDanglingFileResolutionMode
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaDanglingFileResolutionModeProvider
 import org.jetbrains.kotlin.analysis.api.projectStructure.copyOrigin
@@ -310,8 +308,8 @@ private fun PsiElement.isWhitespaceOrComment(): Boolean = this is PsiWhiteSpace 
  * or computes it using [computeMode].
  *
  * The cached value is stored in user data properties of [this] and depends
- * on the value of the project-wide [out-of-block modification tracker][createProjectWideSourceModificationTracker].
- * If the modification counter is incremented, all previously cached values are dropped.
+ * on the modification stamps of [this] and its [copyOrigin].
+ * If the sum of these modification stamps is incremented, the previously cached value is recalculated.
  *
  * The caching is only supported for physical dangling files with non-null [copyOrigin].
  * Files have to by physical, i.e., support PSI tree change events,
@@ -321,29 +319,14 @@ private fun PsiElement.isWhitespaceOrComment(): Boolean = this is PsiWhiteSpace 
 private fun KtFile.getOrComputeMode(
     computeMode: () -> KaDanglingFileResolutionMode
 ): KaDanglingFileResolutionMode {
-    val cachedMode = getUserData(CALCULATED_DANGLING_FILE_RESOLUTION_MODE_KEY)
-    if (cachedMode != null) {
-        return cachedMode.value
-    }
-
-    if (this.isDangling && this.copyOrigin != null && this.isPhysical) {
-        val cachedValuesManager = CachedValuesManager.getManager(project)
-        val modificationTracker = project.createProjectWideSourceModificationTracker()
-
-        val cachedValue = cachedValuesManager.createCachedValue(
-            {
-                val computedMode = computeMode()
-                CachedValueProvider.Result.create(computedMode, modificationTracker)
-            },
-            /* trackValue = */false
-        )
-
-        putUserData(CALCULATED_DANGLING_FILE_RESOLUTION_MODE_KEY, cachedValue)
-        return cachedValue.value
+    val copyOrigin = this.copyOrigin
+    return if (this.isDangling && copyOrigin != null && this.isPhysical) {
+        CachedValuesManager.getCachedValue(this) {
+            CachedValueProvider.Result.createSingleDependency(
+                computeMode(),
+                ModificationTracker { modificationStamp + copyOrigin.modificationStamp })
+        }
     } else {
-        return computeMode()
+        computeMode()
     }
 }
-
-private val CALCULATED_DANGLING_FILE_RESOLUTION_MODE_KEY: Key<CachedValue<KaDanglingFileResolutionMode>> =
-    Key.create("CALCULATED_DANGLING_FILE_RESOLUTION_MODE")
