@@ -56,6 +56,9 @@ public class Emulator {
         commandLine.setExePath(pathManager.getToolsFolderInAndroidSdk() + "/bin/" + androidCmdName);
         commandLine.addParameter("--sdk_root=" + pathManager.getAndroidSdkRoot());
 
+        // Always install emulator package
+        commandLine.addParameter("emulator");
+
         // Allow override of system image via system property
         String overrideImage = System.getProperty("kotlin.android.avd.systemImage");
         if (overrideImage != null && !overrideImage.isEmpty()) {
