@@ -129,18 +129,16 @@ abstract class AbstractResolveReferenceTest : AbstractResolveTest<KtReference?>(
             val symbolsAgainResultAsReferences = resolveSymbolsAsReferences(reference)
             val symbolsAsReferences = symbolsResultAsReferences.symbols
             ignoreStabilityIfNeeded {
-                if (symbolsResult != null) {
-                    assertStableResult(
-                        testServices = testServices,
-                        firstAttempt = symbolsResult.attempt,
-                        secondAttempt = symbolsAgainResult!!.attempt,
-                    )
-                }
+                assertStableResult(
+                    testServices = testServices,
+                    firstAttempt = symbolsResult.attempt,
+                    secondAttempt = symbolsAgainResult.attempt,
+                )
 
                 testServices.assertions.assertEquals(symbolsAsReferences, symbolsAgainResultAsReferences.symbols)
             }
 
-            val symbols = symbolsResult?.symbols ?: symbolsAsReferences
+            val symbols = symbolsResult.symbols
             val isImplicitReferenceToCompanion = reference.isImplicitReferenceToCompanion()
 
             val resolvesByNamesViolations = resolvesByNamesViolations(
@@ -163,18 +161,16 @@ abstract class AbstractResolveReferenceTest : AbstractResolveTest<KtReference?>(
                 appendLine("isImplicitReferenceToCompanion: $isImplicitReferenceToCompanion")
                 appendLine("usesContextSensitiveResolution: ${reference.usesContextSensitiveResolution}")
                 resolvesByNamesViolations?.let(::appendLine)
-                if (symbolsResult != null) {
-                    val attempt = symbolsResult.attempt
+                val attempt = symbolsResult.attempt
 
-                    // This call mustn't be suppressed as this is the API contracts
-                    @OptIn(KtExperimentalApi::class)
-                    assertSpecificResolutionApi(testServices, attempt, reference as KtResolvable)
+                // This call mustn't be suppressed as this is the API contracts
+                @OptIn(KtExperimentalApi::class)
+                assertSpecificResolutionApi(testServices, attempt, reference as KtResolvable)
 
-                    append("attempt: ")
-                    appendLine(attempt?.let(::renderFrontendIndependentKClassNameOf) ?: "null")
-                    if (attempt is KaSymbolResolutionError) {
-                        appendLine("diagnostic: ${stringRepresentation(attempt.diagnostic)}")
-                    }
+                append("attempt: ")
+                appendLine(attempt?.let(::renderFrontendIndependentKClassNameOf) ?: "null")
+                if (attempt is KaSymbolResolutionError) {
+                    appendLine("diagnostic: ${stringRepresentation(attempt.diagnostic)}")
                 }
 
                 val renderedSymbols = renderSymbols(symbols)
@@ -183,14 +179,12 @@ abstract class AbstractResolveReferenceTest : AbstractResolveTest<KtReference?>(
                     append(renderedSymbols)
                 }
 
-                if (symbolsResult != null) {
-                    val renderedSymbolsAsReferences = renderSymbols(symbolsAsReferences)
-                    if (renderedSymbolsAsReferences != renderedSymbols) {
-                        appendLine()
-                        appendLine("resolveToSymbols:")
-                        withIndent {
-                            append(renderedSymbolsAsReferences)
-                        }
+                val renderedSymbolsAsReferences = renderSymbols(symbolsAsReferences)
+                if (renderedSymbolsAsReferences != renderedSymbols) {
+                    appendLine()
+                    appendLine("resolveToSymbols:")
+                    withIndent {
+                        append(renderedSymbolsAsReferences)
                     }
                 }
             }
@@ -216,12 +210,8 @@ abstract class AbstractResolveReferenceTest : AbstractResolveTest<KtReference?>(
 
     @OptIn(KtExperimentalApi::class)
     context(_: KaSession)
-    private fun resolveSymbolsAsResolvable(reference: KtReference): ResolveResult.Attempt? {
-        return if (reference is KtResolvable) {
-            ResolveResult.Attempt(reference.tryResolveSymbols())
-        } else {
-            null
-        }
+    private fun resolveSymbolsAsResolvable(reference: KtReference): ResolveResult.Attempt {
+        return ResolveResult.Attempt(reference.tryResolveSymbols())
     }
 
     /**
