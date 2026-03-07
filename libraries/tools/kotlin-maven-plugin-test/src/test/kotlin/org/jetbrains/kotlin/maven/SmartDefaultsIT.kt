@@ -48,4 +48,47 @@ class SmartDefaultsIT : KotlinMavenTestBase() {
             }
         }
     }
+
+    @MavenTest
+    fun `test-smart-defaults-execution-level-source-dirs-override-smart-defaults`(mavenVersion: TestVersions.Maven) {
+        val buildOptions = if (isWindowsHost) buildOptions.copy(useKotlinDaemon = false) else buildOptions
+        testProject("test-smart-defaults-execution-source-dirs", mavenVersion, buildOptions) {
+            build("compile", "test-compile") {
+                assertBuildLogContains("Kotlin smart defaults are enabled")
+
+                // compile should use only explicitly specified execution-level sourceDirs if present
+                assertFileExists("target/classes/sample/CustomMain.class")
+                assertFileDoesNotExist("target/classes/sample/DefaultMain.class") {
+                    "Default main source root was compiled unexpectedly"
+                }
+
+                // test-compile should use only explicitly specified execution-level sourceDirs if present
+                assertFileExists("target/test-classes/sample/CustomTest.class")
+                assertFileDoesNotExist("target/test-classes/sample/DefaultTest.class") {
+                    "Default test source root was compiled unexpectedly"
+                }
+            }
+        }
+    }
+
+    @MavenTest
+    fun `test-smart-defaults-execution-level-source-dirs-do-not-produce-duplicate-source-root-warnings`(
+        mavenVersion: TestVersions.Maven,
+    ) {
+        val buildOptions = if (isWindowsHost) buildOptions.copy(useKotlinDaemon = false) else buildOptions
+        testProject("test-smart-defaults-execution-source-dirs-no-duplicates", mavenVersion, buildOptions) {
+            build("compile", "test-compile") {
+                assertBuildLogContains("Kotlin smart defaults are enabled")
+                assertBuildLogDoesNotContain("Duplicate source root")
+
+                // compile should include all explicitly configured source directories
+                assertFileExists("target/classes/sample/CustomMain.class")
+                assertFileExists("target/classes/sample/DefaultMain.class")
+
+                // test-compile should include all explicitly configured test source directories
+                assertFileExists("target/test-classes/sample/CustomTest.class")
+                assertFileExists("target/test-classes/sample/DefaultTest.class")
+            }
+        }
+    }
 }

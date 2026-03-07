@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.maven.test
 
 import org.apache.maven.shared.verifier.Verifier
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.File
 import kotlin.io.path.Path
@@ -54,10 +55,26 @@ fun Verifier.assertBuildLogContains(vararg substring: String) {
     }
 }
 
+fun Verifier.assertBuildLogDoesNotContain(substring: String) {
+    forEachBuildLogLine { line ->
+        if (substring in line) {
+            Assertions.fail("Build log contains unexpected line: '$substring'")
+        }
+    }
+}
+
 fun Verifier.assertFileExists(
     relativePath: String,
     messageSupplier: () -> String = { "Expected file not found: $relativePath" },
 ) {
     val path = Path(basedir).resolve(relativePath)
     assertTrue(path.exists(), messageSupplier)
+}
+
+fun Verifier.assertFileDoesNotExist(
+    relativePath: String,
+    messageSupplier: () -> String = { "Unexpected file found: $relativePath" },
+) {
+    val path = Path(basedir).resolve(relativePath)
+    assertFalse(path.exists(), messageSupplier)
 }

@@ -57,6 +57,12 @@ public abstract class KotlinCompileMojoBase<A extends CommonCompilerArguments> e
     protected MavenSession session;
 
     /**
+     * The default source directories containing the sources to be compiled.
+     */
+    @Parameter(defaultValue = "${project.compileSourceRoots}", required = true)
+    private List<String> defaultSourceDirs;
+
+    /**
      * The source directories containing the sources to be compiled.
      */
     @Parameter
@@ -75,9 +81,7 @@ public abstract class KotlinCompileMojoBase<A extends CommonCompilerArguments> e
     private List<String> pluginOptions;
 
     protected List<String> getSourceFilePaths() {
-        List<String> sourceFilePaths = new ArrayList<>();
-        if (sourceDirs != null && !sourceDirs.isEmpty()) sourceFilePaths.addAll(sourceDirs);
-        sourceFilePaths.addAll(project.getCompileSourceRoots());
+        List<String> sourceFilePaths = sourceDirs != null && !sourceDirs.isEmpty() ? sourceDirs : defaultSourceDirs;
 
         return sourceFilePaths.stream().map(path -> new File(path).toPath().normalize().toString())
                 .distinct().collect(Collectors.toList());
