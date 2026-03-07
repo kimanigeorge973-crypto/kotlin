@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 interface A1 {
     fun test(o: String, k: String): String

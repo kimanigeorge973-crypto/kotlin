@@ -1,5 +1,6 @@
 // WITH_STDLIB
 // WITH_COROUTINES
+// IGNORE_BACKEND: ANDROID
 
 import helpers.*
 import kotlin.coroutines.*

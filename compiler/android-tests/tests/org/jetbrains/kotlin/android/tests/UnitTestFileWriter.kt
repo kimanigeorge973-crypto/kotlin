@@ -68,6 +68,7 @@ class UnitTestFileWriter(
     }
 
     private fun generateTestMethod(p: Printer, testName: String, className: String, filePath: String) {
+        p.println("@org.junit.jupiter.api.Test")
         p.println("public void test$testName() throws Exception {")
         p.pushIndent()
         p.println("invokeBoxMethod($className.class, \"$filePath\", \"OK\");")

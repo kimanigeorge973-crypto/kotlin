@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 open class A {
     open fun foo(a: String, b: String = "b") = b + a

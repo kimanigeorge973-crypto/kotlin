@@ -79,6 +79,16 @@ val toolsOsDarwin = when {
     }
 }
 
+val toolsOsDarwinArch = when {
+    OperatingSystem.current().isWindows -> "win_x64"
+    OperatingSystem.current().isMacOsX -> "darwin_aarch64"
+    OperatingSystem.current().isLinux -> "linux_x64"
+    else -> {
+        logger.error("Unknown operating system for android tools: ${OperatingSystem.current().name}")
+        ""
+    }
+}
+
 val preparePlatform by task<DefaultTask> {
     doLast {}
 }
@@ -218,6 +228,7 @@ androidBuildTools("33.0.1")
 androidBuildTools("34.0.0")
 androidBuildTools("35.0.0")
 
+unzipSdkTask("emulator-$toolsOsDarwinArch", emulatorVersion, "", "")
 unzipSdkTask("android_m2repository", "r44", "extras/android", "")
 unzipSdkTask("platform-tools", platformToolsVersion, "", toolsOsDarwin)
 unzipSdkTask("commandlinetools-$toolsOsShort", "${commandLineToolsVersion}_latest", "", "")

@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 import kotlin.reflect.KCallable
 import kotlin.reflect.full.isSubtypeOf

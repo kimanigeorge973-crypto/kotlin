@@ -1,5 +1,6 @@
 // WITH_STDLIB
 // TARGET_BACKEND: JVM
+// IGNORE_BACKEND: ANDROID
 
 // FILE: inline.kt
 

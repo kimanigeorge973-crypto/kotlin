@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// WITH_STDLIB
 
 import kotlin.reflect.jvm.isAccessible
 import kotlin.test.assertEquals

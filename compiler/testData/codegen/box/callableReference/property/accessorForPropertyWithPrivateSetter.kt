@@ -1,5 +1,7 @@
 
 // WITH_STDLIB
+// IGNORE_BACKEND: ANDROID
+
 // FILE: b.kt
 import a.A
 

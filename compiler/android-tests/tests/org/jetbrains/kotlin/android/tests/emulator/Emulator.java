@@ -56,9 +56,6 @@ public class Emulator {
         commandLine.setExePath(pathManager.getToolsFolderInAndroidSdk() + "/bin/" + androidCmdName);
         commandLine.addParameter("--sdk_root=" + pathManager.getAndroidSdkRoot());
 
-        // Always install emulator package
-        commandLine.addParameter("emulator");
-
         // Allow override of system image via system property
         String overrideImage = System.getProperty("kotlin.android.avd.systemImage");
         if (overrideImage != null && !overrideImage.isEmpty()) {
@@ -109,7 +106,7 @@ public class Emulator {
 
         // Prefer the new SDK layout: $SDK/emulator/emulator
         String sdkRoot = pathManager.getAndroidSdkRoot();
-        String newLayoutEmulator = sdkRoot + "/emulator";
+        String newLayoutEmulator = sdkRoot + "/emulator/emulator";
 
         File newEmulatorFile = new File(newLayoutEmulator);
         if (newEmulatorFile.isFile() && newEmulatorFile.canExecute()) {
@@ -119,11 +116,13 @@ public class Emulator {
             commandLine.setExePath(pathManager.getEmulatorFolderInAndroidSdk() + "/emulator");
         }
 
+        commandLine.addParameters("-cores", "4");
+        commandLine.addParameters("-memory", "4096");
+
         commandLine.addParameter("-avd");
         commandLine.addParameter(AVD_NAME);
         commandLine.addParameter("-no-audio");
         commandLine.addParameter("-no-window");
-        commandLine.addParameter("-no-metrics");
         commandLine.addParameter("-gpu");
         commandLine.addParameter("off");
         commandLine.addParameter("-no-accel");
@@ -330,7 +329,12 @@ public class Emulator {
     private static void finishProcess(String processName) {
         if (SystemInfo.isUnix) {
             GeneralCommandLine pidOfProcess = new GeneralCommandLine();
-            pidOfProcess.setExePath("pidof");
+            if (SystemInfo.isMac) {
+                pidOfProcess.setExePath("pgrep");
+                pidOfProcess.addParameter("-f");
+            } else {
+                pidOfProcess.setExePath("pidof");
+            }
             pidOfProcess.addParameter(processName);
             RunResult runResult = RunUtils.execute(pidOfProcess);
             String processIdsStr = runResult.getOutput().substring(("pidof " + processName).length());

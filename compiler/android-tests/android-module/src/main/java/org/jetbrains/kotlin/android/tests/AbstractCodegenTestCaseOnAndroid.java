@@ -16,11 +16,11 @@
 
 package org.jetbrains.kotlin.android.tests;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Method;
 
-public class AbstractCodegenTestCaseOnAndroid extends TestCase {
+public class AbstractCodegenTestCaseOnAndroid {
 
     protected void invokeBoxMethod(Class clazz, String filePath, String expectedResult) throws Exception {
         try {

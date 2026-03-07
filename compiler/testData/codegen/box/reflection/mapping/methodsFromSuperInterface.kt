@@ -1,5 +1,7 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// WITH_STDLIB
+
 package test
 
 import kotlin.reflect.jvm.javaMethod

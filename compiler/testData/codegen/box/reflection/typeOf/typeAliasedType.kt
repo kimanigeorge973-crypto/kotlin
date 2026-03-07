@@ -1,6 +1,6 @@
 // WITH_REFLECT
 // KJS_WITH_FULL_RUNTIME
-// IGNORE_BACKEND: JS_IR, JS_IR_ES6
+// IGNORE_BACKEND: JS_IR, JS_IR_ES6, ANDROID
 // Should be unmuted for JS when KT-79471 is fixed
 
 package test

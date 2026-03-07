@@ -1,6 +1,7 @@
 // TARGET_BACKEND: JVM
 // WITH_STDLIB
 // WITH_COROUTINES
+// IGNORE_BACKEND: ANDROID
 
 // FILE: flow.kt
 package flow

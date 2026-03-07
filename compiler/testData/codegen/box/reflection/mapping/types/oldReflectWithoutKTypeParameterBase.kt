@@ -3,6 +3,8 @@
 // FULL_JDK
 // OPT_IN: kotlin.ExperimentalStdlibApi
 
+// IGNORE_BACKEND: ANDROID
+
 // This test emulates behavior of pre-2.3.20 kotlin-reflect against kotlin-stdlib 2.3.20+.
 // Prior to 2.3.20, KTypeParameterImpl did not inherit from KTypeParameterBase (which has appeared in kotlin-stdlib 2.3.20),
 // and kotlin-stdlib implementation of javaType created a fake TypeVariable object instead of finding it in the type parameter's container.

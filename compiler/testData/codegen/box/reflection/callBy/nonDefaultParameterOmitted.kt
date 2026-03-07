@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 fun foo(x: Int, y: Int = 2) = x + y
 

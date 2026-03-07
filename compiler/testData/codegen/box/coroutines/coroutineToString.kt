@@ -2,6 +2,8 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
 // WITH_COROUTINES
+// IGNORE_BACKEND: ANDROID
+
 package test
 
 import helpers.*

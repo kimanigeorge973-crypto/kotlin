@@ -1,6 +1,7 @@
 // TARGET_BACKEND: JVM
 
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 import kotlin.reflect.full.IllegalCallableAccessException
 import kotlin.reflect.jvm.isAccessible

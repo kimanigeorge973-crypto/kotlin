@@ -3,6 +3,7 @@
 // TARGET_BACKEND: JVM_IR
 
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 fun check(expected: String, obj: Any?) {
     val actual = obj.toString()

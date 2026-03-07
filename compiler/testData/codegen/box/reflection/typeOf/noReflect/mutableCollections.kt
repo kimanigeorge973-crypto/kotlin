@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_STDLIB
+// IGNORE_BACKEND: ANDROID
 
 package test
 

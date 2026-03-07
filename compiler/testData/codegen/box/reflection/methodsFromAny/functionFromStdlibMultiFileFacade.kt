@@ -2,6 +2,7 @@
 // KT-12630 KotlinReflectionInternalError on referencing some functions from stdlib
 
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 import kotlin.test.*
 

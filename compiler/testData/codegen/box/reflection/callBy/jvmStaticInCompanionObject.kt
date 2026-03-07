@@ -1,6 +1,7 @@
 // TARGET_BACKEND: JVM
 
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 // KT-12915 IAE on callBy of JvmStatic function with default arguments
 

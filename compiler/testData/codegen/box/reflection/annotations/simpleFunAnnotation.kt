@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// WITH_STDLIB
 
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Simple(val value: String)

@@ -26,6 +26,8 @@ import org.jetbrains.kotlin.android.tests.run.RunUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.intellij.openapi.util.text.Strings.capitalize;
+
 public class GradleRunner {
     private final List<String> listOfCommands;
 

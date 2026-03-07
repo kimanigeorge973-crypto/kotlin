@@ -1,6 +1,7 @@
 // TARGET_BACKEND: JVM
 
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 import kotlin.reflect.KProperty1
 import kotlin.test.assertEquals

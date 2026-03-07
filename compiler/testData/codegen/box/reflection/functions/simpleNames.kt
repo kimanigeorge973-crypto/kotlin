@@ -1,4 +1,5 @@
 // WITH_REFLECT
+// WITH_STDLIB
 
 import kotlin.test.assertEquals
 

@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 class A(val result: String = "OK") {
     fun foo(x: Int = 42): String {

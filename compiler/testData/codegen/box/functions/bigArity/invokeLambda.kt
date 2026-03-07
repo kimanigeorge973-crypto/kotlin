@@ -1,4 +1,5 @@
 // LANGUAGE: +FunctionTypesWithBigArity
+// WITH_STDLIB
 
 class A(val value: Int)
 

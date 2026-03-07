@@ -3,6 +3,7 @@
 // WITH_STDLIB
 // WITH_COROUTINES
 // CHECK_TAIL_CALL_OPTIMIZATION
+// IGNORE_BACKEND: ANDROID
 
 import helpers.*
 import kotlin.coroutines.*

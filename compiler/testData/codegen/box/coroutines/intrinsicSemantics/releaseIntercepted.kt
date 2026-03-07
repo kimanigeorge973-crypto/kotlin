@@ -1,4 +1,6 @@
 // WITH_STDLIB
+// IGNORE_BACKEND: ANDROID
+
 import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.*
 

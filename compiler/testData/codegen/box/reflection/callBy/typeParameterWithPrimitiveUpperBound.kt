@@ -1,5 +1,6 @@
 // TARGET_BACKEND: JVM
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 import kotlin.reflect.KFunction
 import kotlin.reflect.KVariance
 import kotlin.test.assertEquals

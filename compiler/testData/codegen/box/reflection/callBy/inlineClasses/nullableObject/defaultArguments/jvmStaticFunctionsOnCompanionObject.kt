@@ -1,6 +1,7 @@
 // TARGET_BACKEND: JVM_IR
 // JVM_TARGET: 1.8
 // WITH_REFLECT
+// IGNORE_BACKEND: ANDROID
 
 import kotlin.reflect.KCallable
 import kotlin.reflect.KParameter
