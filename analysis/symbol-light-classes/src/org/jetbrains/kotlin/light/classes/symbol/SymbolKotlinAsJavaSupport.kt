@@ -6,34 +6,40 @@
 package org.jetbrains.kotlin.light.classes.symbol
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.CachedValueProvider
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
 import org.jetbrains.kotlin.analysis.api.KaNonPublicApi
 import org.jetbrains.kotlin.analysis.api.platform.KaCachedService
+import org.jetbrains.kotlin.analysis.api.platform.analysisMessageBus
 import org.jetbrains.kotlin.analysis.api.platform.declarations.createDeclarationProvider
-import org.jetbrains.kotlin.analysis.api.platform.modification.createProjectWideLibraryModificationTracker
-import org.jetbrains.kotlin.analysis.api.platform.modification.createProjectWideSourceModificationTracker
+import org.jetbrains.kotlin.analysis.api.platform.modification.*
 import org.jetbrains.kotlin.analysis.api.platform.packages.createPackageProvider
 import org.jetbrains.kotlin.analysis.api.platform.permissions.KaAnalysisPermissionChecker
+import org.jetbrains.kotlin.analysis.api.platform.projectStructure.KaModuleConverter
 import org.jetbrains.kotlin.analysis.api.platform.projectStructure.KotlinProjectStructureProvider
 import org.jetbrains.kotlin.analysis.api.projectStructure.*
 import org.jetbrains.kotlin.analysis.decompiled.light.classes.DecompiledLightClassesFactory
 import org.jetbrains.kotlin.analysis.decompiled.light.classes.KtLightClassForDecompiledDeclaration
 import org.jetbrains.kotlin.analysis.decompiler.psi.file.KtClsFile
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.asJava.classes.KtFakeLightClass
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForFacade
 import org.jetbrains.kotlin.asJava.classes.lazyPub
+import org.jetbrains.kotlin.asJava.finder.KaLightClassesModuleHelper
+import org.jetbrains.kotlin.fileClasses.isJvmMultifileClassFile
+import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolBasedFakeLightClass
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolLightClassForFacade
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolLightClassForScript
 import org.jetbrains.kotlin.light.classes.symbol.classes.createSymbolLightClassNoCache
+import org.jetbrains.kotlin.light.classes.symbol.utils.NestedCaffeineCache
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.parentOrNull
@@ -108,7 +114,29 @@ private fun KaModule.isLightClassSupportAvailable(): Boolean {
     return targetPlatform.has<JvmPlatform>() || isMultiplatformSupportAvailable
 }
 
-internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupportBase<KaModule>(project) {
+internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupportSharedBase<KaModule>(project) {
+
+    init {
+        // It's generally best practice to register listeners in plugin XMLs. However, we don't know whether the platform intends to
+        // implement a caching package provider factory or not, and thus can't register these listeners in the XML.
+        project.analysisMessageBus.connect(project).subscribe(
+            KotlinModificationEvent.TOPIC,
+            KotlinModificationEventListener { event ->
+                when (event) {
+                    is KotlinModuleStateModificationEvent,
+                    is KotlinModuleOutOfBlockModificationEvent,
+                    KotlinGlobalModuleStateModificationEvent,
+                    KotlinGlobalSourceModuleStateModificationEvent,
+                    KotlinGlobalScriptModuleStateModificationEvent,
+                    KotlinGlobalSourceOutOfBlockModificationEvent,
+                        -> lightClassCache.invalidateAll()
+
+                    is KotlinCodeFragmentContextModificationEvent -> {}
+                }
+            }
+        )
+    }
+
     @KaCachedService
     private val projectStructureProvider by lazyPub { KotlinProjectStructureProvider.getInstance(project) }
 
@@ -117,6 +145,18 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
             element = this,
             useSiteModule = null,
         ).takeIf(KaModule::isLightClassSupportAvailable)
+    }
+
+    @OptIn(KaImplementationDetail::class)
+    private fun PsiElement.convertModuleOrDefaultIfSupportEnabled(module: Module?): KaModule? {
+        val kaModule = module?.let { ideaModule ->
+            KaModuleConverter.getInstance(ideaModule.project)?.asKaModule(ideaModule)
+        } ?: projectStructureProvider.getModule(
+            element = this,
+            useSiteModule = null,
+        )
+
+        return kaModule.takeIf(KaModule::isLightClassSupportAvailable)
     }
 
     override fun findClassOrObjectDeclarationsInPackage(
@@ -176,8 +216,8 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
             .getKotlinOnlySubpackageNames(fqn)
             .map { fqn.child(it) }
 
-    override fun createInstanceOfLightScript(script: KtScript): KtLightClass? {
-        val module = script.getModuleIfSupportEnabled() ?: return null
+    override fun createInstanceOfLightScript(script: KtScript, module: KaModule?): KtLightClass? {
+        if (module == null) return null
         return SymbolLightClassForScript(script, module)
     }
 
@@ -190,7 +230,7 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
         else -> null
     }
 
-    override fun createInstanceOfDecompiledLightClass(classOrObject: KtClassOrObject): KtLightClass? {
+    override fun createInstanceOfDecompiledLightClass(classOrObject: KtClassOrObject, module: KaModule?): KtLightClass? {
         val lightClass = DecompiledLightClassesFactory.getLightClassForDecompiledClassOrObject(classOrObject, project)
         if (lightClass != null) {
             return lightClass
@@ -198,15 +238,16 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
 
         if (isMultiplatformSupportAvailable) {
             // Light classes for binary declarations are built over decompiled Java stubs which KMP files don't provide
-            return createInstanceOfLightClass(classOrObject)
+            return createInstanceOfLightClass(classOrObject, module)
         }
 
         return null
     }
 
-    override fun createInstanceOfLightClass(classOrObject: KtClassOrObject): KtLightClass? {
-        val module = classOrObject.getModuleIfSupportEnabled() ?: return null
-        return createSymbolLightClassNoCache(classOrObject, module)
+    @OptIn(KaImplementationDetail::class)
+    override fun createInstanceOfLightClass(classOrObject: KtClassOrObject, module: KaModule?): KtLightClass? {
+        val kaModule = module?.takeIf(KaModule::isLightClassSupportAvailable) ?: return null
+        return createSymbolLightClassNoCache(classOrObject, kaModule)
     }
 
     override fun createInstanceOfDecompiledLightFacade(facadeFqName: FqName, files: List<KtFile>): KtLightClassForFacade? {
@@ -239,16 +280,47 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
         val module = files.first().getModuleIfSupportEnabled()
         if (module != null) {
             val lightClass = createInstanceOfLightFacade(facadeFqName, module, files)
-            if (lightClass != null) {
-                return lightClass
-            }
+            return lightClass
         }
 
         return null
     }
 
-    override fun createInstanceOfLightFacade(facadeFqName: FqName, module: KaModule, files: List<KtFile>): KtLightClassForFacade? {
+    override fun createInstanceOfLightFacade(facadeFqName: FqName, module: KaModule, files: List<KtFile>): KtLightClassForFacade {
         return SymbolLightClassForFacade(facadeFqName, files, module)
+    }
+
+    override fun getFacadeClassesInPackage(packageFqName: FqName, scope: GlobalSearchScope): Collection<KtLightClassForFacade> {
+        return findFilesForFacadeByPackage(packageFqName, scope).toFacadeClasses(scope)
+    }
+
+    override fun getFacadeClasses(facadeFqName: FqName, scope: GlobalSearchScope): Collection<KtLightClassForFacade> {
+        return findFilesForFacade(facadeFqName, scope).toFacadeClasses(scope)
+    }
+
+    @OptIn(KaImplementationDetail::class)
+    private fun Collection<KtFile>.toFacadeClasses(scope: GlobalSearchScope): List<KtLightClassForFacade> = mapNotNull { file ->
+        file.takeIf { it.facadeIsPossible() }?.let { file ->
+            when (val response = KaLightClassesModuleHelper.getSuitableJvmModule(file, scope)) {
+                is KaLightClassesModuleHelper.Response.MODULE_NOT_FOUND -> null
+                is KaLightClassesModuleHelper.Response.MODULE_FOUND -> {
+                    KaModuleConverter.getInstance(file.project)?.asKaModule(response.module)
+                }
+                else -> file.findModule()
+            }
+        }?.let { file to it }
+    }.groupBy { (file, module) ->
+        FacadeKey(file.javaFileFacadeFqName, file.isJvmMultifileClassFile, module)
+    }.mapNotNull { (_, pairs) ->
+        pairs.firstNotNullOfOrNull { (file, module) ->
+            (file to module).takeIf { facadeIsApplicable(module, file) }
+        }?.let { (file, module) -> getLightFacade(file, module) }
+    }
+
+    private fun getLightFacade(file: KtFile, module: KaModule): KtLightClassForFacade? = ifValid(file) {
+        cacheLightClass(file, module) {
+            createLightFacade(file, module)
+        }
     }
 
     override val KaModule.contentSearchScope: GlobalSearchScope
@@ -295,13 +367,59 @@ internal class SymbolKotlinAsJavaSupport(project: Project) : KotlinAsJavaSupport
 
     override fun getFakeLightClass(classOrObject: KtClassOrObject): KtFakeLightClass = SymbolBasedFakeLightClass(classOrObject)
 
-    override fun <E : KtElement, R : KtLightClass> cacheLightClass(element: E, provider: CachedValueProvider<R>): R? {
-        return if (isMultiplatformSupportAvailable) {
-            @Suppress("UNCHECKED_CAST")
-            KMP_CACHE.get().computeIfAbsent(element) { provider.compute()?.value } as R?
-        } else {
-            super.cacheLightClass(element, provider)
+    private val lightClassCache = NestedCaffeineCache<KaModule, KtElement, KtLightClass>()
+
+    override fun getLightClass(classOrObject: KtClassOrObject): KtLightClass? = ifValid(classOrObject) {
+        val kaModule = classOrObject.getModuleIfSupportEnabled() ?: return null
+        cacheLightClass(classOrObject, kaModule) {
+            createLightClass(classOrObject, kaModule)
         }
+    }
+
+    override fun getLightClass(classOrObject: KtClassOrObject, module: Module?): KtLightClass? = ifValid(classOrObject) {
+        val kaModule = classOrObject.convertModuleOrDefaultIfSupportEnabled(module) ?: return null
+        cacheLightClass(classOrObject, kaModule) {
+            createLightClass(classOrObject, kaModule)
+        }
+    }
+
+    override fun getLightClass(classOrObject: KtClassOrObject, module: KaModule?): KtLightClass? = ifValid(classOrObject) {
+        if (module == null) return null
+        cacheLightClass(classOrObject, module) {
+            createLightClass(classOrObject, module)
+        }
+    }
+
+    override fun getLightFacade(file: KtFile, module: Module?): KtLightClassForFacade? = ifValid(file) {
+        val kaModule = file.convertModuleOrDefaultIfSupportEnabled(module) ?: return null
+        cacheLightClass(file, kaModule) {
+            createLightFacade(file, kaModule)
+        }
+    }
+
+    override fun getLightFacade(file: KtFile): KtLightClassForFacade? = getLightFacade(file, null)
+
+    @OptIn(KaImplementationDetail::class)
+    override fun getLightClassForScript(script: KtScript, module: Module?): KtLightClass? = ifValid(script) {
+        val kaModule = script.convertModuleOrDefaultIfSupportEnabled(module) ?: return null
+        cacheLightClass(script, kaModule) {
+            createLightScript(script, kaModule)
+        }
+    }
+
+    private fun <R : KtLightClass> cacheLightClass(
+        element: KtElement,
+        module: KaModule,
+        provider: () -> R?
+    ): R? {
+        @Suppress("UNCHECKED_CAST")
+        return if (isMultiplatformSupportAvailable) {
+            KMP_CACHE.get().computeIfAbsent(element) { provider() }
+        } else {
+            lightClassCache.getOrPut(module, element) { _, _ ->
+                provider()
+            }
+        } as R?
     }
 
     private fun KtElement.isFromSourceOrLibraryBinary(): Boolean = getModuleIfSupportEnabled()?.isFromSourceOrLibraryBinary() == true

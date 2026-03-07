@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.analysis.decompiled.light.classes.origin.LightMember
 import org.jetbrains.kotlin.analysis.decompiled.light.classes.origin.LightMemberOriginForCompiledMethod
 import org.jetbrains.kotlin.analysis.decompiler.psi.file.KtClsFile
 import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.asJava.classes.*
 import org.jetbrains.kotlin.asJava.isGetEntriesMethod
 import org.jetbrains.kotlin.asJava.isSyntheticValuesOrValueOfMethod
@@ -31,7 +32,7 @@ internal inline fun <R : PsiElement, T> R.cachedValueWithLibraryTracker(
 ): T = CachedValuesManager.getCachedValue(this) {
     CachedValueProvider.Result.createSingleDependency(
         computer(),
-        KotlinAsJavaSupportBase.getInstance(project).librariesTracker(this),
+        KotlinAsJavaSupportSharedBase.getInstance(project).librariesTracker(this),
     )
 }
 
@@ -48,7 +49,7 @@ open class KtLightClassForDecompiledDeclaration(
     private val contentFinderCache by lazyPub {
         ClassContentFinderCache(
             extensibleClass = this,
-            modificationTrackers = listOf(KotlinAsJavaSupportBase.getInstance(project).librariesTracker(this)),
+            modificationTrackers = listOf(KotlinAsJavaSupportSharedBase.getInstance(project).librariesTracker(this)),
         )
     }
 

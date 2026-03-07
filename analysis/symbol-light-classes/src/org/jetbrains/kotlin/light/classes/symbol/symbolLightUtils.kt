@@ -7,28 +7,62 @@ package org.jetbrains.kotlin.light.classes.symbol
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.IncorrectOperationException
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.base.KaConstantValue
+import org.jetbrains.kotlin.analysis.api.getModule
+import org.jetbrains.kotlin.analysis.api.platform.projectStructure.KaModuleConverter
+import org.jetbrains.kotlin.analysis.api.platform.projectStructure.KotlinModuleDependentsProvider
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaModule
 import org.jetbrains.kotlin.analysis.api.symbols.*
 import org.jetbrains.kotlin.analysis.api.symbols.pointers.KaSymbolPointer
 import org.jetbrains.kotlin.analysis.api.types.*
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.asJava.elements.KtLightElement
 import org.jetbrains.kotlin.asJava.elements.KtLightMember
 import org.jetbrains.kotlin.asJava.elements.psiType
+import org.jetbrains.kotlin.asJava.finder.KaLightClassesModuleHelper
 import org.jetbrains.kotlin.light.classes.symbol.annotations.*
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolLightClassBase
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolLightClassForInterface
 import org.jetbrains.kotlin.light.classes.symbol.classes.SymbolLightClassForInterfaceDefaultImpls
 import org.jetbrains.kotlin.load.java.JvmAnnotationNames
 import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.platform.isCommon
+import org.jetbrains.kotlin.platform.jvm.isJvm
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.utils.exceptions.errorWithAttachment
 import java.util.*
+
+internal class KaLightClassesModuleHelperImpl : KaLightClassesModuleHelper {
+    @OptIn(KaExperimentalApi::class, KaImplementationDetail::class)
+    override fun getSuitableJvmModule(element: KtElement, searchScope: GlobalSearchScope): KaLightClassesModuleHelper.Response {
+        val moduleConverter =
+            KaModuleConverter.getInstance(element.project) ?: return KaLightClassesModuleHelper.Response.SHOULD_USE_DEFAULT
+        return analyzeForLightClasses(element) {
+            val kaModule = getModule(element)
+            if (kaModule.targetPlatform.isCommon()) {
+                val dependents = KotlinModuleDependentsProvider.getInstance(element.project).getRefinementDependents(kaModule)
+                val jvmDependent = dependents.filter { it.targetPlatform.isJvm() }.firstNotNullOfOrNull { dependentModule ->
+                    val module = moduleConverter.asIDEAModule(dependentModule) ?: return@firstNotNullOfOrNull null
+                    module.takeIf { searchScope.isSearchInModuleContent(it) }
+                } ?: return@analyzeForLightClasses KaLightClassesModuleHelper.Response.MODULE_NOT_FOUND
+
+                KaLightClassesModuleHelper.Response.MODULE_FOUND(jvmDependent)
+            } else if (kaModule.targetPlatform.isJvm()) {
+                KaLightClassesModuleHelper.Response.SHOULD_USE_DEFAULT
+            } else {
+                KaLightClassesModuleHelper.Response.MODULE_NOT_FOUND
+            }
+        }
+    }
+}
 
 internal fun <L : Any> L.invalidAccess(): Nothing =
     error("Cls delegate shouldn't be accessed for symbol light classes! Qualified name: ${javaClass.name}")
@@ -330,9 +364,10 @@ internal inline fun <R : PsiElement, T> R.cachedValue(
     if (specialTrackers != null) {
         CachedValueProvider.Result.create(value, specialTrackers)
     } else {
+        val kotlinAsJavaSupport = KotlinAsJavaSupportSharedBase.getInstance(project)
         CachedValueProvider.Result.createSingleDependency(
             value,
-            KotlinAsJavaSupportBase.getInstance(project).outOfBlockModificationTracker(this),
+            kotlinAsJavaSupport.outOfBlockModificationTracker(this),
         )
     }
 }

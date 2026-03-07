@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.asJava
 
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
@@ -19,11 +20,15 @@ import org.jetbrains.kotlin.psi.KtScript
 abstract class KotlinAsJavaSupport {
     abstract fun getLightClass(classOrObject: KtClassOrObject): KtLightClass?
 
-    abstract fun getLightClassForScript(script: KtScript): KtLightClass?
+    abstract fun getLightClass(classOrObject: KtClassOrObject, module: Module?): KtLightClass?
+
+    abstract fun getLightClassForScript(script: KtScript, module: Module?): KtLightClass?
 
     abstract fun getFakeLightClass(classOrObject: KtClassOrObject): KtFakeLightClass
 
     abstract fun getLightFacade(file: KtFile): KtLightClassForFacade?
+
+    abstract fun getLightFacade(file: KtFile, module: Module?): KtLightClassForFacade?
 
     abstract fun createFacadeForSyntheticFile(file: KtFile): KtLightClassForFacade
 

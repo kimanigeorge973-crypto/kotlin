@@ -13,7 +13,7 @@ import com.intellij.psi.impl.light.LightMethodBuilder
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.asJava.toLightClass
@@ -107,7 +107,7 @@ class KtUltraLightClassForScript(
         {
             CachedValueProvider.Result.create(
                 ownMethods(),
-                KotlinAsJavaSupportBase.getInstance(project).outOfBlockModificationTracker(this)
+                KotlinAsJavaSupportSharedBase.getInstance(project).outOfBlockModificationTracker(this)
             )
         },
         false,

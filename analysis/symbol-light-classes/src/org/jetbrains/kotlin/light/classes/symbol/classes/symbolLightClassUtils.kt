@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.analysis.api.types.KaType
 import org.jetbrains.kotlin.analysis.api.types.KaTypeMappingMode
 import org.jetbrains.kotlin.analysis.utils.errors.requireIsInstance
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.asJava.classes.KotlinSuperTypeListBuilder
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.asJava.classes.METHOD_INDEX_BASE
@@ -72,7 +72,7 @@ internal fun createLightClassNoCache(
 }
 
 internal fun KtClassOrObject.contentModificationTrackers(): List<ModificationTracker> {
-    val outOfBlockTracker = KotlinAsJavaSupportBase.getInstance(project).outOfBlockModificationTracker(this)
+    val outOfBlockTracker = KotlinAsJavaSupportSharedBase.getInstance(project).outOfBlockModificationTracker(this)
     return if (isLocal) {
         val file = containingKtFile
         listOf(outOfBlockTracker, ModificationTracker { file.modificationStamp })

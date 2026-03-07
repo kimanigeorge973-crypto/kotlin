@@ -95,7 +95,7 @@ class CliKotlinAsJavaSupport(project: Project, private val traceHolder: CliTrace
         ).mapNotNull { member -> (member as? PackageViewDescriptor)?.fqName }
     }
 
-    override fun createInstanceOfLightScript(script: KtScript): KtLightClass {
+    override fun createInstanceOfLightScript(script: KtScript, module: KtFile?): KtLightClass {
         return LightClassGenerationSupport.getInstance(script.project).createUltraLightClassForScript(script)
     }
 
@@ -123,8 +123,10 @@ class CliKotlinAsJavaSupport(project: Project, private val traceHolder: CliTrace
 
     override fun createFacadeForSyntheticFile(file: KtFile): KtLightClassForFacade = error("Should not be called")
     override fun declarationLocation(file: KtFile): DeclarationLocation = DeclarationLocation.ProjectSources
-    override fun createInstanceOfDecompiledLightClass(classOrObject: KtClassOrObject): KtLightClass = error("Should not be called")
-    override fun createInstanceOfLightClass(classOrObject: KtClassOrObject): KtLightClass {
+    override fun createInstanceOfDecompiledLightClass(classOrObject: KtClassOrObject, module: KtFile?): KtLightClass =
+        error("Should not be called")
+
+    override fun createInstanceOfLightClass(classOrObject: KtClassOrObject, module: KtFile?): KtLightClass {
         return LightClassGenerationSupport.getInstance(classOrObject.project).createUltraLightClass(classOrObject)
     }
 }

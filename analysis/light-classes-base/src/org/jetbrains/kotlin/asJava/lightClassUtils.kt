@@ -45,7 +45,7 @@ fun KtClassOrObject.toFakeLightClass(): KtFakeLightClass = KotlinAsJavaSupport.g
 
 fun KtFile.findFacadeClass(): KtLightClass? = KotlinAsJavaSupport.getInstance(project).getLightFacade(this)
 
-fun KtScript.toLightClass(): KtLightClass? = KotlinAsJavaSupport.getInstance(project).getLightClassForScript(this)
+fun KtScript.toLightClass(): KtLightClass? = KotlinAsJavaSupport.getInstance(project).getLightClassForScript(this, null)
 
 fun KtElement.toLightElements(): List<PsiNamedElement> = when (this) {
     is KtClassOrObject -> listOfNotNull(toLightClass())

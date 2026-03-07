@@ -22,7 +22,7 @@ import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.BitUtil.isSet
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.UltraLightClassModifierExtension
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
@@ -544,7 +544,7 @@ internal fun List<KtAnnotationEntry>.toLightAnnotations(
     }
 
 internal fun KtClassOrObject.getExternalDependencies(): List<ModificationTracker> {
-    val outOfBlockTracker = KotlinAsJavaSupportBase.getInstance(project).outOfBlockModificationTracker(this)
+    val outOfBlockTracker = KotlinAsJavaSupportSharedBase.getInstance(project).outOfBlockModificationTracker(this)
     return if (isLocal) {
         val file = containingKtFile
         listOf(outOfBlockTracker, ModificationTracker { file.modificationStamp })

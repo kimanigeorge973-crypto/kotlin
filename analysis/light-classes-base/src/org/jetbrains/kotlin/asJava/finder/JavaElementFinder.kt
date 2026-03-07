@@ -61,8 +61,16 @@ class JavaElementFinder(
         val classOrObjectDeclarations = kotlinAsJavaSupport.findClassOrObjectDeclarations(qualifiedName, scope)
 
         for (declaration in classOrObjectDeclarations) {
+            val response = KaLightClassesModuleHelper.getSuitableJvmModule(declaration, scope)
+
+            if (response is KaLightClassesModuleHelper.Response.MODULE_NOT_FOUND) {
+                continue
+            }
+
+            val module = (response as? KaLightClassesModuleHelper.Response.MODULE_FOUND)?.module
+
             if (declaration !is KtEnumEntry) {
-                val lightClass = kotlinAsJavaSupport.getLightClass(declaration)
+                val lightClass = kotlinAsJavaSupport.getLightClass(declaration, module)
                 if (lightClass != null) {
                     answer.add(lightClass)
                 }
@@ -92,7 +100,15 @@ class JavaElementFinder(
         for (classOrObject in kotlinAsJavaSupport.findClassOrObjectDeclarations(qualifiedName.parent(), scope)) {
             ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
             if (predicate(classOrObject)) {
-                val interfaceClass = kotlinAsJavaSupport.getLightClass(classOrObject) ?: continue
+                val response = KaLightClassesModuleHelper.getSuitableJvmModule(classOrObject, scope)
+
+                if (response is KaLightClassesModuleHelper.Response.MODULE_NOT_FOUND) {
+                    continue
+                }
+
+                val module = (response as? KaLightClassesModuleHelper.Response.MODULE_FOUND)?.module
+
+                val interfaceClass = kotlinAsJavaSupport.getLightClass(classOrObject, module) ?: continue
                 val implsClass = interfaceClass.findInnerClassByName(syntheticName, false) ?: continue
                 answer.add(implsClass)
             }
@@ -143,7 +159,15 @@ class JavaElementFinder(
 
         val declarations = kotlinAsJavaSupport.findClassOrObjectDeclarationsInPackage(packageFQN, scope)
         for (declaration in declarations) {
-            val aClass = kotlinAsJavaSupport.getLightClass(declaration) ?: continue
+            val response = KaLightClassesModuleHelper.getSuitableJvmModule(declaration, scope)
+
+            if (response is KaLightClassesModuleHelper.Response.MODULE_NOT_FOUND) {
+                continue
+            }
+
+            val module = (response as? KaLightClassesModuleHelper.Response.MODULE_FOUND)?.module
+
+            val aClass = kotlinAsJavaSupport.getLightClass(declaration, module) ?: continue
             answer.add(aClass)
         }
 

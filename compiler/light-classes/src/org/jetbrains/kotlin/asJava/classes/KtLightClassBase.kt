@@ -12,7 +12,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.PsiClassImplUtil
 import com.intellij.psi.impl.light.AbstractLightClass
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
+import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportSharedBase
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import javax.swing.Icon
 
@@ -28,7 +28,7 @@ abstract class KtLightClassBase protected constructor(
     }
 
     protected open fun cacheDependencies(): List<Any> = listOf(
-        KotlinAsJavaSupportBase.getInstance(project).outOfBlockModificationTracker(this)
+        KotlinAsJavaSupportSharedBase.getInstance(project).outOfBlockModificationTracker(this)
     )
 
     override fun getElementIcon(flags: Int): Icon? = null
