@@ -82,15 +82,15 @@ internal class KaFirSubstitutorProvider(
     override fun createSubstitutor(mappings: Map<KaTypeParameterSymbol, KaType>): KaSubstitutor = withValidityAssertion {
         if (mappings.isEmpty()) return KaSubstitutor.Empty(token)
 
-        val firSubstitution = buildMap {
-            mappings.forEach { (ktTypeParameterSymbol, ktType) ->
-                check(ktTypeParameterSymbol is KaFirTypeParameterSymbolBase<*>)
-                check(ktType is KaFirType)
-                put(ktTypeParameterSymbol.firSymbol, ktType.coneType)
+        val substitution = buildMap {
+            mappings.forEach { (typeParameterSymbol, type) ->
+                check(typeParameterSymbol is KaFirTypeParameterSymbolBase<*>)
+                check(type is KaFirType)
+                put(typeParameterSymbol.firSymbol, type.coneType)
             }
         }
 
-        return when (val coneSubstitutor = substitutorByMap(firSubstitution, analysisSession.firSession)) {
+        return when (val coneSubstitutor = substitutorByMap(substitution, analysisSession.firSession)) {
             is ConeSubstitutorByMap -> KaFirMapBackedSubstitutor(coneSubstitutor, analysisSession.firSymbolBuilder)
             else -> KaFirGenericSubstitutor(coneSubstitutor, analysisSession.firSymbolBuilder)
         }
