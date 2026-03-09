@@ -45,7 +45,7 @@ fun Test(x: Foo?, %composer: Composer?, %changed: Int, %default: Int) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %dirty, -1, <>)
     }
-    A(x, %composer, 0b1110 and %dirty)
+    A(x, %composer, %stable or 0b1110 and %dirty)
     if (isTraceInProgress()) {
       traceEventEnd()
     }

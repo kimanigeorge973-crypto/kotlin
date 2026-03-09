@@ -1747,33 +1747,36 @@ class ComposableFunctionBodyTransformer(
         changedParam: IrChangedBitMaskValue,
         slotIndex: Int,
         param: IrValueDeclaration,
-    ) = if (FeatureFlag.StrongSkipping.enabled && stability.isUncertain()) {
-        irIfThenElse(
-            type = context.irBuiltIns.booleanType,
-            condition = irIsStable(changedParam, slotIndex),
-            thenPart = irChanged(
-                irCurrentComposer(),
-                irGet(param),
-                fileContainingValue = param.fileOrNull,
-                inferredStable = true,
-                compareInstanceForFunctionTypes = true,
-                compareInstanceForUnstableValues = true
-            ),
-            elsePart = irChanged(
-                irCurrentComposer(),
-                irGet(param),
-                fileContainingValue = param.fileOrNull,
-                inferredStable = false,
-                compareInstanceForFunctionTypes = true,
-                compareInstanceForUnstableValues = true
+    ): IrExpression {
+        val fileContainingParam = param.fileOrNull
+        return if (FeatureFlag.StrongSkipping.enabled && stability.isUncertain()) {
+            irIfThenElse(
+                type = context.irBuiltIns.booleanType,
+                condition = irIsStable(changedParam, slotIndex),
+                thenPart = irChanged(
+                    irCurrentComposer(),
+                    irGet(param),
+                    fileContainingValue = fileContainingParam,
+                    inferredStable = true,
+                    compareInstanceForFunctionTypes = true,
+                    compareInstanceForUnstableValues = true
+                ),
+                elsePart = irChanged(
+                    irCurrentComposer(),
+                    irGet(param),
+                    fileContainingValue = fileContainingParam,
+                    inferredStable = false,
+                    compareInstanceForFunctionTypes = true,
+                    compareInstanceForUnstableValues = true
+                )
             )
-        )
-    } else {
-        irChanged(
-            irGet(param),
-            fileContainingValue = param.fileOrNull,
-            compareInstanceForFunctionTypes = true
-        )
+        } else {
+            irChanged(
+                irGet(param),
+                fileContainingValue = fileContainingParam,
+                compareInstanceForFunctionTypes = true
+            )
+        }
     }
 
     private fun irEndRestartGroupAndUpdateScope(
@@ -3172,7 +3175,7 @@ class ComposableFunctionBodyTransformer(
             }
         }
 
-        val fileContainingExpression = expression.symbol.owner.fileOrNull
+        val fileContainingExpression = currentScope.fileScope?.declaration
         var dispatchMeta: CallArgumentMeta? = null
         val argsMeta = mutableListOf<CallArgumentMeta>()
         var valueParamIndex = 0
@@ -3235,7 +3238,7 @@ class ComposableFunctionBodyTransformer(
     }
 
     private fun visitRememberCall(expression: IrCall): IrExpression {
-        val fileContainingRememberCall = expression.symbol.owner.fileOrNull
+        val fileContainingRememberCall = currentScope.fileScope?.declaration
         val inputArgs = mutableListOf<IrExpression>()
         var hasSpreadArgs = false
         var calculationArg: IrExpression? = null

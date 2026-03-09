@@ -110,7 +110,7 @@ fun App(%composer: Composer?, %changed: Int) {
     }
     TextField(<block>{
       sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
-      val tmp0_group = %composer.cache(%composer.changedInstance(currentRequestConfig)) {
+      val tmp0_group = %composer.cache(%composer.changed(currentRequestConfig)) {
         { it: String ->
           updateRequestConfig()
         }

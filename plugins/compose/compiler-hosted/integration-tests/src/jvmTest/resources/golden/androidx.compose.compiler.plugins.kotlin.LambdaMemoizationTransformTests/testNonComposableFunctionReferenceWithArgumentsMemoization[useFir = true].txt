@@ -45,7 +45,7 @@ fun Something(%composer: Composer?, %changed: Int) {
     val shouldMemoize = <block>{
       val tmp0 = x
       sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
-      val tmp1_group = %composer.cache(%composer.changedInstance(tmp0)) {
+      val tmp1_group = %composer.cache(false) {
         tmp0::qux
       }
       sourceInformationMarkerEnd(%composer)

@@ -35,8 +35,8 @@ fun Test(x: Foo, %composer: Composer?, %changed: Int) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %dirty, -1, <>)
     }
-    A(x, %composer, 0b1110 and %dirty)
-    A(Foo(0), %composer, 0)
+    A(x, %composer, %stable or 0b1110 and %dirty)
+    A(Foo(0), %composer, %stable)
     A(<block>{
       sourceInformationMarkerStart(%composer, <>, "CC(remember):Test.kt#9igjgp")
       val tmp0_group = %composer.cache(false) {
@@ -44,7 +44,7 @@ fun Test(x: Foo, %composer: Composer?, %changed: Int) {
       }
       sourceInformationMarkerEnd(%composer)
       tmp0_group
-    }, %composer, 0)
+    }, %composer, %stable)
     if (isTraceInProgress()) {
       traceEventEnd()
     }

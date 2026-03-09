@@ -36,7 +36,7 @@ fun Ref(cls: Cls, content: Function2<Composer, Int, Unit>, %composer: Composer?,
       val tmp0_group = %composer.cache(%dirty and 0b1110 == 0b0100 || %dirty and 0b1000 != 0 && %composer.changedInstance(tmp0)) {
         @Composable
         fun Cls.Fn(%composer: Composer?, %changed: Int) {
-          receiver.Fn(0, %composer, 0b1110 and %changed, 0b0001)
+          receiver.Fn(0, %composer, %stable or 0b1110 and %changed, 0b0001)
         }
         tmp0::Fn
       }
