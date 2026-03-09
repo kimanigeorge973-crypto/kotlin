@@ -163,7 +163,13 @@ open class ExpectDeclarationRemover(val symbolTable: ReferenceSymbolTable, priva
                     expression.transformChildrenVoid()
                     return expression.remapSymbolParent(
                         classRemapper = { symbolTable.descriptorExtension.referenceClass(it.descriptor.findActualForExpect() as ClassDescriptor).owner },
-                        functionRemapper = { symbolTable.referenceFunction(it.descriptor.findActualForExpect() as FunctionDescriptor).owner }
+                        functionRemapper = {
+                            if (it.descriptor.isExpect) {
+                                symbolTable.referenceFunction(it.descriptor.findActualForExpect() as FunctionDescriptor).owner
+                            } else {
+                                it
+                            }
+                        }
                     )
                 }
             }, data = null)
