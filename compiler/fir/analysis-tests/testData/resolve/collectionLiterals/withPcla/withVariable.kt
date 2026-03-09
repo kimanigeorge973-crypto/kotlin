@@ -73,6 +73,7 @@ fun testWithSemifixation() {
         x.size
     }
 
+    // TODO: KT-84797
     <!TYPE_MISMATCH("String; Int")!>buildBox {
         x <!ASSIGNMENT_TYPE_MISMATCH("Set<String>; Set<Int>")!>=<!> setOf(1, 2, 3)
         x = ["!"]
