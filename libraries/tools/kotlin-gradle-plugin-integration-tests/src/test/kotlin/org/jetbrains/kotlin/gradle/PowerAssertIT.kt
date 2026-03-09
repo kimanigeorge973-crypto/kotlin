@@ -34,4 +34,31 @@ class PowerAssertIT : KGPBaseTest() {
             build("check")
         }
     }
+
+    @OtherGradlePluginTests
+    @DisplayName("power-assert applied to all source sets")
+    @GradleTest
+    fun testPowerAssertDefaultSourceSets_ALL(gradleVersion: GradleVersion) {
+        project("powerAssertDefaultSourceSets-all", gradleVersion) {
+            build("check")
+        }
+    }
+
+    @OtherGradlePluginTests
+    @DisplayName("power-assert applied to test source sets")
+    @GradleTest
+    fun testPowerAssertDefaultSourceSets_TEST(gradleVersion: GradleVersion) {
+        project("powerAssertDefaultSourceSets-test", gradleVersion) {
+            build("check")
+        }
+    }
+
+    @OtherGradlePluginTests
+    @DisplayName("power-assert applied to no source sets")
+    @GradleTest
+    fun testPowerAssertDefaultSourceSets_NONE(gradleVersion: GradleVersion) {
+        project("powerAssertDefaultSourceSets-none", gradleVersion) {
+            build("check")
+        }
+    }
 }

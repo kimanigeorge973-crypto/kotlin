@@ -20,6 +20,7 @@
 package org.jetbrains.kotlin.powerassert.gradle
 
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import javax.inject.Inject
@@ -32,11 +33,20 @@ abstract class PowerAssertGradleExtension @Inject constructor(
      * Defines the fully-qualified path of functions which should be transformed by the Power-Assert compiler plugin.
      * If nothing is defined, defaults to [`kotlin.assert`][assert].
      */
-    val functions: SetProperty<String> = objectFactory.setProperty(String::class.java).convention(setOf("kotlin.assert"))
+    val functions: SetProperty<String> =
+        objectFactory.setProperty(String::class.java).convention(setOf("kotlin.assert"))
 
     /**
      * Defines the Kotlin SourceSets by name which will be transformed by the Power-Assert compiler plugin.
-     * When the provider returns `null` - which is the default - all test SourceSets will be transformed.
+     * When the provider returns `null` or an empty Set (the default) the value of [defaultSourceSets] will be used.
      */
-    val includedSourceSets: SetProperty<String> = objectFactory.setProperty(String::class.java).convention(emptySet())
+    val includedSourceSets: SetProperty<String> =
+        objectFactory.setProperty(String::class.java).convention(emptySet())
+
+    /**
+     * Defines the default Kotlin SourceSets which will be transformed by the Power-Assert compiler plugin
+     * when no values are provided by [includedSourceSets].
+     */
+    val defaultSourceSets: Property<DefaultSourceSets> =
+        objectFactory.property(DefaultSourceSets::class.java).convention(DefaultSourceSets.TEST)
 }

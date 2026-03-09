@@ -41,7 +41,11 @@ class PowerAssertGradlePlugin : KotlinCompilerPluginSupportPlugin {
         val extension = project.extensions.getByType(PowerAssertGradleExtension::class.java)
         val includedSourceSets = extension.includedSourceSets.orNull
         return if (includedSourceSets.isNullOrEmpty()) {
-            kotlinCompilation.name == KotlinCompilation.TEST_COMPILATION_NAME
+            when (extension.defaultSourceSets.orNull ?: DefaultSourceSets.NONE) {
+                DefaultSourceSets.ALL -> true
+                DefaultSourceSets.TEST -> kotlinCompilation.name == KotlinCompilation.TEST_COMPILATION_NAME
+                DefaultSourceSets.NONE -> false
+            }
         } else {
             kotlinCompilation.defaultSourceSet.name in includedSourceSets
         }
