@@ -2235,7 +2235,7 @@ public class CliTestGenerated extends AbstractCliTest {
   @RunWith(JUnit3RunnerWithInners.class)
   public static class Wasm extends AbstractCliTest {
     private void runTest(String testDataFilePath) {
-      KotlinTestUtils.runTest(this::doJsTest, this, testDataFilePath);
+      KotlinTestUtils.runTest(this::doWasmTest, this, testDataFilePath);
     }
 
     public void testAllFilesPresentInWasm() {
@@ -2250,6 +2250,16 @@ public class CliTestGenerated extends AbstractCliTest {
     @TestMetadata("reportPerfLowerings.args")
     public void testReportPerfLowerings() {
       runTest("compiler/testData/cli/wasm/reportPerfLowerings.args");
+    }
+
+    @TestMetadata("wasmExtraHelp.args")
+    public void testWasmExtraHelp() {
+      runTest("compiler/testData/cli/wasm/wasmExtraHelp.args");
+    }
+
+    @TestMetadata("wasmHelp.args")
+    public void testWasmHelp() {
+      runTest("compiler/testData/cli/wasm/wasmHelp.args");
     }
   }
 

@@ -7,62 +7,48 @@ package org.jetbrains.kotlin.cli.js
 
 import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.cli.CliDiagnostics.WEB_ARGUMENT_WARNING
-import org.jetbrains.kotlin.cli.common.CLICompiler
-import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.common.arguments.K2JsArgumentConstants.RUNTIME_DIAGNOSTIC_EXCEPTION
 import org.jetbrains.kotlin.cli.common.arguments.K2JsArgumentConstants.RUNTIME_DIAGNOSTIC_LOG
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.cli.pipeline.web.CommonWebConfigurationUpdater
-import org.jetbrains.kotlin.cli.pipeline.web.WebCliPipeline
+import org.jetbrains.kotlin.cli.common.arguments.KotlinWasmCompilerArguments
+import org.jetbrains.kotlin.cli.common.arguments.copyK2JSCompilerArguments
+import org.jetbrains.kotlin.cli.pipeline.web.*
 import org.jetbrains.kotlin.cli.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.js.config.RuntimeDiagnostic
-import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
-import org.jetbrains.kotlin.metadata.deserialization.MetadataVersion
-import org.jetbrains.kotlin.platform.TargetPlatform
-import org.jetbrains.kotlin.platform.js.JsPlatforms
-import org.jetbrains.kotlin.utils.KotlinPaths
+import org.jetbrains.kotlin.library.impl.BuiltInsPlatform
 
-class K2JSCompiler : CLICompiler<K2JSCompilerArguments>() {
-    override val platform: TargetPlatform
-        get() = JsPlatforms.defaultJsPlatform
+class K2JSCompiler : KotlinJsCompilerBase<K2JSCompilerArguments>() {
+    override val builtInsPlatform: BuiltInsPlatform = BuiltInsPlatform.JS
 
     override fun createArguments(): K2JSCompilerArguments {
         return K2JSCompilerArguments()
     }
 
-    override fun doExecutePhased(
-        arguments: K2JSCompilerArguments,
-        services: Services,
-        basicMessageCollector: MessageCollector,
-    ): ExitCode? {
-        return WebCliPipeline(defaultPerformanceManager).execute(arguments, services, basicMessageCollector)
+    override fun createCliPipeline(arguments: K2JSCompilerArguments): WebCliPipeline<K2JSCompilerArguments> {
+        return if (arguments.wasm) {
+            LegacyJsWasmPipelineAdapter(WasmCliPipeline(defaultPerformanceManager))
+        } else {
+            JsCliPipeline(defaultPerformanceManager)
+        }
     }
-
-    override fun doExecute(
-        arguments: K2JSCompilerArguments,
-        configuration: CompilerConfiguration,
-        rootDisposable: Disposable,
-        paths: KotlinPaths?,
-    ): ExitCode = error("K1 compiler entry point is no longer supported.")
 
     override fun setupPlatformSpecificArgumentsAndServices(
         configuration: CompilerConfiguration,
         arguments: K2JSCompilerArguments,
-        services: Services,
+        services: Services
     ) {
-        CommonWebConfigurationUpdater.setupPlatformSpecificArgumentsAndServices(configuration, arguments, services)
+        CommonJsConfigurationUpdater.setupPlatformSpecificArgumentsAndServices(configuration, arguments, services)
     }
 
-    override fun executableScriptFileName(): String = "kotlinc-js"
-
-    override fun createMetadataVersion(versionArray: IntArray): BinaryVersion {
-        return MetadataVersion(*versionArray)
+    override fun initializeCommonConfiguration(
+        configuration: CompilerConfiguration,
+        arguments: K2JSCompilerArguments,
+        rootDisposable: Disposable,
+    ) {
+        CommonJsConfigurationUpdater.initializeCommonConfiguration(configuration, arguments, rootDisposable)
     }
-
-    override fun MutableList<String>.addPlatformOptions(arguments: K2JSCompilerArguments) {}
 
     companion object {
         @JvmStatic
@@ -70,6 +56,14 @@ class K2JSCompiler : CLICompiler<K2JSCompilerArguments>() {
             doMain(K2JSCompiler(), args)
         }
     }
+}
+
+internal fun K2JSCompilerArguments.toWasmArguments(diagnosticsCollector: CompilerConfiguration): KotlinWasmCompilerArguments {
+    diagnosticsCollector.report(
+        WEB_ARGUMENT_WARNING,
+        "Use `KotlinWasmCompiler` when compiling to Wasm. Using Wasm related arguments with `K2JSCompiler` will become an error in a future compiler version."
+    )
+    return copyK2JSCompilerArguments(this, KotlinWasmCompilerArguments())
 }
 
 fun RuntimeDiagnostic.Companion.resolve(
