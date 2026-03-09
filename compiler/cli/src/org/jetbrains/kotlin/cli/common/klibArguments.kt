@@ -214,9 +214,6 @@ fun CompilerConfiguration.checkForUnexpectedKlibLibraries(
 }
 
 fun CompilerConfiguration.prohibitExportKlibToOlderAbiVersionAtSecondStage() {
-    val languageVersionSettings = this[LANGUAGE_VERSION_SETTINGS]
-        ?: error("Language version settings should be already set up")
-
     if (languageVersionSettings.supportsFeature(LanguageFeature.ExportKlibToOlderAbiVersion)) {
         report(
             COMPILER_ARGUMENTS_ERROR,
