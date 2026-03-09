@@ -99,6 +99,7 @@ fun box(): String {
     for ((light, full) in lightTypes.zip(fullTypes)) {
         if (light != full) return "Failed equals(light, full) for ${full}"
         if (full != light) return "Failed equals(full, light) for ${full}"
+        if (light.hashCode() != full.hashCode()) return "Failed light/full hashCode equality for ${full}"
     }
     return "OK"
 }

@@ -158,8 +158,5 @@ internal class DescriptorKType(
             type == other.type && classifier == other.classifier && arguments == other.arguments
         } else super.equals(other)
 
-    override fun hashCode(): Int =
-        if (useK1Implementation) {
-            (31 * ((31 * type.hashCode()) + classifier.hashCode())) + arguments.hashCode()
-        } else super.hashCode()
+    override fun hashCode(): Int = super.hashCode()
 }

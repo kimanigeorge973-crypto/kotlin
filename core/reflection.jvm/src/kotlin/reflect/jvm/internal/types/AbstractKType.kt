@@ -50,8 +50,22 @@ internal abstract class AbstractKType(
         else -> false
     }
 
-    override fun hashCode(): Int =
-        (31 * ((31 * classifier.hashCode()) + arguments.hashCode())) + isMarkedNullable.hashCode()
+    override fun hashCode(): Int {
+        // Keep this aligned with kotlin.jvm.internal.TypeReference.hashCode() so mixed
+        // light/full reflection equality also stays valid for hash-based collections.
+        var flags = 0
+        if (isMarkedNullable) {
+            flags = flags or 1
+        }
+        if (mutableCollectionClass != null) {
+            flags = flags or 2
+        }
+        if (isNothingType) {
+            flags = flags or 4
+        }
+
+        return (classifier.hashCode() * 31 + arguments.hashCode()) * 31 + flags.hashCode()
+    }
 
     override fun toString(): String =
         ReflectionObjectRenderer.renderType(this)
