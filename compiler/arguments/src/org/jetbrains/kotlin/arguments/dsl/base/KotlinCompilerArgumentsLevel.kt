@@ -44,7 +44,8 @@ import kotlin.properties.ReadOnlyProperty
 data class KotlinCompilerArgumentsLevel(
     val name: String,
     val arguments: Set<KotlinCompilerArgument>,
-    val nestedLevels: Set<KotlinCompilerArgumentsLevel>
+    val nestedLevels: Set<KotlinCompilerArgumentsLevel>,
+    val modifiers: Set<Modifier> = emptySet()
 ) {
 
     /**
@@ -75,7 +76,8 @@ data class KotlinCompilerArgumentsLevel(
         return KotlinCompilerArgumentsLevel(
             name,
             (arguments + another.arguments).sortedBy { it.name }.toSet(),
-            mergedNestedLevels
+            mergedNestedLevels,
+            modifiers
         )
     }
 }
@@ -88,6 +90,14 @@ internal class KotlinCompilerArgumentsLevelBuilder(
     val name: String
 ) {
     private val arguments = mutableSetOf<KotlinCompilerArgument>()
+    private val modifiers = mutableSetOf<Modifier>()
+
+    /**
+     * Add a [Modifier] to this level.
+     */
+    fun modifier(modifier: Modifier) {
+        modifiers.add(modifier)
+    }
 
     /**
      * Define a new [KotlinCompilerArgument].
@@ -117,7 +127,7 @@ internal class KotlinCompilerArgumentsLevelBuilder(
     fun subLevel(
         name: String,
         mergeWith: Set<KotlinCompilerArgumentsLevel> = emptySet(),
-        config: KotlinCompilerArgumentsLevelBuilder.() -> Unit
+        config: KotlinCompilerArgumentsLevelBuilder.() -> Unit,
     ) {
         val levelBuilder = KotlinCompilerArgumentsLevelBuilder(name)
         config(levelBuilder)
@@ -134,7 +144,8 @@ internal class KotlinCompilerArgumentsLevelBuilder(
     fun build(): KotlinCompilerArgumentsLevel = KotlinCompilerArgumentsLevel(
         name,
         arguments,
-        nestedLevels
+        nestedLevels,
+        modifiers.toSet()
     )
 }
 
@@ -164,4 +175,9 @@ internal fun compilerArgumentsLevel(
     config(levelBuilder)
     val compilerArgumentsLevel = levelBuilder.build()
     compilerArgumentsLevel
+}
+
+
+enum class Modifier {
+    DEPRECATED,
 }
