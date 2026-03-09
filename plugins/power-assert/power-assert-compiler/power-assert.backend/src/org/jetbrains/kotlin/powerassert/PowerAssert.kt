@@ -6,7 +6,14 @@
 package org.jetbrains.kotlin.powerassert
 
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
+import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOriginImpl
+import org.jetbrains.kotlin.name.FqName
 
 val EXPLAIN_BLOCK by IrStatementOriginImpl
 val EXPLAIN_TEMPORARY by IrDeclarationOriginImpl.Synthetic
+val FUNCTION_FOR_POWER_ASSERT by IrDeclarationOriginImpl.Synthetic
+
+val PowerAssertGetExplanation = FqName("kotlinx.powerassert.PowerAssert.Companion.<get-explanation>")

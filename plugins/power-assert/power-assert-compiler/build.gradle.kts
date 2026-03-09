@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
+
 description = "Kotlin Power-Assert Compiler Plugin"
 
 plugins {
@@ -8,12 +11,22 @@ plugins {
 }
 
 val junit5Classpath by configurations.creating
+val powerAssertJvmRuntimeClasspath: Configuration by configurations.creating
+val powerAssertJsRuntimeClasspath: Configuration by configurations.creating {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(KotlinUsages.KOTLIN_RUNTIME))
+        attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
+    }
+}
 
 dependencies {
+    embedded(project(":kotlin-power-assert-compiler-plugin.common")) { isTransitive = false }
     embedded(project(":kotlin-power-assert-compiler-plugin.backend")) { isTransitive = false }
+    embedded(project(":kotlin-power-assert-compiler-plugin.frontend")) { isTransitive = false }
     embedded(project(":kotlin-power-assert-compiler-plugin.cli")) { isTransitive = false }
 
     testFixturesApi(project(":kotlin-power-assert-compiler-plugin.backend"))
+    testFixturesApi(project(":kotlin-power-assert-compiler-plugin.frontend"))
 
     testFixturesApi(platform(libs.junit.bom))
     testFixturesApi(libs.junit.jupiter.api)
@@ -25,6 +38,8 @@ dependencies {
     testRuntimeOnly(commonDependency("com.fasterxml:aalto-xml"))
 
     junit5Classpath(libs.junit.jupiter.api)
+    powerAssertJvmRuntimeClasspath(project(":kotlin-power-assert-runtime")) { isTransitive = false }
+    powerAssertJsRuntimeClasspath(project(":kotlin-power-assert-runtime")) { isTransitive = false }
 }
 
 optInToExperimentalCompilerApi()
@@ -44,11 +59,9 @@ testsJar()
 
 projectTests {
     testTask(jUnitMode = JUnitMode.JUnit5) {
-        val localJunit5Classpath: FileCollection = junit5Classpath
-
-        doFirst {
-            systemProperty("junit5.classpath", localJunit5Classpath.asPath)
-        }
+        addClasspathProperty(junit5Classpath, "junit5.classpath")
+        addClasspathProperty(powerAssertJvmRuntimeClasspath, "powerAssertRuntime.jvm.classpath")
+        addClasspathProperty(powerAssertJsRuntimeClasspath, "powerAssertRuntime.js.classpath")
     }
 
     testGenerator("org.jetbrains.kotlin.powerassert.TestGeneratorKt", generateTestsInBuildDirectory = true)
