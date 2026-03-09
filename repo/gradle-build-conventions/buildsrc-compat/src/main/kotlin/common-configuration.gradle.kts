@@ -107,23 +107,23 @@ val modulesWithRequiredExplicitTypes = rootProject.extra["firAllCompilerModules"
 
 fun Project.configureKotlinCompilationOptions() {
     plugins.withType<KotlinBasePluginWrapper> {
-        val commonCompilerArgs = listOfNotNull(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-progressive".takeIf { getBooleanProperty("test.progressive.mode") ?: false },
-            "-Xdont-warn-on-error-suppression",
-            "-Xcontext-parameters", // KT-72222
-            "-Xexplicit-backing-fields", // KT-14663
-        )
-
-        // Between making a language feature stable and the next bootstrap, we need to keep providing the compiler argument.
-        // But this produces a warning
-        // "The argument ... is redundant for the current language version ..."
-        // in the bootstrap test and fails because of -Werror.
-        // To work around it, we suppress the warning.
-        @OptIn(ExperimentalBuildToolsApi::class, ExperimentalKotlinGradlePluginApi::class)
-        val redundantCLIArg = project.provider {
-            if (project.kotlinExtension.compilerVersion.get() != project.kotlinToolingVersion.toString()) ""
-            else "-Xwarning-level=REDUNDANT_CLI_ARG:disabled"
+        val commonCompilerArgs = provider {
+            listOfNotNull(
+                "-opt-in=kotlin.RequiresOptIn",
+                "-progressive".takeIf { getBooleanProperty("test.progressive.mode") ?: false },
+                "-Xdont-warn-on-error-suppression",
+                "-Xcontext-parameters", // KT-72222
+                "-Xexplicit-backing-fields", // KT-14663
+                // Between making a language feature stable and the next bootstrap, we need to keep providing the compiler argument.
+                // But this produces a warning
+                // "The argument ... is redundant for the current language version ..."
+                // in the bootstrap test and fails because of -Werror.
+                // To work around it, we suppress the warning.
+                @OptIn(ExperimentalBuildToolsApi::class, ExperimentalKotlinGradlePluginApi::class)
+                "-Xwarning-level=REDUNDANT_CLI_ARG:disabled".takeIf {
+                    project.kotlinExtension.compilerVersion.get() == project.kotlinToolingVersion.toString()
+                },
+            )
         }
 
         val kotlinLanguageVersion: String by rootProject.extra
@@ -132,7 +132,6 @@ fun Project.configureKotlinCompilationOptions() {
         tasks.withType<KotlinCompilationTask<*>>().configureEach {
             compilerOptions {
                 freeCompilerArgs.addAll(commonCompilerArgs)
-                freeCompilerArgs.add(redundantCLIArg)
                 languageVersion.set(KotlinVersion.fromVersion(kotlinLanguageVersion))
                 apiVersion.set(KotlinVersion.fromVersion(kotlinLanguageVersion))
                 freeCompilerArgs.add("-Xskip-prerelease-check")
