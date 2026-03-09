@@ -19,10 +19,10 @@ private val jvmModulePhases1 = createModulePhases(
     ::FragmentSharedVariablesLowering,
     ::JvmK1IrValidationBeforeLoweringPhase,
     ::ProcessOptionalAnnotations,
+    ::JvmUpgradeCallableReferences,
     ::JvmExpectDeclarationRemover,
     ::ConstEvaluationLowering,
     ::FileClassLowering,
-    ::JvmUpgradeCallableReferences,
     ::JvmStaticInObjectLowering,
     ::RepeatedAnnotationLowering,
 )
