@@ -15,7 +15,7 @@ interface KotlinJsCompilerTypeHolder {
      */
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Remove compiler type selection from the DSL.",
+        "Kotlin/JS IR is the only supported compiler type. Remove compiler type selection from the DSL. Scheduled for removal in Kotlin 2.6.",
         level = DeprecationLevel.WARNING,
     )
     val defaultJsCompilerType: KotlinJsCompilerType
@@ -28,7 +28,7 @@ interface KotlinJsCompilerTypeHolder {
      */
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Remove compiler type selection from the DSL.",
+        "Kotlin/JS IR is the only supported compiler type. Remove compiler type selection from the DSL. Scheduled for removal in Kotlin 2.6.",
         level = DeprecationLevel.WARNING,
     )
     val IR: KotlinJsCompilerType

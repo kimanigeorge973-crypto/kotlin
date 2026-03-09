@@ -16,7 +16,7 @@ interface KotlinTargetContainerWithJsPresetFunctions :
     KotlinJsCompilerTypeHolder {
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(name, configure)"),
         level = DeprecationLevel.WARNING,
     )
@@ -28,7 +28,7 @@ interface KotlinTargetContainerWithJsPresetFunctions :
 
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(name, configure)"),
         level = DeprecationLevel.WARNING,
     )
@@ -54,7 +54,7 @@ interface KotlinTargetContainerWithJsPresetFunctions :
 
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(configure)"),
         level = DeprecationLevel.WARNING,
     )
@@ -68,7 +68,7 @@ interface KotlinTargetContainerWithJsPresetFunctions :
     fun js(name: String, configure: Action<KotlinJsTargetDsl>) = js(name = name) { configure.execute(this) }
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(configure)"),
         level = DeprecationLevel.WARNING,
     )
@@ -80,7 +80,7 @@ interface KotlinTargetContainerWithJsPresetFunctions :
 
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(name, configure)"),
         level = DeprecationLevel.WARNING,
     )
@@ -97,7 +97,7 @@ interface KotlinTargetContainerWithJsPresetFunctions :
 
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(name, configure)"),
         level = DeprecationLevel.WARNING,
     )

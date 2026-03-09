@@ -9,7 +9,7 @@ package org.jetbrains.kotlin.gradle.plugin
  * The different modes of the Kotlin compiler for compiling source code into an output artifact for the [KotlinPlatformType.js] platform.
  */
 @Deprecated(
-    "Kotlin/JS IR is the only supported compiler type. Remove compiler type selection from the DSL.",
+    "Kotlin/JS IR is the only supported compiler type. Remove compiler type selection from the DSL. Scheduled for removal in Kotlin 2.6.",
     level = DeprecationLevel.WARNING,
 )
 enum class KotlinJsCompilerType {

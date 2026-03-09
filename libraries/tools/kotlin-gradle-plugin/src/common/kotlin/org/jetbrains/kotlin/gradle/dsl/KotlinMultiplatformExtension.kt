@@ -81,7 +81,7 @@ internal constructor(
 
     @Suppress("DEPRECATION")
     @Deprecated(
-        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead.",
+        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead. Scheduled for removal in Kotlin 2.6.",
         replaceWith = ReplaceWith("js(name, configure)"),
         level = DeprecationLevel.WARNING,
     )
