@@ -150,7 +150,8 @@ fun Project.configureKotlinCompilationOptions() {
                 !project.path.startsWith(":native:objcexport-header-generator") &&
                 !project.path.startsWith(":libraries:tools:analysis-api-based-klib-reader") &&
                 !project.path.startsWith(":native:external-projects-test-utils") &&
-                !project.path.startsWith(":plugins:plugin-sandbox:plugin-annotations")
+                !project.path.startsWith(":plugins:plugin-sandbox:plugin-annotations") &&
+                !project.path.startsWith(":kotlin-power-assert-runtime")
             ) {
                 doFirst {
                     if (!useAbsolutePathsInKlib && this !is KotlinJvmCompile && this !is KotlinCompileCommon) {
@@ -352,6 +353,7 @@ fun Project.configureTests() {
             ":kotlin-native:libclangInterop",
             ":kotlin-native:llvmInterop",
             ":kotlin-native:tools:kdumputil",
+            ":kotlin-power-assert-runtime",
             ":kotlin-scripting-common",
             ":kotlin-scripting-compiler",
             ":kotlin-scripting-dependencies",
