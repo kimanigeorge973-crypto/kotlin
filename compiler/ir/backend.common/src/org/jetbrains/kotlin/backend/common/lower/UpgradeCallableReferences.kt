@@ -298,12 +298,8 @@ open class UpgradeCallableReferences(
                     setterFun = runIf(expression.type.isKMutableProperty() && setter != null) {
                         requireNotNull(setter)
                         val setterArguments = getterArguments.map {
-                            it.copy(
-                                correspondingParameter = when (val p = it.correspondingParameter) {
-                                    null -> setter.dispatchReceiverParameter // maybe null if both hasMissingObjectDispatchReceiver()
-                                    else -> setter.parameters.getOrNull(p.indexInParameters)
-                                }
-                            )
+                            val parameter = it.correspondingParameter ?: error("Getter has no corresponding parameter for the argument")
+                            it.copy(correspondingParameter = setter.parameters.getOrNull(parameter.indexInParameters))
                         }
                         expression.wrapFunction(setterArguments, data, setter, isPropertySetter = true)
                     }
