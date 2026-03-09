@@ -452,6 +452,48 @@ func testCallClosureInNewScope() async throws {
     try #require(result == 42)
 }
 
+// MARK: - Kotlin-initiated cancellation tests
+
+@Test
+func testKotlinCancelsSwiftClosure() async throws {
+    let start = Date()
+    let result = cancelClosureFromKotlin {
+        // Sleep for 10 seconds - should be cancelled by Kotlin's withTimeoutOrNull after 100ms
+        try await Task.sleep(nanoseconds: 10_000_000_000)
+        return 42
+    }
+
+    let elapsed = Date().timeIntervalSince(start)
+    try #require(result == "timed_out")
+    // Should complete much faster than 10 seconds
+    #expect(elapsed < 5.0)
+}
+
+@Test
+func testKotlinCancelsSwiftClosureQuickReturn() async throws {
+    // If the closure completes before the timeout, it should return normally
+    let result = cancelClosureFromKotlin {
+        await Task.yield()
+        return 42
+    }
+
+    try #require(result == "completed: 42")
+}
+
+@Test
+func testKotlinCancelsSwiftClosureWithArg() async throws {
+    let start = Date()
+    let result = cancelClosureWithArgFromKotlin(delayMs: 0) { arg in
+        // Sleep for 10 seconds - should be cancelled by Kotlin's withTimeoutOrNull after 100ms
+        try await Task.sleep(nanoseconds: 10_000_000_000)
+        return arg * 2
+    }
+
+    let elapsed = Date().timeIntervalSince(start)
+    try #require(result == "timed_out")
+    #expect(elapsed < 5.0)
+}
+
 // MARK: - Closure that calls back into Kotlin
 
 //@Test

@@ -197,6 +197,27 @@ fun callClosureInNewScope(block: suspend () -> Int): Int {
     }
 }
 
+// ========== Kotlin-initiated cancellation tests ==========
+
+fun cancelClosureFromKotlin(block: suspend () -> Int): String {
+    return runBlocking {
+        val result = withTimeoutOrNull(100) {
+            block()
+        }
+        if (result == null) "timed_out" else "completed: $result"
+    }
+}
+
+fun cancelClosureWithArgFromKotlin(delayMs: Long, block: suspend (Int) -> Int): String {
+    return runBlocking {
+        val result = withTimeoutOrNull(100) {
+            delay(delayMs)
+            block(42)
+        }
+        if (result == null) "timed_out" else "completed: $result"
+    }
+}
+
 // ========== Closure that calls back into Kotlin ==========
 
 fun closureCallingKotlin(block: suspend (suspend () -> Int) -> Int): Int {

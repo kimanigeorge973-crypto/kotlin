@@ -17,13 +17,22 @@ public func accept_suspend_function_type(
         let pointerToBlock = __exceptionPtr
         return { _1 in return main_internal_functional_type_caller_SwiftU2EVoid__TypesOfArguments__Swift_UnsafeMutableRawPointer_Swift_Error__(pointerToBlock, _1) }
     }()
-            Task {
-                do {
-                    let result = try await originalBlock()
-                    __continuation(result)
-                } catch {
-                    __exception(error)
+            let __cancellation: KotlinCoroutineSupport.KotlinTask = KotlinCoroutineSupport.KotlinTask.__createClassWrapper(externalRCRef: __cancellationPtr)
+            let task = Task {
+                await withTaskCancellationHandler {
+                    do {
+                        let result = try await originalBlock()
+                        __continuation(result)
+                    } catch {
+                        __exception(error)
+                    }
+                } onCancel: {
+                    __cancellation.cancelExternally()
                 }
+            }
+            __cancellation.setCallback { shouldCancel in
+                defer { if shouldCancel { task.cancel() } }
+                return task.isCancelled
             }
         }
     }())

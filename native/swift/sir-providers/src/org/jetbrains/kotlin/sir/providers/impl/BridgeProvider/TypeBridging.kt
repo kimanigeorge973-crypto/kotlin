@@ -1022,7 +1022,7 @@ internal sealed class Bridge(
             }
 
             private fun asyncSwiftToKotlin(typeNamer: SirTypeNamer, valueExpression: String): String = with(session) {
-                val (continuationBridge, exceptionBridge, _) = asyncParameters ?: error("Async parameters must present for an async function ")
+                val (continuationBridge, exceptionBridge, cancellationBridge) = asyncParameters ?: error("Async parameters must present for an async function ")
 
                 // Regular parameters for the original Swift async block
                 val regularArgsInClosure = parameters
@@ -1051,6 +1051,9 @@ internal sealed class Bridge(
                 // Convert exception pointer to Swift callable
                 val exceptionSwiftConversion = exceptionBridge.inSwiftSources.kotlinToSwift(typeNamer, "__exceptionPtr")
 
+                // Convert cancellation pointer to KotlinTask for bidirectional cancellation
+                val cancellationSwiftConversion = cancellationBridge.inSwiftSources.kotlinToSwift(typeNamer, "__cancellationPtr")
+
                 // Get Swift type for the continuation signature
                 // The continuation accepts Swift types (not C-bridged types)
                 val continuationSwiftType = typeNamer.swiftFqName(continuationBridge.swiftType)
@@ -1058,18 +1061,30 @@ internal sealed class Bridge(
                 // Exception handler type - takes Swift.Error (automatically bridged to NSError)
                 val exceptionSwiftType = typeNamer.swiftFqName(exceptionBridge.swiftType)
 
+                // Cancellation object type
+                val cancellationSwiftType = typeNamer.swiftFqName(cancellationBridge.swiftType)
+
                 return@with """{
                 |    let originalBlock = $valueExpression
                 |    return {$defineArgs
                 |        let __continuation: $continuationSwiftType = $continuationSwiftConversion
                 |        let __exception: $exceptionSwiftType = $exceptionSwiftConversion
-                |        Task {
-                |            do {
-                |                let result = try await originalBlock($originalBlockCallArgs)
-                |                __continuation(result)
-                |            } catch {
-                |                __exception(error)
+                |        let __cancellation: $cancellationSwiftType = $cancellationSwiftConversion
+                |        let task = Task {
+                |            await withTaskCancellationHandler {
+                |                do {
+                |                    let result = try await originalBlock($originalBlockCallArgs)
+                |                    __continuation(result)
+                |                } catch {
+                |                    __exception(error)
+                |                }
+                |            } onCancel: {
+                |                __cancellation.cancelExternally()
                 |            }
+                |        }
+                |        __cancellation.setCallback { shouldCancel in
+                |            defer { if shouldCancel { task.cancel() } }
+                |            return task.isCancelled
                 |        }
                 |    }
                 |}()""".trimMargin()

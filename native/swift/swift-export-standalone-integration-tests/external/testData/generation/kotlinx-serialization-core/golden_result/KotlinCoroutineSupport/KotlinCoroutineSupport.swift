@@ -20,7 +20,7 @@ package final class KotlinTask: KotlinRuntime.KotlinBase {
         }())
     }
 
-    package override init(
+    public override init(
         __externalRCRefUnsafe: Swift.UnsafeMutableRawPointer?,
         options: KotlinRuntime.KotlinBaseConstructionOptions
     ) {
