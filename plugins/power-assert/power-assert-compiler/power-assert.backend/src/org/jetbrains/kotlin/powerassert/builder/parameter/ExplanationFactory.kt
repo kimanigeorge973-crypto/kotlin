@@ -85,13 +85,13 @@ class ExplanationFactory(
         }
     }
 
-    fun IrBuilderWithScope.irConstantExpression(
+    fun IrBuilderWithScope.irLiteralExpression(
         startOffset: Int,
         endOffset: Int,
         displayOffset: Int,
         value: IrExpression,
     ): IrConstructorCall {
-        return irCall(builtIns.constantExpressionConstructor).apply {
+        return irCall(builtIns.literalExpressionConstructor).apply {
             arguments[0] = irInt(startOffset)
             arguments[1] = irInt(endOffset)
             arguments[2] = irInt(displayOffset)
@@ -132,8 +132,8 @@ class ExplanationFactory(
         val initializer = variable.temporary.initializer
 
         return when {
-            variable.constant -> {
-                irConstantExpression(
+            variable.literal -> {
+                irLiteralExpression(
                     startOffset = sourceRange.start - startOffset,
                     endOffset = sourceRange.endInclusive - startOffset,
                     displayOffset = displayOffset - startOffset,

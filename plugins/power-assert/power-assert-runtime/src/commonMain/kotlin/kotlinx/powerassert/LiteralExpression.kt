@@ -10,16 +10,15 @@ package kotlinx.powerassert
  * This is different from a constant, as access of a `const val` will be represented as a [ValueExpression].
  * Possible literals include numbers, strings, booleans, and null.
  */
-// TODO LiteralExpression?
 @ExperimentalPowerAssert
-public class ConstantExpression(
+public class LiteralExpression(
     startOffset: Int,
     endOffset: Int,
     displayOffset: Int,
     value: Any?,
 ) : Expression(startOffset, endOffset, displayOffset, value) {
-    override fun copy(deltaOffset: Int): ConstantExpression {
-        return ConstantExpression(
+    override fun copy(deltaOffset: Int): LiteralExpression {
+        return LiteralExpression(
             startOffset = startOffset + deltaOffset,
             endOffset = endOffset + deltaOffset,
             displayOffset = displayOffset + deltaOffset,
@@ -28,6 +27,6 @@ public class ConstantExpression(
     }
 
     override fun toString(): String {
-        return "ConstantExpression(startOffset=$startOffset, endOffset=$endOffset, displayOffset=$displayOffset, value=$value)"
+        return "LiteralExpression(startOffset=$startOffset, endOffset=$endOffset, displayOffset=$displayOffset, value=$value)"
     }
 }

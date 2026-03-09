@@ -35,7 +35,7 @@ sealed class IrDiagramVariable(
         original: IrExpression,
         val sourceRangeInfo: SourceRangeInfo,
         val text: String,
-        val constant: Boolean = false,
+        val literal: Boolean = false,
     ) : IrDiagramVariable(temporary, original)
 
     class Hidden(

@@ -157,7 +157,7 @@ class StringParameterBuilder(
     private fun IrDiagramVariable.Displayable.toValueDisplay(
         originalInfo: SourceRangeInfo,
     ): ValueDisplay? {
-        if (constant) return null
+        if (literal) return null
 
         var indent = sourceRangeInfo.startColumnNumber
         var row = sourceRangeInfo.startLineNumber - originalInfo.startLineNumber

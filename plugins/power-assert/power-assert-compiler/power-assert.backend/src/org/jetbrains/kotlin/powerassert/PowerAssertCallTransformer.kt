@@ -110,6 +110,7 @@ class PowerAssertCallTransformer(
         val callBuilder = callBuilders.maxByOrNull { delegate ->
             delegate.function.parameters.count { it.kind == IrParameterKind.Regular }
         }
+
         if (callBuilder == null) {
             val regularParameters = function.parameters.filter { it.kind == IrParameterKind.Regular }
             val valueTypesTruncated = regularParameters.subList(0, regularParameters.size - 1)
@@ -117,6 +118,15 @@ class PowerAssertCallTransformer(
             val valueTypesAll = regularParameters.joinToString("") { it.type.render() + ", " }
             context.diagnosticReporter.at(originalCall, currentFile)
                 .report(POWER_ASSERT_CAPABLE_OVERLOAD_MISSING, function.kotlinFqName, valueTypesTruncated, valueTypesAll)
+            return super.visitCall(originalCall)
+        }
+
+        val roots = buildArgumentTrees(callBuilder, function, originalCall)
+
+        // If all roots are null or non-visible, there are no transformable parameters
+        if (roots.all { it.child == null }) {
+            context.diagnosticReporter.at(originalCall, currentFile)
+                .report(POWER_ASSERT_CONSTANT)
             return super.visitCall(originalCall)
         }
 
@@ -129,14 +139,6 @@ class PowerAssertCallTransformer(
             DefaultMessageParameterBuilder(explanationFactory, function, messageArgument, diagramBuilder)
         } else {
             StringParameterBuilder(sourceFile, originalCall, function, messageArgument)
-        }
-        val roots = buildArgumentTrees(callBuilder, function, originalCall)
-
-        // If all roots are null or non-visible, there are no transformable parameters
-        if (roots.all { it.child == null }) {
-            context.diagnosticReporter.at(originalCall, currentFile)
-                .report(POWER_ASSERT_CONSTANT)
-            return super.visitCall(originalCall)
         }
 
         return buildPowerAssertCall(originalCall, callBuilder, parameterBuilder, roots)

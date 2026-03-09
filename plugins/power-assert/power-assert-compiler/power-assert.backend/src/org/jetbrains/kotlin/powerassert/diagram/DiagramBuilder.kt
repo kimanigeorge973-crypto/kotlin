@@ -88,7 +88,7 @@ private fun IrBlockBuilder.add(
     val copy = expression.deepCopyWithSymbols(scope.getLocalDeclarationParent()).transform(transformer, null)
 
     val temporary = irTemporary(copy, nameHint = "Explain", origin = EXPLAIN_TEMPORARY)
-    val variable = IrDiagramVariable.Displayable(temporary, expression, sourceRangeInfo, text, constant = true)
+    val variable = IrDiagramVariable.Displayable(temporary, expression, sourceRangeInfo, text, literal = true)
     return call(irGet(temporary), variables.add(variable))
 }
 
@@ -172,7 +172,7 @@ private fun IrBlockBuilder.add(
     val copy = expression.deepCopyWithSymbols(scope.getLocalDeclarationParent()).transform(transformer, null)
 
     val temporary = irTemporary(copy, nameHint = "Explain", origin = EXPLAIN_TEMPORARY)
-    val variable = IrDiagramVariable.Displayable(temporary, expression, sourceRangeInfo, text, constant = false)
+    val variable = IrDiagramVariable.Displayable(temporary, expression, sourceRangeInfo, text, literal = false)
     return call(irGet(temporary), variables.add(variable))
 }
 

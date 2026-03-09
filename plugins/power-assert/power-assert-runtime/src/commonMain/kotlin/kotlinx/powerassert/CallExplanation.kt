@@ -16,7 +16,7 @@ public class CallExplanation(
 
     /**
      * The arguments provided to the function call in parameter order.
-     * Implicit or default arguments will be `null`.
+     * Implicit, default, or arguments annotated with [PowerAssert.Ignore] will be `null`.
      */
     public val arguments: List<Argument?>,
 ) : Explanation() {

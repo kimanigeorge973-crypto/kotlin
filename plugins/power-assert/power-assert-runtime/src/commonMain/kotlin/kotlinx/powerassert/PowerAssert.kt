@@ -8,6 +8,12 @@ package kotlinx.powerassert
 import kotlin.jvm.JvmStatic
 
 /**
+ * Annotates a function which natively supports Power-Assert call transformation.
+ * Calls to this function, when transformed with the Power-Assert compiler-plugin,
+ * will provide access to an instance of [CallExplanation] via [PowerAssert.explanation].
+ * This explanation will provide information about the call-site so a Power-Assert style
+ * diagram can be generated.
+ *
  * ```
  * @PowerAssert
  * fun assert(condition: Boolean) {
@@ -24,6 +30,10 @@ import kotlin.jvm.JvmStatic
 @ExperimentalPowerAssert
 public annotation class PowerAssert {
     public companion object {
+        /**
+         * Provides access to call-site information where the function was called as a [CallExplanation].
+         * May only be accessed from within a function annotated with [PowerAssert].
+         */
         @Suppress("RedundantNullableReturnType")
         @JvmStatic
         public val explanation: CallExplanation?
@@ -31,6 +41,10 @@ public annotation class PowerAssert {
     }
 
     /**
+     * Indicates the Power-Assert compiler-plugin should ignore the annotated element.
+     *
+     * A parameter of a function may be annotated, so call-site information is never provided about the argument.
+     *
      * ```
      * @PowerAssert
      * fun assert(
@@ -39,6 +53,8 @@ public annotation class PowerAssert {
      *     @PowerAssert.Ignore message: String? = null,
      * )
      * ```
+     *
+     * Or a type may be annotated, so function arguments of that type are automatically ignored.
      *
      * ```
      * @PowerAssert.Ignore // Parameters of type AssertionBuilder are automatically ignored.

@@ -40,7 +40,7 @@ private fun StringBuilder.appendDiagram(
     }
 
     fun Expression.toDiagramValue(): DiagramValue? {
-        if (this is ConstantExpression) return null
+        if (this is LiteralExpression) return null
         val display = render(this) ?: return null
         val row = -(newlineOffsets.binarySearch(displayOffset) + 1)
         val rowOffset = if (row == 0) 0 else newlineOffsets[row - 1] + 1

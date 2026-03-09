@@ -91,9 +91,9 @@ class PowerAssertBuiltIns private constructor(
     val valueExpressionType = valueExpressionClass.defaultTypeWithoutArguments
     val valueExpressionConstructor = valueExpressionClass.primaryConstructor()
 
-    val constantExpressionClass = finder.findClassOrError(classId("ConstantExpression"))
-    val constantExpressionType = constantExpressionClass.defaultTypeWithoutArguments
-    val constantExpressionConstructor = constantExpressionClass.primaryConstructor()
+    val literalExpressionClass = finder.findClassOrError(classId("LiteralExpression"))
+    val literalExpressionType = literalExpressionClass.defaultTypeWithoutArguments
+    val literalExpressionConstructor = literalExpressionClass.primaryConstructor()
 
     val equalityExpressionClass = finder.findClassOrError(classId("EqualityExpression"))
     val equalityExpressionType = equalityExpressionClass.defaultTypeWithoutArguments
