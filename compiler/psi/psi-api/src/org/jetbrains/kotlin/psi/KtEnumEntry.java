@@ -152,7 +152,6 @@ public class KtEnumEntry extends KtClass implements KtDeclarationWithReturnType 
 
     @Override
     public void delete() {
-        // KT-84564
         PsiElement semicolon = getSemicolon();
         if (semicolon != null) {
             // Get previous KtEnumEntry, and move semicolon to it
