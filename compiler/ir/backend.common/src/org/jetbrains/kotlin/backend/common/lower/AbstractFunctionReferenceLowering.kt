@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrInstanceInitializerCallImpl
 import org.jetbrains.kotlin.ir.irAttribute
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrTransformer
@@ -83,7 +84,12 @@ var IrClass.declarationsAtFunctionReferenceLowering: List<IrDeclaration>? by irA
  * But it can happen, that [LocalDeclarationsLowering] would later capture something additional into the classes.
  */
 abstract class AbstractFunctionReferenceLowering<C : CommonBackendContext>(val context: C) : FileLoweringPass {
+    protected val IrRichFunctionReference.isLambda: Boolean
+        get() = origin.isLambda
+
     override fun lower(irFile: IrFile) {
+        val cachedFunctionReferencesClasses = mutableMapOf<IrFunctionSymbol, IrClass>()
+
         irFile.transform(object : IrTransformer<IrDeclaration?>() {
             override fun visitClass(declaration: IrClass, data: IrDeclaration?): IrStatement {
                 if (declaration.isFun || declaration.symbol.isSuspendFunction() || declaration.symbol.isKSuspendFunction()) {
@@ -111,7 +117,26 @@ abstract class AbstractFunctionReferenceLowering<C : CommonBackendContext>(val c
                     expression.startOffset, expression.endOffset
                 )
 
+                val targetCallableSymbol = expression.reflectionTargetSymbol
+
+                // For named unbound function references we can generate a class only once and reuse constructor of it
+                // to reduce bundle size when the same function reference is obtained multiple times
+                val canBeDeduplicated = targetCallableSymbol != null
+                        && expression.boundValues.isEmpty()
+                        && !expression.isLambda
+
+                if (canBeDeduplicated && targetCallableSymbol in cachedFunctionReferencesClasses) {
+                    val cachedClass = cachedFunctionReferencesClasses[targetCallableSymbol]
+                    val ctorSymbol = cachedClass?.primaryConstructor?.symbol!!
+                    return irBuilder.irCallConstructor(ctorSymbol, emptyList()).apply {
+                        origin = getConstructorCallOrigin(expression)
+                    }
+                }
+
                 val clazz = buildClass(expression, irBuilder.scope.getLocalDeclarationParent())
+                if (canBeDeduplicated)
+                    cachedFunctionReferencesClasses[targetCallableSymbol] = clazz
+
                 val constructor = clazz.primaryConstructor!!
                 val newExpression = irBuilder.irCallConstructor(constructor.symbol, emptyList()).apply {
                     origin = getConstructorCallOrigin(expression)

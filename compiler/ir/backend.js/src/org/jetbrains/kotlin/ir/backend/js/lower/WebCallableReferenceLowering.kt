@@ -32,9 +32,6 @@ import org.jetbrains.kotlin.utils.memoryOptimizedPlus
 abstract class WebCallableReferenceLowering(context: JsCommonBackendContext) :
     AbstractFunctionReferenceLowering<JsCommonBackendContext>(context) {
 
-    protected val IrRichFunctionReference.isLambda: Boolean
-        get() = origin.isLambda
-
     protected val IrRichFunctionReference.isKReference: Boolean
         get() = type.let { it.isKFunction() || it.isKSuspendFunction() }
 
