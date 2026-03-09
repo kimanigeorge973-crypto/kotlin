@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.gradle.internal.config.MavenComparableVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -121,7 +122,7 @@ fun Project.configureKotlinCompilationOptions() {
         // To work around it, we suppress the warning.
         @OptIn(ExperimentalBuildToolsApi::class, ExperimentalKotlinGradlePluginApi::class)
         val redundantCLIArg = project.provider {
-            if (project.kotlinExtension.compilerVersion.get() != project.kotlinBuildProperties.kotlinBootstrapVersion.get()) ""
+            if (project.kotlinExtension.compilerVersion.get() != project.kotlinToolingVersion.toString()) ""
             else "-Xwarning-level=REDUNDANT_CLI_ARG:disabled"
         }
 
