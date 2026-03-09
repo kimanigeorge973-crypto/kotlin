@@ -2084,6 +2084,11 @@ public class CliTestGenerated extends AbstractCliTest {
       runTest("compiler/testData/cli/js/perFileWithWrongModuleKind.args");
     }
 
+    @TestMetadata("prohibitExportKlibToOlderAbiVersionAtSecondStage.args")
+    public void testProhibitExportKlibToOlderAbiVersionAtSecondStage() {
+      runTest("compiler/testData/cli/js/prohibitExportKlibToOlderAbiVersionAtSecondStage.args");
+    }
+
     @TestMetadata("publicSyntheticAccessorGenerationWithExplicitAPIModeDisabled.args")
     public void testPublicSyntheticAccessorGenerationWithExplicitAPIModeDisabled() {
       runTest("compiler/testData/cli/js/publicSyntheticAccessorGenerationWithExplicitAPIModeDisabled.args");
