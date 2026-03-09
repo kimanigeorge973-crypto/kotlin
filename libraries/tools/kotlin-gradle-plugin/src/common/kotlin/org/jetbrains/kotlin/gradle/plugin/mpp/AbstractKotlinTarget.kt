@@ -6,6 +6,7 @@ package org.jetbrains.kotlin.gradle.plugin.mpp
 
 import org.gradle.api.Action
 import org.gradle.api.DomainObjectSet
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurablePublishArtifact
 import org.gradle.api.attributes.AttributeContainer
@@ -92,6 +93,14 @@ abstract class AbstractKotlinTarget(
     override val components: Set<KotlinTargetSoftwareComponent> by lazy {
         kotlinComponents.map { kotlinComponent -> KotlinTargetSoftwareComponent(this, kotlinComponent) }.toSet()
     }
+
+    @Deprecated(
+        "Accessing 'sourceSets' container on the Kotlin target level DSL is deprecated. " +
+                "Consider configuring 'sourceSets' on the Kotlin extension level.",
+        level = DeprecationLevel.WARNING
+    )
+    @Suppress("DEPRECATION")
+    final override val sourceSets: NamedDomainObjectContainer<KotlinSourceSet> get() = super.sourceSets
 
     protected open fun createKotlinVariant(
         componentName: String,
@@ -183,4 +192,3 @@ abstract class AbstractKotlinTarget(
 
 internal fun KotlinTarget.disambiguateName(simpleName: String) =
     lowerCamelCaseName(targetName, simpleName)
-
