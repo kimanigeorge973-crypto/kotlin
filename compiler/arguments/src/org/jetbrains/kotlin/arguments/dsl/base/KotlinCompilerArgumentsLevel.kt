@@ -59,9 +59,6 @@ data class KotlinCompilerArgumentsLevel(
      * Nested compiler argument levels with the same [name][KotlinCompilerArgumentsLevel.name] are merged together.
      */
     internal fun mergeWith(another: KotlinCompilerArgumentsLevel): KotlinCompilerArgumentsLevel {
-        require(name == another.name) {
-            "Names for compiler arguments level should be the same! We are trying to merge $name with ${another.name}"
-        }
         val argumentsWithTheSameNames = arguments.map { it.name }.intersect(another.arguments.map { it.name })
         require(argumentsWithTheSameNames.isEmpty()) {
             "Both levels with name $name contain compiler arguments with the same name(s): " +
