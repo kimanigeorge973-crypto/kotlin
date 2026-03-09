@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-@file:Suppress("FunctionName")
+@file:Suppress("DEPRECATION", "FunctionName")
 
 package org.jetbrains.kotlin.gradle.regressionTests
 
@@ -16,7 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class KT58427ResolveJSCompilerArguments {
-    @Suppress("DEPRECATION_ERROR")
+    @Suppress("DEPRECATION", "DEPRECATION_ERROR")
     @Test
     fun `test - resolve js compiler arguments with CompilerArgumentsAware`() {
         val project = buildProjectWithMPP()

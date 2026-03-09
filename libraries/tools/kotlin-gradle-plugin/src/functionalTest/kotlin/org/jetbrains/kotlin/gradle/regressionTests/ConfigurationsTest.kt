@@ -19,7 +19,6 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
@@ -161,8 +160,8 @@ class ConfigurationsTest : MultiplatformExtensionTest() {
     fun `don't publish wasm targets with KotlinJsCompilerAttribute attribute`() {
         with(kotlin) {
             val jsAttribute = Attribute.of(String::class.java)
-            js("nodeJs", KotlinJsCompilerType.IR) { attributes { attribute(jsAttribute, "nodeJs") } }
-            js("browser", KotlinJsCompilerType.IR) { attributes { attribute(jsAttribute, "browser") } }
+            js("nodeJs") { attributes { attribute(jsAttribute, "nodeJs") } }
+            js("browser") { attributes { attribute(jsAttribute, "browser") } }
             @OptIn(ExperimentalWasmDsl::class)
             wasmJs()
 

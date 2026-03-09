@@ -79,6 +79,12 @@ internal constructor(
     final override val targets: NamedDomainObjectCollection<KotlinTarget>
         get() = targetsContainer.targets
 
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Kotlin/JS IR is the only supported compiler type. Use js(name, configure) instead.",
+        replaceWith = ReplaceWith("js(name, configure)"),
+        level = DeprecationLevel.WARNING,
+    )
     override fun js(
         name: String,
         compiler: KotlinJsCompilerType,

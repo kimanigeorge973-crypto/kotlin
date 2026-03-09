@@ -268,12 +268,24 @@ abstract class KotlinJsProjectExtension(project: Project) :
         return target
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Kotlin/JS IR is the only supported compiler type. Use js(body) instead.",
+        replaceWith = ReplaceWith("js(body)"),
+        level = DeprecationLevel.WARNING,
+    )
     fun js(
         @Suppress("UNUSED_PARAMETER") // KT-64275
         compiler: KotlinJsCompilerType = defaultJsCompilerType,
         body: KotlinJsTargetDsl.() -> Unit = { },
     ): KotlinJsTargetDsl = jsInternal(body)
 
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Kotlin/JS IR is the only supported compiler type. Use js(body) instead.",
+        replaceWith = ReplaceWith("js(body)"),
+        level = DeprecationLevel.WARNING,
+    )
     fun js(
         compiler: String,
         body: KotlinJsTargetDsl.() -> Unit = { },
@@ -288,11 +300,23 @@ abstract class KotlinJsProjectExtension(project: Project) :
 
     fun js() = js { }
 
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Kotlin/JS IR is the only supported compiler type. Use js(configure) instead.",
+        replaceWith = ReplaceWith("js(configure)"),
+        level = DeprecationLevel.WARNING,
+    )
     fun js(compiler: KotlinJsCompilerType, configure: Action<KotlinJsTargetDsl>) =
         js(compiler = compiler) {
             configure.execute(this)
         }
 
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Kotlin/JS IR is the only supported compiler type. Use js(configure) instead.",
+        replaceWith = ReplaceWith("js(configure)"),
+        level = DeprecationLevel.WARNING,
+    )
     fun js(compiler: String, configure: Action<KotlinJsTargetDsl>) =
         js(compiler = compiler) {
             configure.execute(this)
