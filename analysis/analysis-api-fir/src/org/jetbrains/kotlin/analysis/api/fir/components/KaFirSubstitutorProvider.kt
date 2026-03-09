@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.analysis.api.fir.components
 
 import org.jetbrains.kotlin.analysis.api.components.KaSubstitutorProvider
 import org.jetbrains.kotlin.analysis.api.fir.KaFirSession
-import org.jetbrains.kotlin.analysis.api.fir.symbols.KaFirTypeParameterSymbol
+import org.jetbrains.kotlin.analysis.api.fir.symbols.KaFirTypeParameterSymbolBase
 import org.jetbrains.kotlin.analysis.api.fir.types.KaFirGenericSubstitutor
 import org.jetbrains.kotlin.analysis.api.fir.types.KaFirMapBackedSubstitutor
 import org.jetbrains.kotlin.analysis.api.fir.types.KaFirType
@@ -84,7 +84,7 @@ internal class KaFirSubstitutorProvider(
 
         val firSubstitution = buildMap {
             mappings.forEach { (ktTypeParameterSymbol, ktType) ->
-                check(ktTypeParameterSymbol is KaFirTypeParameterSymbol)
+                check(ktTypeParameterSymbol is KaFirTypeParameterSymbolBase<*>)
                 check(ktType is KaFirType)
                 put(ktTypeParameterSymbol.firSymbol, ktType.coneType)
             }
