@@ -199,14 +199,14 @@ fun callClosureInNewScope(block: suspend () -> Int): Int {
 
 // ========== Closure that calls back into Kotlin ==========
 
-//fun closureCallingKotlin(block: suspend (suspend () -> Int) -> Int): Int {
-//    return runBlocking {
-//        block {
-//            delay(10)
-//            42
-//        }
-//    }
-//}
+fun closureCallingKotlin(block: suspend (suspend () -> Int) -> Int): Int {
+    return runBlocking {
+        block {
+            delay(10)
+            42
+        }
+    }
+}
 
 // ========== Edge cases ==========
 

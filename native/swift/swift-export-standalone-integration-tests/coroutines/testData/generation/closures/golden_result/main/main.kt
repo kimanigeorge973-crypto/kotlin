@@ -41,8 +41,8 @@ public fun main_internal_functional_type_caller_SwiftU2EVoid__TypesOfArguments__
 }
 
 @ExportedBridge("main_internal_functional_type_caller_SwiftU2EVoid__TypesOfArguments__Swift_UnsafeMutableRawPointer_Swift_Error__")
-public fun main_internal_functional_type_caller_SwiftU2EVoid__TypesOfArguments__Swift_UnsafeMutableRawPointer_Swift_Error__(pointerToBlock: kotlin.native.internal.NativePtr, _1: platform.Foundation.NSError): Unit {
+public fun main_internal_functional_type_caller_SwiftU2EVoid__TypesOfArguments__Swift_UnsafeMutableRawPointer_Swift_Error__(pointerToBlock: kotlin.native.internal.NativePtr, _1: kotlin.native.internal.NativePtr): Unit {
     val __pointerToBlock = kotlin.native.internal.ref.dereferenceExternalRCRef(pointerToBlock)!!
-    val ___1 = _1
+    val ___1 = interpretObjCPointer<platform.Foundation.NSError>(_1)
     (__pointerToBlock as Function1<platform.Foundation.NSError, Unit>).invoke(___1)
 }

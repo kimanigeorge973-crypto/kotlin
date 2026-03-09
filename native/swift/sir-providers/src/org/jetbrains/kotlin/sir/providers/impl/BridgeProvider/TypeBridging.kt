@@ -88,7 +88,7 @@ private fun bridgeNominalType(type: SirNominalType, position: SirTypeVariance): 
     return when (val subtype = type.typeDeclaration) {
         SirSwiftModule.unsafeMutableRawPointer -> AsOpaqueObject(type, KotlinType.KotlinObject, CType.Object)
         SirSwiftModule.never -> AsOpaqueObject(type, KotlinType.KotlinObject, CType.Void)
-        SirSwiftModule.error -> AsIs(SirSwiftModule.error.nominalType(), KotlinType.NSError, CType.NSError)
+        SirSwiftModule.error -> AsObjCBridged(SirSwiftModule.error.nominalType(), CType.NSError)
 
         SirSwiftModule.optional -> when (val bridge = bridgeType(type.typeArguments.first(), position)) {
             is AsObject,
@@ -828,7 +828,7 @@ internal sealed class Bridge(
                         AsCovariantBlock(parameters = listOf(returnType), returnType = AsVoid),
                         // exception - takes Swift.Error (automatically bridged to NSError)
                         AsCovariantBlock(
-                            parameters = listOf(AsIs(SirSwiftModule.error.nominalType(), KotlinType.NSError, CType.NSError)),
+                            parameters = listOf(AsObjCBridged(SirSwiftModule.error.nominalType(), CType.NSError)),
                             returnType = AsVoid,
                         ),
                         // cancellation

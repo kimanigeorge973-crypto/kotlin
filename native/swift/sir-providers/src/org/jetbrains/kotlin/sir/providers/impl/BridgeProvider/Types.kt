@@ -93,8 +93,6 @@ internal enum class KotlinType(val repr: String) {
 
     PointerToKotlinObject("kotlinx.cinterop.COpaquePointerVar"),
 
-    NSError("platform.Foundation.NSError"),
-
     // id, +0
     ObjCObjectUnretained("kotlin.native.internal.NativePtr"),
 
@@ -123,5 +121,4 @@ internal val KotlinType.defaultValue: String
         KotlinType.ObjCObjectUnretained, // This is semantically +0, so we're allowed to simply dismiss the pointer.
             -> "kotlin.native.internal.NativePtr.NULL"
         KotlinType.String -> ""
-        KotlinType.NSError -> "null"
     }
