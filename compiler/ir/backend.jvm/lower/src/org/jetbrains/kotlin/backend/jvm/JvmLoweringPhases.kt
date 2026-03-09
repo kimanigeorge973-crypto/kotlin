@@ -15,11 +15,11 @@ import org.jetbrains.kotlin.backend.jvm.lower.*
 import org.jetbrains.kotlin.config.phaser.AnyNamedPhase
 
 private val jvmModulePhases1 = createModulePhases(
+    ::JvmUpgradeCallableReferences,
     ::ExternalPackageParentPatcherLowering,
     ::FragmentSharedVariablesLowering,
     ::JvmK1IrValidationBeforeLoweringPhase,
     ::ProcessOptionalAnnotations,
-    ::JvmUpgradeCallableReferences,
     ::JvmExpectDeclarationRemover,
     ::ConstEvaluationLowering,
     ::FileClassLowering,
