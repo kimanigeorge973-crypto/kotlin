@@ -1540,7 +1540,6 @@ class ComposeCrossModuleTests(useFir: Boolean) : AbstractCodegenTest(useFir) {
 
     @Test
     fun testStablePropertyCodegen() {
-        assumeTrue(useFir)
         compile(
             mapOf(
                 "Main" to mapOf(
