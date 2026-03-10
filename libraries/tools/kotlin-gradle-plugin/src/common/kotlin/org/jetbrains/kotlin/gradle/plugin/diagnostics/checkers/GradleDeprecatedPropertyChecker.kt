@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 /*
  * Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
@@ -10,7 +8,6 @@ package org.jetbrains.kotlin.gradle.plugin.diagnostics.checkers
 import org.gradle.api.Project
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.gradle.internal.properties.PropertiesBuildService
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_DEPRECATED_TEST_PROPERTY
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_KMP_ISOLATED_PROJECT_SUPPORT
@@ -47,8 +44,10 @@ internal object GradleDeprecatedPropertyChecker : KotlinGradleProjectChecker {
         DeprecatedProperty("kotlin.build.report.dir"),
         DeprecatedProperty("kotlin.native.ignoreIncorrectDependencies"),
         DeprecatedProperty("kotlin.wasm.stability.nowarn"),
-        DeprecatedProperty(KotlinJsCompilerType.jsCompilerProperty),
-        DeprecatedProperty("${KotlinJsCompilerType.jsCompilerProperty}.nowarn"),
+        @Suppress("DEPRECATION")
+        DeprecatedProperty(org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType.jsCompilerProperty),
+        @Suppress("DEPRECATION")
+        DeprecatedProperty("${org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType.jsCompilerProperty}.nowarn"),
         DeprecatedProperty("kotlin.mpp.androidGradlePluginCompatibility.nowarn"), // Since 2.1.0
         DeprecatedProperty(
             "kotlin.experimental.swift-export.enabled",
