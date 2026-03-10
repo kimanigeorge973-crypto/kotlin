@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.atomicfu.compiler.backend.common
 
 import org.jetbrains.kotlin.backend.common.CompilationException
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.wrapWithCompilationException
 import org.jetbrains.kotlin.backend.jvm.ir.representativeUpperBound
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrElement
@@ -28,7 +29,6 @@ import org.jetbrains.kotlin.ir.visitors.IrTransformer
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
-import org.jetbrains.kotlin.utils.exceptions.rethrowIntellijPlatformExceptionIfNeeded
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.*
 import org.jetbrains.kotlinx.atomicfu.compiler.diagnostic.AtomicfuErrorMessages.CONSTRAINTS_MESSAGE
 
@@ -73,10 +73,10 @@ abstract class AbstractAtomicfuTransformer(
         try {
             return block()
         } catch (ce: CompilationException) {
+            ce.initializeFileDetails(this)
             throw ce
-        } catch (e: Exception) {
-            rethrowIntellijPlatformExceptionIfNeeded(e)
-            throw CompilationException("kotlinx-atomicfu compiler plugin internal error", this, null, e)
+        } catch (e: Throwable) {
+            throw e.wrapWithCompilationException("kotlinx-atomicfu compiler plugin internal error", this, null)
         }
     }
 
