@@ -1791,7 +1791,7 @@ internal class KaFirResolver(
         val derivedClass = findDerivedClass(psi)?.resolveToFirSymbolOfTypeSafe<FirClassSymbol<*>>(resolutionFacade) ?: return emptyList()
 
         val candidates = AllCandidatesResolver(analysisSession.firSession)
-            .getAllCandidatesForDelegatedConstructor(analysisSession.resolutionFacade, this, derivedClass.toLookupTag(), psi)
+            .getAllCandidatesForDelegatedConstructor(analysisSession.resolutionFacade, this, derivedClass, psi)
 
         return candidates.mapNotNull {
             convertToKaCallCandidate(
