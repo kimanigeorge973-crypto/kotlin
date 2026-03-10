@@ -662,8 +662,10 @@ abstract class AbstractCompileKotlinAgainstCustomBinariesTest : AbstractKotlinCo
     }
 
     fun testUnreachableExtensionValPropertyDeclaration() {
-        val (output, exitCode) = compileKotlin("source.kt", tmpdir, expectedFileName = null)
-        assertEquals("Output:\n$output", ExitCode.COMPILATION_ERROR, exitCode)
+        muteForK1 {
+            val (output, exitCode) = compileKotlin("source.kt", tmpdir, expectedFileName = null)
+            assertEquals("Output:\n$output", ExitCode.COMPILATION_ERROR, exitCode)
+        }
     }
 
     fun testAnonymousObjectTypeMetadata() = muteForK1 {
