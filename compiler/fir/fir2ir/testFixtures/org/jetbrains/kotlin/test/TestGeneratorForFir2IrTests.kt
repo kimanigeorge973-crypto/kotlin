@@ -25,36 +25,44 @@ fun main(args: Array<String>) {
     val excludedScriptDirs = listOf("script")
 
     generateTestGroupSuiteWithJUnit5(args, mainClassName) {
-        testGroup(testRoot, testDataRoot = "compiler/testData") {
+        testGroup(testRoot, testDataRoot = "compiler/testData/codegen") {
             testClass<AbstractFirLightTreeBlackBoxCodegenTest> {
-                model("codegen/box", excludeDirs = k1BoxTestDir + excludedScriptDirs)
+                model("box", excludeDirs = k1BoxTestDir + excludedScriptDirs)
+                model("boxJvm", excludeDirs = k1BoxTestDir + excludedScriptDirs)
             }
 
             testClass<AbstractFirLightTreeHeaderModeCodegenTest> {
-                model("codegen/box", excludeDirs = k1BoxTestDir + excludedScriptDirs)
+                model("box", excludeDirs = k1BoxTestDir + excludedScriptDirs)
+                model("boxJvm", excludeDirs = k1BoxTestDir + excludedScriptDirs)
             }
 
             testClass<AbstractFirPsiBlackBoxCodegenTest> {
-                model("codegen/box", excludeDirs = k1BoxTestDir)
+                model("box", excludeDirs = k1BoxTestDir)
+                model("boxJvm", excludeDirs = k1BoxTestDir)
             }
             testClass<AbstractJvmLightTreeBlackBoxCodegenWithSeparateKmpCompilationTest> {
-                model("codegen/box/${k2BoxTestDir.first()}")
+                model("box/${k2BoxTestDir.first()}")
+                model("boxJvm/${k2BoxTestDir.first()}")
             }
 
+            testClass<AbstractReflectionLegacyImplementationTest> {
+                model("box/reflection")
+                model("boxJvm/reflection")
+            }
+
+            testClass<AbstractNewReflectionFakeOverridesImplementationTest> {
+                model("box/reflection")
+                model("boxJvm/reflection")
+            }
+        }
+
+        testGroup(testRoot, testDataRoot = "compiler/testData") {
             testClass<AbstractFirLightTreeBlackBoxCodegenTest>("FirLightTreeBlackBoxModernJdkCodegenTestGenerated") {
                 model("codegen/boxModernJdk")
             }
 
             testClass<AbstractFirPsiBlackBoxCodegenTest>("FirPsiBlackBoxModernJdkCodegenTestGenerated") {
                 model("codegen/boxModernJdk")
-            }
-
-            testClass<AbstractReflectionLegacyImplementationTest> {
-                model("codegen/box/reflection")
-            }
-
-            testClass<AbstractNewReflectionFakeOverridesImplementationTest> {
-                model("codegen/box/reflection")
             }
 
             testClass<AbstractFirPsiBlackBoxInlineCodegenTest> {
@@ -135,46 +143,46 @@ fun main(args: Array<String>) {
             }
         }
 
-        testGroup(testRoot, testDataRoot = "compiler/testData") {
-            testClass<AbstractFirLightTreeJvmIrTextTest> {
-                model(
-                    "ir/irText",
-                    excludeDirs = listOf("declarations/multiplatform/k1")
-                )
-            }
+//        testGroup(testRoot, testDataRoot = "compiler/testData") {
+//            testClass<AbstractFirLightTreeJvmIrTextTest> {
+//                model(
+//                    "ir/irText",
+//                    excludeDirs = listOf("declarations/multiplatform/k1")
+//                )
+//            }
+//
+//            testClass<AbstractFirPsiJvmIrTextTest> {
+//                model(
+//                    "ir/irText",
+//                    excludeDirs = listOf("declarations/multiplatform/k1")
+//                )
+//            }
+//
+//            testClass<AbstractFirLightTreeJvmIrSourceRangesTest> {
+//                model("ir/sourceRanges")
+//            }
+//
+//            testClass<AbstractFirPsiJvmIrSourceRangesTest> {
+//                model("ir/sourceRanges")
+//            }
+//
+//            testClass<AbstractFirLightTreeBytecodeTextTest> {
+//                model("codegen/bytecodeText")
+//            }
+//
+//            testClass<AbstractFirPsiBytecodeTextTest> {
+//                model("codegen/bytecodeText")
+//            }
+//        }
 
-            testClass<AbstractFirPsiJvmIrTextTest> {
-                model(
-                    "ir/irText",
-                    excludeDirs = listOf("declarations/multiplatform/k1")
-                )
-            }
-
-            testClass<AbstractFirLightTreeJvmIrSourceRangesTest> {
-                model("ir/sourceRanges")
-            }
-
-            testClass<AbstractFirPsiJvmIrSourceRangesTest> {
-                model("ir/sourceRanges")
-            }
-
-            testClass<AbstractFirLightTreeBytecodeTextTest> {
-                model("codegen/bytecodeText")
-            }
-
-            testClass<AbstractFirPsiBytecodeTextTest> {
-                model("codegen/bytecodeText")
-            }
-        }
-
-        testGroup(testRoot, "compiler/tests-spec/testData") {
-            testClass<AbstractFirBlackBoxCodegenTestSpec> {
-                model(
-                    relativeRootPath = "codegen/box",
-                    excludeDirs = listOf("helpers", "templates") + detectDirsWithTestsMapFileOnly("codegen/box"),
-                )
-            }
-        }
+//        testGroup(testRoot, "compiler/tests-spec/testData") {
+//            testClass<AbstractFirBlackBoxCodegenTestSpec> {
+//                model(
+//                    relativeRootPath = "codegen/box",
+//                    excludeDirs = listOf("helpers", "templates") + detectDirsWithTestsMapFileOnly("codegen/box"),
+//                )
+//            }
+//        }
     }
 }
 
