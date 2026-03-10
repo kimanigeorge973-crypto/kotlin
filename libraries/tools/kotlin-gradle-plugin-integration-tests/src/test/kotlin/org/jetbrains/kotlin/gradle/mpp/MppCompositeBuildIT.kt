@@ -228,6 +228,10 @@ class MppCompositeBuildIT : KGPBaseTest() {
             projectPath.resolve("included-build").addDefaultSettingsToSettingsGradle(gradleVersion)
             buildGradleKts.replaceText("<kgp_version>", KOTLIN_VERSION)
             projectPath.resolve("included-build/build.gradle.kts").replaceText("<kgp_version>", "1.7.21")
+            projectPath.resolve("included-build/included/build.gradle.kts").replaceText(
+                "js {",
+                "js(org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType.IR) {"
+            )
 
             build("assemble") {
                 assertTasksExecuted(":compileCommonMainKotlinMetadata")
