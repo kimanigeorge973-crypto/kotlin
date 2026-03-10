@@ -88,7 +88,7 @@ abstract class AbstractFunctionReferenceLowering<C : CommonBackendContext>(val c
         get() = origin.isLambda
 
     override fun lower(irFile: IrFile) {
-        val cachedFunctionReferencesClasses = mutableMapOf<IrFunctionSymbol, IrClass>()
+        val cachedFunctionReferencesClasses = mutableMapOf<CachedFunctionReferenceKey, IrClass>()
 
         irFile.transform(object : IrTransformer<IrDeclaration?>() {
             override fun visitClass(declaration: IrClass, data: IrDeclaration?): IrStatement {
@@ -119,23 +119,38 @@ abstract class AbstractFunctionReferenceLowering<C : CommonBackendContext>(val c
 
                 val targetCallableSymbol = expression.reflectionTargetSymbol
 
-                // For named unbound function references we can generate a class only once and reuse constructor of it
+                // For named function references we can generate a class only once and reuse constructor of it
                 // to reduce bundle size when the same function reference is obtained multiple times
-                val canBeDeduplicated = targetCallableSymbol != null
-                        && expression.boundValues.isEmpty()
-                        && !expression.isLambda
+                val canBeDeduplicated = targetCallableSymbol != null && !expression.isLambda
 
-                if (canBeDeduplicated && targetCallableSymbol in cachedFunctionReferencesClasses) {
-                    val cachedClass = cachedFunctionReferencesClasses[targetCallableSymbol]
-                    val ctorSymbol = cachedClass?.primaryConstructor?.symbol!!
-                    return irBuilder.irCallConstructor(ctorSymbol, emptyList()).apply {
+                val cacheKey = targetCallableSymbol?.let { targetSymbol ->
+                    CachedFunctionReferenceKey(
+                        targetSymbol,
+                        expression.boundValues.map { it.type },
+                        expression.type,
+                        expression.hasUnitConversion,
+                        expression.hasSuspendConversion,
+                        expression.hasVarargConversion,
+                    )
+                }
+
+                if (canBeDeduplicated && cacheKey in cachedFunctionReferencesClasses) {
+                    val cachedClass = cachedFunctionReferencesClasses[cacheKey]
+                    val ctor = cachedClass?.primaryConstructor!!
+                    return irBuilder.irCallConstructor(ctor.symbol, emptyList()).apply {
                         origin = getConstructorCallOrigin(expression)
+                        for ((index, value) in expression.boundValues.withIndex()) {
+                            arguments[index] = value
+                        }
+                        for (index in expression.boundValues.size until arguments.size) {
+                            arguments[index] = irBuilder.getExtraConstructorArgument(ctor.parameters[index], expression)
+                        }
                     }
                 }
 
                 val clazz = buildClass(expression, irBuilder.scope.getLocalDeclarationParent())
-                if (canBeDeduplicated)
-                    cachedFunctionReferencesClasses[targetCallableSymbol] = clazz
+                if (canBeDeduplicated && cacheKey != null)
+                    cachedFunctionReferencesClasses[cacheKey] = clazz
 
                 val constructor = clazz.primaryConstructor!!
                 val newExpression = irBuilder.irCallConstructor(constructor.symbol, emptyList()).apply {
@@ -375,4 +390,13 @@ abstract class AbstractFunctionReferenceLowering<C : CommonBackendContext>(val c
     protected abstract fun getConstructorOrigin(reference: IrRichFunctionReference): IrDeclarationOrigin
     protected abstract fun getInvokeMethodOrigin(reference: IrRichFunctionReference): IrDeclarationOrigin
     protected abstract fun getConstructorCallOrigin(reference: IrRichFunctionReference): IrStatementOrigin?
+
+    private data class CachedFunctionReferenceKey(
+        val targetSymbol: IrFunctionSymbol,
+        val boundValueTypes: List<IrType>,
+        val referenceType: IrType,
+        val hasUnitConversion: Boolean,
+        val hasSuspendConversion: Boolean,
+        val hasVarargConversion: Boolean,
+    )
 }
