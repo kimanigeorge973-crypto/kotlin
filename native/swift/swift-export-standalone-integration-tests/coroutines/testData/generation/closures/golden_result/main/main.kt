@@ -10,11 +10,11 @@ public fun __root___accept_suspend_function_type__TypesOfArguments__U282920async
         val originalBlock = convertBlockPtrToKotlinFunction<(kotlin.native.internal.NativePtr, kotlin.native.internal.NativePtr, kotlin.native.internal.NativePtr)->Unit>(block);
         suspend {
             val __cancellation: SwiftJob = SwiftJob()
-            kotlin.coroutines.coroutineContext[kotlinx.coroutines.Job]?.let { 
+            kotlin.coroutines.coroutineContext[kotlinx.coroutines.Job]?.let {
                 __cancellation.alsoCancel(it)
                 it.alsoCancel(__cancellation)
             }
-            
+
             kotlinx.coroutines.suspendCancellableCoroutine { __cont ->
                 val __cancellationPtr = kotlin.native.internal.ref.createRetainedExternalRCRef(__cancellation)
                 val __continuation: Function1<Int, Unit> = { _result ->
@@ -46,4 +46,3 @@ public fun main_internal_functional_type_caller_SwiftU2EVoid__TypesOfArguments__
     val ___1 = interpretObjCPointer<platform.Foundation.NSError>(_1)
     (__pointerToBlock as Function1<platform.Foundation.NSError, Unit>).invoke(___1)
 }
-
