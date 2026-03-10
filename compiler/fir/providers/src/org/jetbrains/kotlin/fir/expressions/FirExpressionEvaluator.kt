@@ -659,10 +659,19 @@ private fun Any?.toConstExpression(
     kind: ConstantValueKind,
     originalExpression: FirExpression
 ): FirLiteralExpression {
+    // Later stages of the compiler expect signed values
+    val value = when (this) {
+        is UByte -> this.toLong()
+        is UShort -> this.toLong()
+        is UInt -> this.toLong()
+        is ULong -> this.toLong()
+        else -> this
+    }
+
     return buildLiteralExpression(
         originalExpression.source,
         kind,
-        this,
+        value,
         originalExpression.annotations.takeIf { it.isNotEmpty() }?.toMutableList(),
         setType = false,
     ).apply { replaceConeTypeOrNull(originalExpression.resolvedType) }
