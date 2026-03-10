@@ -61,13 +61,31 @@ public abstract class MyClass2 /* test.MyClass2*/ implements java.util.Collectio
   public <T> T[] toArray(T[]);// <T>  toArray(T[])
 
   @java.lang.Override()
+  public @org.jetbrains.annotations.NotNull() java.lang.String remove(int);//  remove(int)
+
+  @java.lang.Override()
+  public @org.jetbrains.annotations.NotNull() java.lang.String set(int, @org.jetbrains.annotations.NotNull() java.lang.String);//  set(int, @org.jetbrains.annotations.NotNull() java.lang.String)
+
+  @java.lang.Override()
+  public abstract @org.jetbrains.annotations.NotNull() java.lang.String get(int);//  get(int)
+
+  @java.lang.Override()
   public abstract boolean contains(@org.jetbrains.annotations.NotNull() java.lang.String);//  contains(@org.jetbrains.annotations.NotNull() java.lang.String)
 
   @java.lang.Override()
   public abstract int getSize();//  getSize()
 
   @java.lang.Override()
+  public abstract int indexOf(@org.jetbrains.annotations.NotNull() java.lang.String);//  indexOf(@org.jetbrains.annotations.NotNull() java.lang.String)
+
+  @java.lang.Override()
+  public abstract int lastIndexOf(@org.jetbrains.annotations.NotNull() java.lang.String);//  lastIndexOf(@org.jetbrains.annotations.NotNull() java.lang.String)
+
+  @java.lang.Override()
   public boolean add(@org.jetbrains.annotations.NotNull() java.lang.String);//  add(@org.jetbrains.annotations.NotNull() java.lang.String)
+
+  @java.lang.Override()
+  public boolean addAll(int, java.util.Collection<? extends @org.jetbrains.annotations.NotNull() java.lang.String>);//  addAll(int, java.util.Collection<? extends @org.jetbrains.annotations.NotNull() java.lang.String>)
 
   @java.lang.Override()
   public boolean addAll(java.util.Collection<? extends @org.jetbrains.annotations.NotNull() java.lang.String>);//  addAll(java.util.Collection<? extends @org.jetbrains.annotations.NotNull() java.lang.String>)
@@ -82,13 +100,25 @@ public abstract class MyClass2 /* test.MyClass2*/ implements java.util.Collectio
   public boolean retainAll(java.util.Collection<?>);//  retainAll(java.util.Collection<?>)
 
   @java.lang.Override()
+  public final @org.jetbrains.annotations.NotNull() java.lang.String get(int);//  get(int)
+
+  @java.lang.Override()
   public final boolean contains(java.lang.Object);//  contains(java.lang.Object)
+
+  @java.lang.Override()
+  public final int indexOf(java.lang.Object);//  indexOf(java.lang.Object)
+
+  @java.lang.Override()
+  public final int lastIndexOf(java.lang.Object);//  lastIndexOf(java.lang.Object)
 
   @java.lang.Override()
   public final int size();//  size()
 
   @java.lang.Override()
   public java.lang.Object[] toArray();//  toArray()
+
+  @java.lang.Override()
+  public void add(int, @org.jetbrains.annotations.NotNull() java.lang.String);//  add(int, @org.jetbrains.annotations.NotNull() java.lang.String)
 
   @java.lang.Override()
   public void clear();//  clear()

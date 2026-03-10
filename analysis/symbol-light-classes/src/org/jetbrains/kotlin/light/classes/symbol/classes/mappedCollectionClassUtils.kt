@@ -239,7 +239,7 @@ internal fun KaSession.generateJavaCollectionMethodStubsIfNeeded(
     allSupertypes: List<KaClassType>,
     result: MutableList<PsiMethod>,
 ) {
-    val closestMappedSupertype = allSupertypes.find { mapKotlinCollectionClassToJava(it.classId) != null } ?: return
+    val closestMappedSupertype = findClosestMappedCollectionSupertype(allSupertypes) ?: return
     if (!isFirstNonInterfaceSubtypeOfCollection(classSymbol)) return
 
     val javaClassId = mapKotlinCollectionClassToJava(closestMappedSupertype.classId) ?: return
@@ -249,6 +249,22 @@ internal fun KaSession.generateJavaCollectionMethodStubsIfNeeded(
     val substitutor = createPsiSubstitutor(javaCollectionPsiClass, closestMappedSupertype, containingClass)
 
     generateJavaCollectionMethodStubs(containingClass, javaCollectionPsiClass, kotlinCollectionSymbol, substitutor, result)
+}
+
+/**
+ * Chooses the first mapped collection supertype that is not shadowed by a more specific mapped one.
+ *
+ * This avoids stopping at `Collection` when the same class also inherits from ex. `List`, so light classes
+ * can generate the richer `List` stub set.
+ */
+private fun KaSession.findClosestMappedCollectionSupertype(allSupertypes: List<KaClassType>): KaClassType? {
+    val mappedSupertypes = allSupertypes.filter { mapKotlinCollectionClassToJava(it.classId) != null }
+
+    return mappedSupertypes.firstOrNull { candidate ->
+        mappedSupertypes.none { other ->
+            other !== candidate && other.isSubtypeOf(candidate) && !candidate.isSubtypeOf(other)
+        }
+    }
 }
 
 private fun KaSession.isFirstNonInterfaceSubtypeOfCollection(classSymbol: KaClassSymbol): Boolean {
