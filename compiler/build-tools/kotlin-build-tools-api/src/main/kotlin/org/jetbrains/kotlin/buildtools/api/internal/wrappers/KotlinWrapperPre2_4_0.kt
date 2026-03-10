@@ -168,6 +168,39 @@ internal class KotlinWrapperPre2_4_0(
         private val delegate: JvmArgumentAccessor,
     ) : JvmArgumentAccessor by delegate {
 
+        @Suppress("UNCHECKED_CAST", "CAST_NEVER_SUCCEEDS")
+        override fun <V> get(key: CommonCompilerArguments.CommonCompilerArgument<V>): V {
+            return when (key) {
+                CommonCompilerArguments.KOTLIN_HOME -> {
+                    if (delegate[key] == null) return null as V
+
+                    val stringValue = delegate[key] as String
+                    Path(stringValue) as V
+                }
+
+                else -> delegate[key]
+            }
+        }
+
+        override fun <V> set(
+            key: CommonCompilerArguments.CommonCompilerArgument<V>,
+            value: V,
+        ) {
+            when (key) {
+                CommonCompilerArguments.KOTLIN_HOME -> {
+                    val pathValue = value as Path?
+                    val stringValue = pathValue?.toFile()?.absolutePath
+                    val stringKey = JvmCompilerArguments.JvmCompilerArgument<String?>(key.id, key.availableSinceVersion)
+
+                    delegate[stringKey] = stringValue
+                }
+
+                else -> {
+                    delegate[key] = value
+                }
+            }
+        }
+
         @Suppress("CAST_NEVER_SUCCEEDS", "UNCHECKED_CAST")
         override fun <V> get(key: JvmCompilerArguments.JvmCompilerArgument<V>): V {
             return when (key) {
