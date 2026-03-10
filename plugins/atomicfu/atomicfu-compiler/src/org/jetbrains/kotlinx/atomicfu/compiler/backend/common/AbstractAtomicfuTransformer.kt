@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.ir.visitors.IrTransformer
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.assignFrom
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
+import org.jetbrains.kotlin.utils.exceptions.rethrowIntellijPlatformExceptionIfNeeded
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.*
 import org.jetbrains.kotlinx.atomicfu.compiler.diagnostic.AtomicfuErrorMessages.CONSTRAINTS_MESSAGE
 
@@ -74,6 +75,7 @@ abstract class AbstractAtomicfuTransformer(
         } catch (ce: CompilationException) {
             throw ce
         } catch (e: Exception) {
+            rethrowIntellijPlatformExceptionIfNeeded(e)
             throw CompilationException("kotlinx-atomicfu compiler plugin internal error", this, null, e)
         }
     }
