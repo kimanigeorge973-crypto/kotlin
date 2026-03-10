@@ -57,7 +57,7 @@ fun Project.customCompilerTest(
     // The same custom compiler of a certain version is used by multiple tasks:
     // `testCustomFirstStage_$version`, `testCustomSecondStage_$version`, `testMinimalInAggregate_customFirstStage`, `testMinimalInAggregate_customSecondStage`
     // So it makes sense to download and unarchive the custom compiler only once per compiler version.
-    val customCompiler: Configuration = configurations.findByName("customCompiler_$version") ?: configurations.create("customCompiler_$version") {
+    val customCompiler: Configuration = getOrCreateConfiguration("customCompiler_$version") {
         project.dependencies.add(
             name,
             "org.jetbrains.kotlin:kotlin-native-prebuilt:${version.rawVersion}:${HostManager.platformName()}@tar.gz"
@@ -68,19 +68,13 @@ fun Project.customCompilerTest(
             implicitDependencies("org.jetbrains.kotlin:kotlin-native-prebuilt:${version.rawVersion}:linux-x86_64@tar.gz")
         }
     }
-    // Cannot use exactly `DependencyDirectories.localKonanDir`, since it's wrong to declare whole `~/.konan/` as an output of `unarchiveCustomCompiler_` task
-    // Should it be so, Gradle fails on implicit dependency: task `:kotlin-native:llvmInterop:genInteropStubs` uses files in `~/.konan/dependencies/llvm-19-aarch64*`
-    // So, a subfolder within `~/.konan/` is needed for output of `unarchiveCustomCompiler_` task
-    val unarchiveTaskName = "unarchiveCustomCompiler_$version"
-    val unarchiveCustomCompiler = tasks.matching { it.name == unarchiveTaskName }.let { matchingTasks ->
-        if (matchingTasks.isEmpty()) {
-            tasks.register<Copy>(unarchiveTaskName) {
-                from(customCompiler.map { file -> tarTree(file) }.single())
-                into(DependencyDirectories.localKonanDir.resolve("kotlin-native-prebuilt-releases"))
-            }
-        } else {
-            tasks.named<Copy>(unarchiveTaskName)
-        }
+    val unarchiveCustomCompiler = getOrCreateTask<Copy>("unarchiveCustomCompiler_$version") {
+        from(customCompiler.map { file -> tarTree(file) }.single())
+
+        // Cannot use exactly `DependencyDirectories.localKonanDir`, since it's wrong to declare whole `~/.konan/` as an output of `unarchiveCustomCompiler_` task
+        // Should it be so, Gradle fails on implicit dependency: task `:kotlin-native:llvmInterop:genInteropStubs` uses files in `~/.konan/dependencies/llvm-19-aarch64*`
+        // So, a subfolder within `~/.konan/` is needed for output of `unarchiveCustomCompiler_$version` task
+        into(DependencyDirectories.localKonanDir.resolve("kotlin-native-prebuilt-releases"))
     }
     return projectTests.nativeTestTask(
         taskName,
