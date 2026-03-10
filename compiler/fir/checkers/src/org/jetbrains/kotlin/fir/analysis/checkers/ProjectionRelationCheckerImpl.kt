@@ -38,7 +38,7 @@ import kotlin.collections.get
 import kotlin.collections.orEmpty
 
 internal object ProjectionRelationCheckerImpl {
-    data class TypeArgumentData(
+    private data class TypeArgumentData(
         val constructor: ConeKotlinType,
         val index: Int,
         val projection: ConeTypeProjection,
