@@ -2415,6 +2415,9 @@ public abstract interface annotation class org/jetbrains/kotlin/gradle/targets/j
 public abstract interface annotation class org/jetbrains/kotlin/gradle/targets/js/dsl/ExperimentalMainFunctionArgumentsDsl : java/lang/annotation/Annotation {
 }
 
+public abstract interface annotation class org/jetbrains/kotlin/gradle/targets/js/dsl/ExperimentalWasmDsl : java/lang/annotation/Annotation {
+}
+
 public final class org/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsBinaryMode : java/lang/Enum {
 	public static final field DEVELOPMENT Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsBinaryMode;
 	public static final field PRODUCTION Lorg/jetbrains/kotlin/gradle/targets/js/dsl/KotlinJsBinaryMode;
