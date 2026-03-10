@@ -43,7 +43,7 @@ object FirTypeArgumentsOfQualifierOfCallableReferenceChecker : FirCallableRefere
         get() = LanguageFeature.ProperSupportOfInnerClassesInCallableReferenceLHS.isEnabled()
 
     /**
-     * @return true if **error** was reported
+     * @return max. severity among reported diagnostics
      */
     context(context: CheckerContext, reporter: DiagnosticReporter)
     private fun checkNonFatalDiagnostics(
@@ -171,10 +171,13 @@ object FirTypeArgumentsOfQualifierOfCallableReferenceChecker : FirCallableRefere
         )
 
         if (nonFatalDiagnosticsCheckResult == null) {
-            // The check for WARNING guarantees that lhs type is the same in pre-`innerClassesProperlySupported` and
-            // post-`innerClassesProperlySupported`.
-            // In particular, that means no unexpected parameter - argument matchings.
-            ProjectionRelationCheckerImpl.doCheck(extractArgumentsTypeRefAndSource(lhs), lhsType)
+            // We only report projection relation deprecation warnings / errors if there were no deprecation warnings / errors
+            // reported for arguments matching
+            ProjectionRelationCheckerImpl.doCheck(
+                extractArgumentsTypeRefAndSource(lhs),
+                lhsType,
+                LanguageFeature.ProperSupportOfInnerClassesInCallableReferenceLHS,
+            )
         }
     }
 }

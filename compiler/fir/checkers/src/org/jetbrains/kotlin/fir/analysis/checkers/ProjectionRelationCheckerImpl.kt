@@ -5,12 +5,15 @@
 
 package org.jetbrains.kotlin.fir.analysis.checkers
 
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
+import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.isDisabled
 import org.jetbrains.kotlin.fir.resolve.createParametersSubstitutor
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.resolve.mapParametersToArgumentsOf
@@ -46,11 +49,14 @@ internal object ProjectionRelationCheckerImpl {
     )
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
-    fun doCheck(argumentsWithSources: List<FirTypeRefSource>?, abbreviatedType: ConeKotlinType) {
+    fun doCheck(
+        argumentsWithSources: List<FirTypeRefSource>?,
+        abbreviatedType: ConeKotlinType,
+        featureForDeprecation: LanguageFeature? = null,
+    ) {
         val potentiallyProblematicArguments = collectPotentiallyProblematicArguments(argumentsWithSources, abbreviatedType)
 
-        val type = abbreviatedType
-        val fullyExpandedType = type.fullyExpandedType()
+        val fullyExpandedType = abbreviatedType.fullyExpandedType()
 
         for (argumentData in potentiallyProblematicArguments) {
             val declaration = argumentData.constructor.toRegularClassSymbol() ?: continue
@@ -73,19 +79,27 @@ internal object ProjectionRelationCheckerImpl {
 
             val argTypeRefSource = argumentData.source
 
-            if (projectionRelation != ProjectionRelation.None) {
-                reporter.reportOn(
-                    argTypeRefSource.source ?: argTypeRefSource.typeRef?.source,
-                    when {
-                        projectionRelation != ProjectionRelation.Conflicting -> FirErrors.REDUNDANT_PROJECTION
-                        type != fullyExpandedType -> FirErrors.CONFLICTING_PROJECTION_IN_TYPEALIAS_EXPANSION
-                        else -> FirErrors.CONFLICTING_PROJECTION
-                    },
-                    fullyExpandedType,
-                )
+            val diagnostic = when {
+                projectionRelation == ProjectionRelation.None -> continue
+                projectionRelation == ProjectionRelation.Redundant -> FirErrors.REDUNDANT_PROJECTION
+                featureForDeprecation?.isDisabled() == true -> {
+                    featureToDeprecationWarning[featureForDeprecation]
+                        ?: error("Unknown feature for deprecation: ${featureForDeprecation.name}")
+                }
+                abbreviatedType != fullyExpandedType -> FirErrors.CONFLICTING_PROJECTION_IN_TYPEALIAS_EXPANSION
+                else -> FirErrors.CONFLICTING_PROJECTION
             }
+            reporter.reportOn(
+                argTypeRefSource.source ?: argTypeRefSource.typeRef?.source,
+                diagnostic,
+                fullyExpandedType,
+            )
         }
     }
+
+    private val featureToDeprecationWarning: Map<LanguageFeature, KtDiagnosticFactory1<ConeKotlinType>> = mapOf(
+        LanguageFeature.ProperSupportOfInnerClassesInCallableReferenceLHS to FirErrors.CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING
+    )
 
     /**
      * When checking projections, we have two kinds of independent traversals:

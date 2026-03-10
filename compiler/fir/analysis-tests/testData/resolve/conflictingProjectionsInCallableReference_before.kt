@@ -15,10 +15,10 @@ class B<out T> {
 }
 
 fun test() {
-    A<<!CONFLICTING_PROJECTION!>out<!> String>::foo
+    A<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>out<!> String>::foo
     A<<!REDUNDANT_PROJECTION!>in<!> String>::foo
     B<<!REDUNDANT_PROJECTION!>out<!> String>::foo
-    B<<!CONFLICTING_PROJECTION!>in<!> String>::foo
+    B<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>in<!> String>::foo
 
     A<*>::foo
     B<*>::foo
@@ -43,11 +43,11 @@ typealias TB<X> = B<X>
 
 fun test() {
     TA<<!REDUNDANT_PROJECTION!>in<!> String>::foo
-    TA<<!CONFLICTING_PROJECTION_IN_TYPEALIAS_EXPANSION!>out<!> String>::foo
+    TA<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>out<!> String>::foo
     TA<String>::foo
     TA<*>::foo
 
-    TB<<!CONFLICTING_PROJECTION_IN_TYPEALIAS_EXPANSION!>in<!> String>::foo
+    TB<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>in<!> String>::foo
     TB<<!REDUNDANT_PROJECTION!>out<!> String>::foo
     TB<String>::foo
     TB<*>::foo
@@ -87,8 +87,8 @@ class A<in T, out S> {
 
 fun test() {
     A<<!REDUNDANT_PROJECTION!>in<!> String, <!REDUNDANT_PROJECTION!>out<!> Int>::foo
-    A<<!CONFLICTING_PROJECTION!>out<!> String, <!CONFLICTING_PROJECTION!>in<!> Int>::foo
-    A<<!REDUNDANT_PROJECTION!>in<!> String, <!CONFLICTING_PROJECTION!>in<!> Int>::foo
+    A<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>out<!> String, <!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>in<!> Int>::foo
+    A<<!REDUNDANT_PROJECTION!>in<!> String, <!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>in<!> Int>::foo
 }
 
 // FILE: inner/local/file5.kt
@@ -106,7 +106,7 @@ fun <X> test() {
         }
     }
     A<<!REDUNDANT_PROJECTION!>in<!> String>.B<String>::foo
-    A<<!CONFLICTING_PROJECTION!>out<!> String>.B<String>::foo
+    A<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>out<!> String>.B<String>::foo
 }
 
 // FILE: two/type/aliases/file6.kt
@@ -121,7 +121,7 @@ typealias T1<X> = C<X>
 typealias T2<X> = T1<X>
 
 fun test() {
-    T2<<!CONFLICTING_PROJECTION_IN_TYPEALIAS_EXPANSION!>out<!> String>::foo
+    T2<<!CONFLICTING_PROJECTION_IN_CALLABLE_REFERENCE_WARNING!>out<!> String>::foo
     T2<<!REDUNDANT_PROJECTION!>in<!> Int>::foo
 }
 
