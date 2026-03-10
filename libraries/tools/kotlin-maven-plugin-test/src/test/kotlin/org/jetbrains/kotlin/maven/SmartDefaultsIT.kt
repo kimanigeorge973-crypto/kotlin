@@ -72,6 +72,22 @@ class SmartDefaultsIT : KotlinMavenTestBase() {
     }
 
     @MavenTest
+    fun `test-smart-defaults-empty-execution-level-source-dirs-fallback-to-smart-defaults`(
+        mavenVersion: TestVersions.Maven,
+    ) {
+        val buildOptions = if (isWindowsHost) buildOptions.copy(useKotlinDaemon = false) else buildOptions
+        testProject("test-smart-defaults-empty-execution-source-dirs", mavenVersion, buildOptions) {
+            build("compile", "test-compile") {
+                assertBuildLogContains("Kotlin smart defaults are enabled")
+
+                // empty explicit execution-level sourceDirs should be treated as absent
+                assertFileExists("target/classes/sample/DefaultMain.class")
+                assertFileExists("target/test-classes/sample/DefaultTest.class")
+            }
+        }
+    }
+
+    @MavenTest
     fun `test-smart-defaults-execution-level-source-dirs-do-not-produce-duplicate-source-root-warnings`(
         mavenVersion: TestVersions.Maven,
     ) {
