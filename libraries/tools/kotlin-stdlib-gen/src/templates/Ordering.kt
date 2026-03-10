@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2025 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -401,7 +401,7 @@ object Ordering : TemplateGroupBase() {
             Returns a list of all elements sorted according to the specified [comparator].
             """
         }
-        specialFor(ArraysOfObjects, ArraysOfPrimitives) {
+        specialFor(ArraysOfObjects) {
             doc {
                 """
                 Returns a list of all elements sorted according to the specified [comparator].
@@ -461,7 +461,7 @@ object Ordering : TemplateGroupBase() {
     } builder {
         doc {
             """
-            Returns an array with all elements of this array sorted according the specified [comparator].
+            Returns an array with all elements of this array sorted according to the specified [comparator].
             
             Use [sortedWith] if you need to get the result in a list.
             """.trimIndent()
