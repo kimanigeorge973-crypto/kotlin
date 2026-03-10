@@ -33,7 +33,6 @@ internal fun equals(obj1: dynamic, obj2: dynamic): Boolean {
         if (obj1 === obj2) return true
         if (obj1.`$id` != obj2.`$id`) return false
         if (obj1.`$flags` != obj2.`$flags`) return false
-        if (obj1.`$arity` != obj2.`$arity`) return false
 
         if (obj1.`$bound` == null && obj2.`$bound` == null) return true
         if (obj1.`$bound` === obj2.`$bound`) return true
@@ -175,7 +174,6 @@ internal fun getStringHashCode(str: String): Int {
 internal fun getCallableReferenceHashCode(obj: dynamic): Int {
     var hash: Int = obj.`$flags`.unsafeCast<Int>()
     hash = (31 * hash) + obj.`$id`.hashCode()
-    hash = (31 * hash) + (obj.`$arity` ?: -1).unsafeCast<Int>()
 
     val bound = obj.`$bound`
     if (bound != null && isJsArray(bound)) {

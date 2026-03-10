@@ -17,6 +17,8 @@ class V {
 
 fun topLevelFun(): String = ""
 
+val refInVariable = ::topLevelFun
+
 fun box(): String {
     val v0 = V()
     val v1 = V()
@@ -29,6 +31,15 @@ fun box(): String {
 
     checkNotEqual(v0::memberFun, V::memberFun)
     checkNotEqual(v0::memberFun, v1::memberFun)
+
+    if (::topLevelFun === ::topLevelFun) throw AssertionError("::topLevelFun should not be identity-equal to ::topLevelFun")
+
+    // Saved reference in variable
+    checkEqual(refInVariable, ::topLevelFun)
+
+    // hashCode stability
+    val ref = ::topLevelFun
+    if (ref.hashCode() != ref.hashCode()) throw AssertionError("hashCode should be stable")
 
     return "OK"
 }
