@@ -53,7 +53,7 @@ Use `AskUserQuestion` to ask these questions (all in one call):
 ### Question 3: Call return type (only if `KtResolvableCall`)
 **Header:** "Call type"
 **Question:** "What should `resolveCall()` return for `<KtPsiType>`?"
-- `KaFunctionCall<KaConstructorSymbol>`
+- `KaFunctiponCall<KaConstructorSymbol>`
 - `KaDelegatedConstructorCall`
 - `KaAnnotationCall`
 - `KaFunctionCall<KaNamedFunctionSymbol>`
