@@ -41,20 +41,6 @@ internal val IrSimpleFunction.returnsResultOfStdlibCall: Boolean
 
 // Criteria for delegate optimizations on the JVM.
 // All cases must be reflected in isJvmOptimizableDelegate() to inform the kotlinx-serialization plugin.
-internal fun IrProperty.getPropertyReferenceForOptimizableDelegatedProperty(): IrPropertyReference? {
-    if (!isDelegated || isFakeOverride || backingField == null) return null
-
-    val delegate = backingField?.initializer?.expression
-    if (delegate !is IrPropertyReference ||
-        getter?.returnsResultOfStdlibCall == false ||
-        setter?.returnsResultOfStdlibCall == false
-    ) return null
-
-    return delegate
-}
-
-// Criteria for delegate optimizations on the JVM.
-// All cases must be reflected in isJvmOptimizableDelegate() to inform the kotlinx-serialization plugin.
 internal fun IrProperty.getRichPropertyReferenceForOptimizableDelegatedProperty(): IrRichPropertyReference? {
     if (!isDelegated || isFakeOverride || backingField == null) return null
 
@@ -90,7 +76,7 @@ internal fun IrProperty.getSingletonOrConstantForOptimizableDelegatedProperty():
 /** Returns true if a delegate is optimizable on the JVM, omitting a `$delegate` auxiliary property */
 fun IrProperty.isJvmOptimizableDelegate(): Boolean =
     isDelegated && !isFakeOverride && backingField != null && // fast path
-            (getPropertyReferenceForOptimizableDelegatedProperty() != null || getSingletonOrConstantForOptimizableDelegatedProperty() != null)
+            getSingletonOrConstantForOptimizableDelegatedProperty() != null
 
 internal val IrRichPropertyReference.constInitializer: IrExpression?
     get() {
