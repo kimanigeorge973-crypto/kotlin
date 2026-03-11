@@ -68,13 +68,17 @@ fun Project.customCompilerTest(
             implicitDependencies("org.jetbrains.kotlin:kotlin-native-prebuilt:${version.rawVersion}:linux-x86_64@tar.gz")
         }
     }
-    val unarchiveCustomCompiler = getOrCreateTask<Copy>("unarchiveCustomCompiler_$version") {
-        from(customCompiler.map { file -> tarTree(file) }.single())
-
-        // Cannot use exactly `DependencyDirectories.localKonanDir`, since it's wrong to declare whole `~/.konan/` as an output of `unarchiveCustomCompiler_` task
-        // Should it be so, Gradle fails on implicit dependency: task `:kotlin-native:llvmInterop:genInteropStubs` uses files in `~/.konan/dependencies/llvm-19-aarch64*`
-        // So, a subfolder within `~/.konan/` is needed for output of `unarchiveCustomCompiler_$version` task
-        into(DependencyDirectories.localKonanDir.resolve("kotlin-native-prebuilt-releases"))
+    val unarchiveTaskName = "unarchiveCustomCompiler_$version"
+    val unarchiveCustomCompiler = if (!tasks.names.contains(unarchiveTaskName)) {
+        tasks.register<Copy>(unarchiveTaskName) {
+            from(customCompiler.map { file -> tarTree(file) }.single())
+            // Cannot use exactly `DependencyDirectories.localKonanDir`, since it's wrong to declare whole `~/.konan/` as an output of `unarchiveCustomCompiler_` task
+            // Should it be so, Gradle fails on implicit dependency: task `:kotlin-native:llvmInterop:genInteropStubs` uses files in `~/.konan/dependencies/llvm-19-aarch64*`
+            // So, a subfolder within `~/.konan/` is needed for output of `unarchiveCustomCompiler_$version` task
+            into(DependencyDirectories.localKonanDir.resolve("kotlin-native-prebuilt-releases"))
+        }
+    } else {
+        tasks.named<Copy>(unarchiveTaskName)
     }
     return projectTests.nativeTestTask(
         taskName,
